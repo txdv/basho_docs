@@ -237,6 +237,10 @@ riakcs:
       - "[[Configuring Riak CS]]"
       - "[[Configuring Stanchion]]"
       - "[[Configuring an S3 client]]"
+  - title: "Multi Data Center"
+    sub:
+      - "[[Multi Data Center Overview]]"
+      - "[[Configuring Multi Data Center]]"
   - title: "System Features"
     sub:
       # - "[[System Features Overview|System Features]]"
