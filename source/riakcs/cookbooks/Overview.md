@@ -1,5 +1,5 @@
 ---
-title: Multi Data Center Overview
+title: Riak CS Multi Data Center Overview
 project: riakcs
 version: 1.3.0+
 document: cookbook
