@@ -1,0 +1,108 @@
+---
+title: Try Riak
+project: riak
+version: 1.2.0+
+document: tutorials
+toc: false
+audience: beginner
+keywords: [mapreduce, search, indexes]
+interest: false
+versions: false
+---
+
+p You may have heard a bit about Riak before finding this page, nothing beats rolling up your sleeves and actually using a new tool.
+
+h2 Setup a Cluster
+h4 Installing Riak
+p Choose your operating system
+
+ul.nav.nav-tabs
+  li.active
+    a href="#install-debian" data-toggle="tab" Debian or Ubuntu
+  li
+    a href="#install-freebsd" data-toggle="tab" FreeBSD
+  li
+    a href="#install-osx" data-toggle="tab" MacOSX
+  li
+    a href="#install-rhel" data-toggle="tab" Redhat or CentOS
+  li
+    a href="#install-other" data-toggle="tab" Others
+
+.tab-content
+  #install-debian.tab-pane.active
+    .code
+      pre sudo apt-get install riak
+    .console
+  #install-freebsd.tab-pane
+    .code
+      pre sudo pkg_add -r http://downloads.basho.com.s3-website-us-east-1.amazonaws.com/riak/1.2/1.2.1/freebsd/9/riak-1.2.1-FreeBSD-amd64.tbz
+    .console
+  #install-osx.tab-pane
+    .code
+      pre brew install riak
+    .console
+  #install-rhel.tab-pane
+    .code
+      pre sudo yum install riak
+    .console
+  #install-other.tab-pane
+    p If you use an OS not covered above, fear not. Riak has packages for other operating systems, such as SmartOS, SUSE, and Windows Azure.
+
+p Normally you'll start by downloading one of the [[Riak packages|Downloads]], and following the given install instructions. We'll make it easy on you and just let you use one of ours we have lying around.
+
+javascript:
+  $(function() {
+    $('ul.nav-tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    consoles = {}
+    $('.tab-content div[id^=install]').each(function(){
+      var id = $(this).attr('id')
+      consoles[id] = new window.Console('#'+id+' .console');
+    });
+  });
+
+
+h4 Configuring a Single Node
+p change backend to be memory riak_kv_memory_backend
+p change all 127.0.0.1 values to a given ip address
+p script to scp the file to the other nodes
+
+h4 Making a Cluster
+
+/ p While we appreciate your enthusiasm, for the purposes of this tutorial please keep to the sspecified values.
+
+h2 Querying
+
+ul.nav.nav-tabs
+  li.active
+    a href="#query-curl" data-toggle="tab" cURL
+  li
+    a href="#query-js" data-toggle="tab" JavaScript
+  li
+    a href="#query-ruby" data-toggle="tab" Ruby
+
+.tab-content
+  #query-curl.tab-pane.active
+    p CURL ALL THE THINGS
+  #query-js.tab-pane
+    p JavaScript ALL THE THINGS
+  #query-ruby.tab-pane
+    p Ruby ALL THE THINGS
+
+/ h5 Java
+/ h5 Python
+/ h5 PHP
+/ h5 Perl?
+/ h5 Erlang?
+
+/ Notes:
+/ * Code samples
+/ * Erlang M/R
+/ * Internal Links
+
+/ - language specific tutorials, written to API
+
+/ div
+/ script src="https://gist.github.com/4227447.js?file=new_client.rb"

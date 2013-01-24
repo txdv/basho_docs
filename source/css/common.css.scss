@@ -1231,3 +1231,15 @@ article {
 .breadcrumbs {
   display:none;
 }
+
+div[role="main"] .gist-file {
+  .gist-meta {
+    font-size:50%;
+    a {
+      background: transparent;
+      width:auto;
+      margin:0;
+      padding:0;
+    }
+  }
+}

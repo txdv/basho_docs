@@ -1,0 +1,97 @@
+body {
+  font-family: 'Century Gothic W01', sans-serif;
+  // color: #828282;
+  font-size: 19px;
+  header {
+    text-align: center;
+    //font-size: 42px;
+    //line-height: 30px;
+  }
+}
+/*
+#main {
+  background: #424242;
+  background-image: linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+  background-image: -o-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+  background-image: -moz-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+  background-image: -webkit-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+  background-image: -ms-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+  background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0.03, rgb(0,0,0)),
+    color-stop(0.69, rgb(66,66,66))
+  );
+
+  border: 2px solid #555;
+
+  -webkit-border-radius: 8px;
+  -moz-border-radius:    8px;
+  -ms-border-radius:     8px;
+  -o-border-radius:      8px;
+  border-radius:         8px;
+
+  -webkit-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+  -moz-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+  -ms-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+  -o-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+  box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+
+  -webkit-box-reflect: below 8px -webkit-gradient(linear, left bottom, left top, from(rgba(255,255,255,0.5)), color-stop(0.6, transparent), to(transparent));
+
+  padding:10px;
+*/
+  .console {
+    background: #424242;
+    background-image: linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+    background-image: -o-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+    background-image: -moz-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+    background-image: -webkit-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+    background-image: -ms-linear-gradient(bottom, rgb(0,0,0) 3%, rgb(66,66,66) 69%);
+    background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.03, rgb(0,0,0)),
+      color-stop(0.69, rgb(66,66,66))
+    );
+
+    border: 2px solid #555;
+
+    -webkit-border-radius: 8px;
+    -moz-border-radius:    8px;
+    -ms-border-radius:     8px;
+    -o-border-radius:      8px;
+    border-radius:         8px;
+
+    -webkit-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+    -moz-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+    -ms-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+    -o-box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+    box-shadow: inset 0px 5px 8px 0px #AAA, 0px 5px 8px rgba(50, 50, 50, 0.93);
+
+    height: 150px;
+    overflow-y: auto;
+    padding: 1em;
+    // padding-bottom: 24px;
+
+    color: white;
+    font-family: Monaco, Courier, font-monospace;
+    font-size: 12pt;
+
+    .jquery-console-focus {
+      .jquery-console-cursor {
+        background: #999;
+        color: #999;
+        font-weight: bold;
+      }
+    }
+
+    .jquery-console-message-value {
+      color:#1ad027;
+      padding:0.1em;
+      padding-left:1em;
+    }
+  }
+// }
