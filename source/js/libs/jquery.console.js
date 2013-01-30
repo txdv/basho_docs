@@ -159,7 +159,7 @@
         extern.reset = function(){
             var welcome = (typeof config.welcomeMessage != 'undefined');
             // inner.parent().fadeOut('fast', function(){
-                inner.find('div').each(function(){
+                inner.find('div,span').each(function(){
                     $(this).remove();
                 });
                 newPromptBox();
@@ -205,8 +205,8 @@
         function newPromptBox() {
             column = 0;
             promptText = '';
-      ringn = 0; // Reset the position of the history ring
-      enableInput();
+            ringn = 0; // Reset the position of the history ring
+            enableInput();
             promptBox = $('<div class="jquery-console-prompt-box"></div>');
             var label = $('<span class="jquery-console-prompt-label"></span>');
             var labelText = extern.continuedPrompt? continuedPromptLabel : promptLabel;
@@ -223,10 +223,10 @@
         container.click(function(){
             inner.addClass('jquery-console-focus');
             inner.removeClass('jquery-console-nofocus');
-            scrollToBottom();
             var top = $(window).scrollTop();
             typer.focus();
             $(window).scrollTop(top);
+            scrollToBottom();
             return false;
         });
 
@@ -421,7 +421,7 @@
 
   function cancelExecution() {
       if(typeof config.cancelHandle == 'function') {
-    config.cancelHandle();
+        config.cancelHandle();
       }
   }
 
@@ -463,37 +463,69 @@
 
         ////////////////////////////////////////////////////////////////////////
         // Disable input
-  function disableInput() {
-      acceptInput = false;
-  };
+        function disableInput() {
+            acceptInput = false;
+        };
 
         // Enable input
-  function enableInput() {
-      acceptInput = true;
-  }
+        function enableInput() {
+            acceptInput = true;
+        }
+
+        function commandResultRecurse(pos,msg,className) {
+          if(msg.length <= pos) {
+            newPromptBox();
+            return;
+          }
+          var ret = msg[pos];
+          if(ret['complete']) {
+            ret['complete'](ret.msg);
+          } else {
+            message(ret.msg,(ret.className || className),ret.newline);
+          }
+          scrollToBottom();
+
+          if(extern.cancelOutput) {
+            message("^C",className);
+            newPromptBox();
+          } else {
+            setTimeout(function(){
+              commandResultRecurse(pos+1,msg,(ret.className || className));
+            }, ret.pause * 1000);
+          }
+        }
 
         ////////////////////////////////////////////////////////////////////////
         // Reset the prompt in invalid command
         function commandResult(msg,className) {
             column = -1;
+            pausePrompt = true;
             updatePromptDisplay();
             if (typeof msg == 'string') {
+                pausePrompt = false;
                 message(msg,className);
             } else if ($.isArray(msg)) {
-                for (var x in msg) {
-                    var ret = msg[x];
-                    message(ret.msg,ret.className);
-                }
+                setTimeout(function(){
+                  commandResultRecurse(0,msg,className);
+                }, 0);
+                // for (var x in msg) {
+                //     var ret = msg[x];
+                //     message(ret.msg,ret.className);
+                // }
             } else { // Assume it's a DOM node or jQuery object.
               inner.append(msg);
             }
-            newPromptBox();
+            if(!pausePrompt) newPromptBox();
         };
 
         ////////////////////////////////////////////////////////////////////////
         // Display a message
-        function message(msg,className) {
-            var mesg = $('<div class="jquery-console-message"></div>');
+        function message(msg,className,nl) {
+            var mesg = null;
+            if(!nl)
+              mesg = $('<div class="jquery-console-message"></div>');
+            else
+              mesg = $('<span class="jquery-console-message"></span>');
             if (className) mesg.addClass(className);
             mesg.filledText(msg).hide();
             inner.append(mesg);

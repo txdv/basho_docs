@@ -1,13 +1,3 @@
-body {
-  font-family: 'Century Gothic W01', sans-serif;
-  // color: #828282;
-  font-size: 19px;
-  header {
-    text-align: center;
-    //font-size: 42px;
-    //line-height: 30px;
-  }
-}
 /*
 #main {
   background: #424242;
@@ -88,10 +78,11 @@ body {
       }
     }
 
-    .jquery-console-message-value {
+    .jquery-console-message-value,
+    .jquery-install-message {
       color:#1ad027;
       padding:0.1em;
-      padding-left:1em;
+      //padding-left:1em;
     }
   }
 // }

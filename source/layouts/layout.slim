@@ -20,10 +20,6 @@ head(class=data.page.document)
   == stylesheet_link_tag "all"
   == javascript_include_tag "all"
   == javascript_include_tag "standalone/version-bar"
-
-  == stylesheet_link_tag "http://twitter.github.com/bootstrap/assets/css/bootstrap.css"
-  == javascript_include_tag "http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"
-
 - classnames = [(data.page.project || $default_project)]
 - classnames << 'dual' if data.page.dual
 body class=classnames.join(' ') id=data.page.body_id

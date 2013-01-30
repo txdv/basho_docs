@@ -1,0 +1,57 @@
+#try-riak div[role="main"] {
+  section.lesson {
+    font-family: 'Century Gothic W01', sans-serif;
+    font-size: 19px;
+
+    border-radius: 5px;
+    border: 1px solid #9ec6df;
+    padding: 15px;
+    background-color: rgba(235,235,255,0.4);
+    margin-bottom:1em;
+    .title {
+      border: 1px solid #9ec6df;
+      margin:-16px;
+      padding:15px;
+      cursor:pointer;
+      &:hover {
+        text-decoration:underline;
+      }
+    }
+    .body {
+      display:none;
+    }
+    .textform {
+      white-space:pre;
+      height:180px;
+      overflow:auto;
+      background-color: rgba(255,255,255,0.5);
+    }
+    .copy {
+      font-size:80%;
+      padding:3px;
+      cursor:pointer;
+      border: 1px solid #AAA;
+      -webkit-border-radius: 3px;
+      -moz-border-radius:    3px;
+      -ms-border-radius:     3px;
+      -o-border-radius:      3px;
+      border-radius:         3px;
+      -webkit-box-shadow: inset 0px 2px 2px 0px #CCC;
+      -moz-box-shadow: inset 0px 2px 2px 0px #CCC;
+      -ms-box-shadow: inset 0px 2px 2px 0px #CCC;
+      -o-box-shadow: inset 0px 2px 2px 0px #CCC;
+      box-shadow: inset 0px 2px 2px 0px #CCC;
+
+      &:hover {
+        color:#fff;
+        border: 1px solid #d97706;
+        background-color:#f99d33;
+        -webkit-box-shadow: inset 0px 1px 1px 0px #FCC;
+        -moz-box-shadow: inset 0px 1px 1px 0px #FCC;
+        -ms-box-shadow: inset 0px 1px 1px 0px #FCC;
+        -o-box-shadow: inset 0px 1px 1px 0px #FCC;
+        box-shadow: inset 0px 1px 1px 0px #FCC;
+      }
+    }
+  }
+}
