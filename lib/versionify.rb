@@ -21,7 +21,7 @@ module Rack::Middleman
     def alter_route(env, var)
       unless env[var] =~ %r"\/((?:#{projects_regex}|shared)\/[^\/]+)\/?(index\.html)?$"
         if env.include?(var)
-          env[var] = env[var].sub(%r"\/(?:#{projects_regex}|shared)\/[\d\.rc]+", '')
+          env[var] = env[var].sub(%r"\/(?:#{projects_regex}|shared)\/(?:[\d\.rc]+|latest)", '')
         end
       else
         env[var] = "/#{$1}/index.html"
@@ -52,7 +52,7 @@ module VersionifyPaths
     def manipulate_resource_list(resources)
       resources.each do |resource|
         path = resource.destination_path
-        next if path =~ /^(?:#{projects_regex})\/[\d\.rc]+\/index\.html/
+        next if path =~ /^(?:#{projects_regex})\/(?:[\d\.rc]+|latest)\/index\.html/
         resource.destination_path = path.sub(/^(#{projects_regex})\//, '')
       end
     end
@@ -89,11 +89,11 @@ module VersionDirs
           f.sub(/((?:#{projects_regex})\/)[^\/]+(\/.*?)/, '\1latest\2')
         end
 
-        # If we're rendering the current version, then generate the latest
-        def include_latest?(project)
-          versions ||= YAML::load(File.open('data/versions.yml'))
-          versions['currents'][project] == $versions[project.to_sym]
-        end
+        # # If we're rendering the current version, then generate the latest
+        # def include_latest?(project)
+        #   versions ||= YAML::load(File.open('data/versions.yml'))
+        #   versions['currents'][project] == $versions[project.to_sym]
+        # end
 
         def cleanup(dir)
           entries = Dir.entries(dir) - [".", ".."]
@@ -135,7 +135,7 @@ module VersionDirs
             # if we don't include the latest, delete this
             next if include_latest?(project)
           # project root files should also copy to latest
-          elsif f =~ /\/(?:#{projects_regex})\/[\d\.rc]+\/index\.html?$/
+          elsif f =~ /\/(?:#{projects_regex})\/(?:[\d\.rc]+|latest)\/index\.html?$/
             if include_latest?(project)
               copy(f, change_version_to_latest(f))
             end

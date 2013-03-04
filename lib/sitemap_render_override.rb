@@ -188,13 +188,13 @@ module SitemapRenderOverride
         next "<a #{anchor.gsub(href, url)}>"
       end
 
-      match_index = href =~ /^\/(#{projects_regex})\/[\d\.rc]+\/$/
+      match_index = href =~ /^\/(#{projects_regex})\/(?:[\d\.rc]+|latest)\/$/
 
       # force the root page to point to the latest projcets
       if $production && project == :root && match_index
         "<a href=\"/#{$1}/latest/\">"
       # /riak*/version/ links should be relative, unless they cross projects
-      elsif match_index #href =~ /^\/(riak[^\/]*?)\/[\d\.rc]+\/$/
+      elsif match_index
         if ($1 || $default_project).to_sym == project
           url = prepend_dir_depth('', depth_to_root)
           "<a #{anchor.gsub(href, url)}>"

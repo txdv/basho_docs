@@ -33,6 +33,9 @@ ready do
       project = $1
       version = $versions[project.to_sym]
       page "/#{project}/#{version}/index.html", :proxy => proxy, :directory_index => false, :ignore => true
+      if include_latest?(project)
+        page "/#{project}/latest/index.html", :proxy => proxy, :directory_index => false, :ignore => true
+      end
     else
       new_path.sub!(%r"^\/?(#{projects_regex})\/", '/')
       new_path.gsub!(/\.html$/, '/index.html') unless proxy =~ /index\.html$/
