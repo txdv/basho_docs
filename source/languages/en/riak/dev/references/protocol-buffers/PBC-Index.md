@@ -49,7 +49,7 @@ Index queries are one of two types
 Pagination
 
 * **max_results** - Number of results to return
-* **continuation** - String returned in paginated response for requesting the next page of results
+* **continuation** - Value returned in paginated response to use in conjunction with `max_results` to request the next page of results
 
 Optional Parameters
 
