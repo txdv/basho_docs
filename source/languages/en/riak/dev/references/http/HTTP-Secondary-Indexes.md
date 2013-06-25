@@ -38,7 +38,7 @@ GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true
 
 {{#1.4.0+}}
 ### Pagination
-Add the parameter `max_results` for pagination, and read (and provide on the next request) the `continuation` value from the results for the following page.
+Add the parameter `max_results` for pagination. This will limit the results and provide for the next request a `continuation` value.
 
 ```
 GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true&max_results=500
