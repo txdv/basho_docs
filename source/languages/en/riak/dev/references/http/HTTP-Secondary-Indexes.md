@@ -47,6 +47,15 @@ GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true&max_results=
 
 {{/1.4.0+}}
 
+
+{{#1.4.0+}}
+### Streaming
+```
+GET /buckets/mybucket/index/myindex_bin/start/end?stream=true
+```
+
+{{/1.4.0+}}
+
 ## Response
 
 Normal status codes:
