@@ -9,20 +9,43 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-[[Secondary Indexes]] allows an application to tag a Riak object with one or more field/value pairs. The object is indexed under these field/value pairs, and the application can later query the index to retrieve a list of matching keys.
+[[Secondary Indexes (2i)|Using Secondary Indexes]] allows an application to tag a Riak object with one or more field/value pairs. The object is indexed under these field/value pairs, and the application can later query the index to retrieve a list of matching keys.
+
+See the above link ([[Using Secondary Indexes]]) for more examples and instructions on adding index values to Riak objects.
 
 ## Request
 
-Exact Match:
+### Exact match
 
 ```bash
 GET /buckets/mybucket/index/myindex_bin/value
 ```
 
-Or Range Query:
+### Range query
 ```
 GET /buckets/mybucket/index/myindex_bin/start/end
 ```
+
+{{#1.4.0+}}
+#### Range query with terms
+To see the index values matched by the range, use `return_terms=true`.
+
+```
+GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true
+```
+{{/1.4.0+}}
+
+
+{{#1.4.0+}}
+### Pagination
+Add the parameter `max_results` for pagination, and read (and provide on the next request) the `continuation` value from the results for the following page.
+
+```
+GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true&max_results=500
+GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true&max_results=500&continuation=g2gCbQAAAAdyaXBqYWtlbQAAABIzNDkyMjA2ODcwNTcxMjk0NzM=
+```
+
+{{/1.4.0+}}
 
 ## Response
 
