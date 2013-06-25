@@ -24,7 +24,7 @@ message RpbIndexReq {
     required bytes bucket = 1;
     required bytes index = 2;
     required IndexQueryType qtype = 3;
-    optional bytes key = 4; // key here means equals value for index?
+    optional bytes key = 4;
     optional bytes range_min = 5;
     optional bytes range_max = 6;
     optional bool return_terms = 7;
