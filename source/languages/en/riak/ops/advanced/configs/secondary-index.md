@@ -21,7 +21,7 @@ For information on programming with 2i, see [[Using Secondary Indexes]].
 
 ### Migrating an Existing Cluster
 
-**Warning**: this should be done with caution to avoid overburdening your cluster. This will involve migrating alldata on any given node to other nodes in the cluster, resulting in higher than usual network and disk I/O.
+**Warning**: this should be done with caution to avoid overburdening your cluster. This will involve migrating all data on any given node to other nodes in the cluster, resulting in higher than usual network and disk I/O.
 
 These steps will remove a node from the cluster, enable a backend that supports 2i, and re-add it to the cluster.
 
@@ -60,8 +60,6 @@ This may seem inefficient in the cases where data is duplicated, but it leads to
 ## Index Lookups
 
 Index queries are only supported on one index field at a time. The query can specify either an exact match or a range of values. Range queries are inclusive, so results may match the start or end value. The query operation returns a list of matching keys. The application may then decide to loop through each key, looking up the value from Riak.
-
-Currently, the result order is undefined, and there is no way to directly pull back a list of objects using secondary indexes. This may change in the future.
 
 An index query can be piped into a MapReduce job, allowing applications to sort, filter, or process query results in parallel across a cluster.
 
