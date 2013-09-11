@@ -59,6 +59,7 @@ riak-admin cluster leave <node>
 ```
 ## cluster force-remove
 Remove &lt;node&gt; from the cluster without first handing off data partitions. This command is designed for crashed, unrecoverable nodes, and should be used with caution.
+If a replacement node has been provisioned, cluster force-replace should be used instead.
 
 ```bash
 riak-admin cluster force-remove <node>
