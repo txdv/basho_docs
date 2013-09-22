@@ -8,30 +8,27 @@ audience: beginner
 keywords: [developers, client, clojure]
 ---
 
-If you haven't set up a Riak Node and started it, please visit the
-[[Prerequisites|Taste of Riak: Prerequisites]] first.
+如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
 
-To try this flavor of Riak, a working installation of Java and
-[Leiningen](https://github.com/technomancy/leiningen) are required.
+要使用本文介绍的 Riak 开发方法，必须先正确安装 Java 和 [Leiningen](https://github.com/technomancy/leiningen)。
 
-### Client Setup
+### 安装客户端
 
-[Welle](http://clojureriak.info/) is a community-maintained Riak client
-library for Clojure.
+[Welle](http://clojureriak.info/) 是由社区维护的 Clojure 语言 Riak 客户端。
 
-First, add Welle as a dependency to your project.
+首先，把 Welle 加入项目的依赖库。
 
 ```clojure
 [com.novemberain/welle "1.5.0"]
 ```
 
-Start a Clojure repl with Leiningen:
+使用 Leiningen 启动 Clojure REPL：
 
 ```bash
 $ lein repl
 ```
 
-Then, enter the following into the repl:
+然后，输入下面的代码：
 
 ```clojure
 (ns taste-of-riak.docs.examples
@@ -45,44 +42,40 @@ Then, enter the following into the repl:
 (wc/connect! "http://127.0.0.1:8098/riak")
 ```
 
-If you set up a local Riak cluster using the [[five minute install]] method,
-use this code snippet instead:
+如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请输入下面的代码：
 
 ```clojure
 ;; Connects to a Riak node at 127.0.0.1:10018
 (wc/connect! "http://127.0.0.1:10018/riak")
 ```
 
-We are now ready to start interacting with Riak.
+现在可以和 Riak 交互了。
 
-### Creating Objects in Riak
+### 在 Riak 中创建对象
 
-First, let’s create a few objects and a bucket to keep them in.
+首先，我们来创建一个 bucket，然后在其中创建几个对象。
 
 ```clojure
 (wb/create "test")
 (kv/store "test" "one" 1 :content-type "application/clojure")
 ```
 
-In this first example we have stored the integer 1 with the lookup key of
-‘one’.  Next let’s store the string "two" as bytes with a matching key.
+上面的例子中我们存储了整数 1，查询所用的键设为“one”。下面我们要存储一个简单的字符串“two”，并设定一个键。
 
 ```clojure
 (kv/store "test" "two" (.getBytes "two"))
 ```
 
-That was easy.  Finally, let’s store a bit of JSON.  You will probably
-recognize the pattern by now.
+上面的例子都很简单。下面来存储一些 JSON 数据。你现在应该已经熟知存储的过程了。
 
 ```clojure
 (def three {:val 3})
 (kv/store "test" "three" three :content-type Constants/CTYPE_JSON_UTF8)
 ```
 
-### Reading Objects from Riak
+### 从 Riak 中读取对象
 
-Now that we have a few objects stored, let’s retrieve them and make sure they
-contain the values we expect.
+我们已经存储了几个对象，下面我们要读取这些对象，确保保存的值是正确地。
 
 ```clojure
 (:value (first (kv/fetch "test" "one")))
@@ -94,21 +87,19 @@ contain the values we expect.
 ; 3
 ```
 
-That was easy.  We simply request the objects by key.
+很简单，只需通过键查询即可。
 
-### Deleting Objects from Riak
+### 从 Riak 中删除对象
 
-As a last step, we’ll demonstrate how to delete data.
+最后，我们来演示如何删除数据。
 
 ```clojure
 (kv/delete "test" "one")
 ```
 
-### Working with Complex Objects
+### 处理复杂对象
 
-Since the world is a little more complicated than simple integers and bits of
-strings, let’s see how we can work with more complex objects.  Take for
-example, this map hash that encapsulates some knowledge about a book.
+对象往往都是很复杂的，不止简单的整数或字符串，下面来看一下如何处理更复杂地对象。举个例子，下面 Map Hash 包含了一本书的信息。
 
 ```clojure
 (def book {:isbn "1111979723",
@@ -118,23 +109,21 @@ example, this map hash that encapsulates some knowledge about a book.
            :copies_owned 3})
 ```
 
-Ok, so we have some information about our Moby Dick collection that we want to
-save.  Storing this to Riak should look familiar by now.
+我们要保存就是这本关于 Moby Dick 的书，存储的过程你现在应该很熟练了：
 
 ```clojure
 (wb/create "books")
 (kv/store "books" (:isbn book) book :content-type Constants/CTYPE_JSON_UTF8)
 ```
 
-Here we serialized the Clojure map to a JSON value. If we fetch our book back,
-we'll see a Clojure map again:
+这里我们把 Clojure 的 Map 序列化成了 JSON 格式。如果取回书籍对象，得到的还是 Clojure Map。
 
 ```clojure
 (:value (first (kv/fetch "books" "1111979723")))
 ; {:author "Herman Melville", :title "Moby Dick", :copies_owned 3, :isbn "1111979723", :body "Call me Ishmael. Some years ago..."}
 ```
 
-As you can see from our examples, Welle can serialize/deserialize values in:
+如上所示，Welle 可以序列化并反序列化如下的数据类型：
 
 * JSON
 * JSON in UTF-8
@@ -142,7 +131,7 @@ As you can see from our examples, Welle can serialize/deserialize values in:
 * Text
 * Text in UTF-8
 
-Finally, let’s clean up our mess:
+最后，做些善后工作：
 
 ```clojure
 (kv/delete "books" "1111979723")

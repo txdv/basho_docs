@@ -8,15 +8,15 @@ audience: beginner
 keywords: [developers, 2i]
 ---
 
-Let's install Riak and build a [five node](http://basho.com/why-your-riak-cluster-should-have-at-least-five-nodes/) cluster running on your local machine.
+让我们来再本地电脑上安装 Riak，然后再搭建一个包含 [5 个节点](http://basho.com/why-your-riak-cluster-should-have-at-least-five-nodes/)的集群。
 
-## Install Riak
+## 安装 Riak
 
-Basho's pre-packaged Riak binaries (found under [[Downloads]]) embed the Erlang runtime. However, this tutorial is based on a source build, so if you do not have Erlang already installed, first [[install erlang|Installing Erlang]]. Building Riak from source requires Erlang R15B01.
+Basho 提供的 Riak 安装包（可以在 [[Downloads]] 获取）内嵌了 Erlang 运行时，不过本页的教程是通过源码安装的，所以如果还没安装 Erlang，请先 [[install erlang|Installing Erlang]]。从源码安装 Riak 需要 Erlang R15B01 的支持。
 
-### Get the Source
+### 获取源码
 
-The following links provide platform-specific instructions for downloading and installing Riak from source.
+下面列出的链接包含了针对各平台的说明，告诉你如何下载并从源码安装 Riak。
 
   * [[Debian and Ubuntu|Installing on Debian and Ubuntu#Installing-From-Source]]
   * [[RHEL and CentOS|Installing on RHEL and CentOS#Installing-From-Source]]
@@ -27,20 +27,20 @@ The following links provide platform-specific instructions for downloading and i
   * [[AWS Marketplace|Installing on AWS Marketplace]]
   * [[Unlisted Operating System|Installing Riak from Source]]
 
-### Build Riak
+### 编译 Riak
 
-So now you have a copy of Riak. Time to build it. Do this by accessing the *riak* directory and running `make all`
+下载完毕后就可以编译了，先进入 *riak* 源码所在的目录，然后执行 `make all` 命令。
 
 ```bash
 $ cd riak-{{V.V.V}}
 $ make all
 ```
 
-`make all` grabs all the Riak dependencies for you so that you don't have to chase them down. This will take a few moments.
+`make all` 命令会获取 Riak 的依赖库，所以无需手动下载了。编译可能要花一点时间。
 
-## Start Up Five Nodes
+## 创建 5 个节点
 
-Now that Riak is built, we are going to use [Rebar](https://github.com/basho/rebar), a packaging and build system for Erlang applications, to get four self-contained Riak nodes running on your machine. Tomorrow, when you put Riak into production, Rebar will enable you to ship a pre-built Riak package to your deployment machines. But for now, we will just stick to the four nodes. {{#1.3.0+}}You can set the number of nodes you wish to create via `DEVNODES`{{/1.3.0+}} To start these up, run:
+Riak 编译完后，我们要使用 [Rebar](https://github.com/basho/rebar)（Erlang 程序的打包和编译工具）创建 5 个运行在本地电脑上的 Riak 节点。未来，如果要把 Riak 部署到生产环境中，使用 Rebar 可以把实现编译好的 Riak 上传到服务器。现在我们只关注本地这 5 个节点。{{#1.3.0+}}节点的数量可以通过 `DEVNODES` 指定。{{/1.3.0+}}运行下面的命令来创建节点：
 
 {{#1.3.0+}}
 
@@ -55,32 +55,32 @@ $ make devrel
 ```
 {{/1.3.0-}}
 
-You have just generated a `dev` directory. Let's go into that directory to check out its contents:
+这个命令会创建 `dev` 文件夹，进入这个文件夹看看其中的内容：
 
 ```bash
 $ cd dev; ls
 ```
 
-That should give you the following:
+结果应该是这样的：
 
 ```bash
 dev1       dev2       dev3       dev4       dev5
 ```
 
-Each directory starting with `dev` is a complete package containing a Riak node. We now need to start each node. Let's start with `dev1`
+每个以 `dev` 开头的文件夹都是一个包含完整 Riak 包得节点。接下来我们要启动各个节点。先启动 `dev1`：
 
 ```bash
 $ dev1/bin/riak start
 ```
 
 <div class="note">
-<div class="title">ulimit warning</div>
+<div class="title">ulimit 提示</div>
 
-At this point you may receive a warning message to increase the number of open file handles (ulimit).  See [[Open Files Limit]] for platform-specific instructions on doing this.
+执行上述命令后会看到一个提示信息，告知需要增加文件句柄限制（ulimit）。各平台的具体做法说明请参照 [[Open Files Limit]]。
 
 </div>
 
-Then do the same for `dev2` through `dev5`
+然后对 `dev2` 到 `dev5` 执行相同的命令：
 
 ```bash
 $ dev2/bin/riak start
@@ -89,19 +89,19 @@ $ dev4/bin/riak start
 $ dev5/bin/riak start
 ```
 
-### Check Running Nodes
+### 查看运行中的节点
 
-After you have the nodes up and running, it's time to test them and make sure they are available. You can do this by taking a quick look at your process list. To do this, run:
+启动节点后，要测试一下，确保可用。我们只需查看进程列表，执行下面的命令：
 
 ```bash
 $ ps aux | grep beam
 ```
 
-This should give you details on five running Riak nodes.
+上述命令会给出正在运行的 5 个节点的详细信息。
 
-## Create the Cluster
+## 搭建集群
 
-The next step is to join these five nodes together to form a cluster. You can do this using the Riak Admin tool. Specifically, what we want to do is join `dev2`, `dev3`, `dev4` and `dev5` to `dev1`:
+下一步要把这 5 个节点放在一起搭建成集群。这个过程可以在 Riak Admin 工具中进行。具体而言，我们需要把 `dev2`、`dev3`、`dev4` 和 `dev5` 并入 `dev1`：
 
 ```bash
 $ dev2/bin/riak-admin cluster join dev1@127.0.0.1
@@ -110,14 +110,13 @@ $ dev4/bin/riak-admin cluster join dev1@127.0.0.1
 $ dev5/bin/riak-admin cluster join dev1@127.0.0.1
 ```
 
-To make the above joins take effect, you first must review the `plan`.
+为了保证上述合并操作生效，首先要查看 `plan` 命令：
 
 ```bash
 $ dev1/bin/riak-admin cluster plan
 ```
 
-The plan will print out a synopsis of what it plans to do, and how the cluster will look
-after this is completed.
+上述命令会给出一个概要，说明计划做什么事，以及所有事做完后集群是什么样的：
 
 ```bash
 =============================== Staged Changes ================================
@@ -154,31 +153,28 @@ Transfers resulting from cluster changes: 51
   13 transfers from 'dev1@127.0.0.1' to 'dev2@127.0.0.1'
 ```
 
-Finally, you can commit the batch.
+最后，执行这些批处理：
 
 ```bash
 $ dev2/bin/riak-admin cluster commit
 ```
 
 <div class="info">
-<div class="title">About riak-admin</div>
+<div class="title">关于 riak-admin</div>
 
-riak-admin is Riak's administrative tool. It's used to do any operational tasks
-other than starting and stopping node, e.g. to join and leave a cluster, to back
-up data, and to manage general cluster operations. You can read more about
-[[riak-admin|riak-admin Command Line]].
+riak-admin 是 Riak 的管理工具。除了启动、停止节点之外所有操作都应该使用这个工具，例如加入或剔除集群，备份数据，以及集群的常规操作。详细说明请阅读 [[riak-admin|riak-admin Command Line]]。
 
 </div>
 
-## Test the Cluster
+## 测试集群
 
-Now we now a have a running five node Riak cluster. Let's make sure it's working correctly. For this we have a couple options. A simple option is to run the member-status command.
+现在我们运行了一个包含 5 个节点的 Riak 集群。下面我们来确保一下一切都运行正常。有几种检查方式，一个简单的方法是执行 `member-status` 命令。
 
 ```bash
 $ dev1/bin/riak-admin member-status
 ```
 
-This will give us a high-level view of our cluster, and what percentage of a ring each node manages.
+上述命令会给出集群的概况，以及每个节点中环的使用量。
 
 ```bash
 ================================= Membership ==================================
@@ -193,13 +189,13 @@ valid      18.8%      --      'dev5@127.0.0.1'
 Valid:5 / Leaving:0 / Exiting:0 / Joining:0 / Down:0
 ```
 
-If you want, you can add a file to your Riak cluster and test it's working properly. Let's say, for instance, we wanted to add an image and make sure it was accessible. First, copy an image to your directory if you don't already have one:
+如果需要，可以在 Riak 集群中放一个文件，测试相关功能是否正常。假设我们要放一个图片，测试是否可以读取。首先，复制一个图片到目录中：
 
 ```bash
 $ cp ~/image/location/image_name.jpg .
 ```
 
-We can then PUT that image into Riak using a curl command (your port might differ, check your `etc/app.config` file for a proper `http` port):
+然后使用 curl 命令把图片放入（通过 PUT 请求） Riak 集群中（你要使用的端口可能不同，请查看 `etc/app.config` 找到正确地 `http` 端口）：
 
 ```
 $ curl -XPUT http://127.0.0.1:10018/riak/images/1.jpg \
@@ -207,8 +203,13 @@ $ curl -XPUT http://127.0.0.1:10018/riak/images/1.jpg \
   --data-binary @image_name.jpg
 ```
 
-You can then verify that image was in fact stored. To do this, simply copy the URL where we PUT the image and paste it into a browser. Your image should appear.
+然后你可以检查一下图片是否真的存入了 Riak 集群。过程很简单，复制存入图片时使用地址，在浏览器中打开即可。应该是可以看到图片的。
 
-You should now have a running, five node Riak cluster. Congratulations!
+现在包含 5 个节点的 Riak 集群已经搭建好了。恭喜你！
 
-<div class="note"><div class="title">HTTP interface ports</div>The above configuration sets up nodes with HTTP interfaces listening on ports `10018`, `10028`, `10038` and `10048` for dev1, dev2, dev3, dev4, dev5 respectively. The default port for single nodes to listen on is 8098 and users will need to take note of this when trying to use any of the default other-language client settings.</div>
+<div class="note">
+<div class="title">HTTP interface ports</div>
+
+上面的设置把节点的 HTTP 端口指定为 `10018`、`10028`、`10038` 和 `10048`，分别对应 dev1、dev2、dev3、dev4 和 dev5。如果只有一个节点，默认监听的端口是 8089。如果使用了默认提供的使用其他语言编写的客户端一定要注意这一点。
+
+</div>

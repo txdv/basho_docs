@@ -8,50 +8,47 @@ audience: intermediate
 keywords: [developers, client, ocaml]
 ---
 
-If you haven't set up a Riak Node and started it, please visit the
-[[Prerequisites|Taste of Riak: Prerequisites]] first.
+如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
 
-To try this flavor of Riak, a working installation of [OCaml](http://ocaml.org/) with [OPAM](http://opam.ocamlpro.com/doc/Quick_Install.html) is required. 
+要使用本文介绍的 Riak 开发方法，必须先正确安装含有 [OPAM](http://opam.ocamlpro.com/doc/Quick_Install.html) 的 [OCaml](http://ocaml.org/)。
 
-### Client Setup
+### 安装客户端
 
-The [riak-ocaml-client](http://metadave.github.io/riak-ocaml-client/) is a community-maintained Riak client library for OCaml.
+[riak-ocaml-client](http://metadave.github.io/riak-ocaml-client/) 是由社区维护的 OCaml 语言 Riak 客户端。
 
-First, download the *riak-ocaml-client* via OPAM.
+首先，使用 OPAM 下载 *riak-ocaml-client*。
 
 ```
 opam install oasis
 opam install riak
 ```
 
-Agree to download additional dependencies when prompted by OPAM.
+如果 OPAM 询问是否下载额外的依赖库，请同意。
 
-
-Next, download the `taste-of-ocaml` sample project from Github:
+然后，从 GitHub 上下载 `taste-of-ocaml` 示例程序。
 
 ```
 git clone git@github.com:basho-labs/taste-of-ocaml.git
 cd taste-of-ocaml
 ```
 
-The `src` directory contains a single file titled `taste_of_riak.ml`.
+文件夹 `src` 中只有一个文件，`taste_of_riak.ml`。
 
-The sample code tries to connect to 127.0.0.1, port 8098 by default. If you set up a local Riak cluster using the [[five minute install]] method,
-change the `pbip` let binding to **10017**:
+示例程序默认尝试连接到 127.0.0.1:8098。如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请修改 `pbip`，绑定到端口 **10017**：
 
 ```
  let pbip = 10017 in
  ...
 ```
 
-Let's compile `src/taste_of_riak.ml` using the following commands:
+然后执行下面的命令编译 `src/taste_of_riak.ml`：
 
 ```
 ./configure
 make
 ```
 
-Running the `./taste_of_riak.byte` command should return the following output:
+运行 `./taste_of_riak.byte` 命令，应该得到如下输出：
 
 ```
 $ ./taste_of_riak.byte
@@ -65,18 +62,17 @@ Get: bucket=MyBucket, key = MyKey
 	Not found
 ```
 
-### Connecting
+### 连接
 
-To connect to a Riak node via protocol buffers, you need to specify the IP address and port number. This value can be found in Riak's `app.config` file, under the `riak_api` section's `pb` property.
+要想通过“协议缓存”（protocol buffers）连接到 Riak 节点，必须制定 IP 地址和端口号。这两个值可以在 Riak 的 `app.config` 文件中找到，在 `riak_api` 区的 `pb` 属性下面。
 
-For example:
+例如：
 
-```	
+```
 	{pb, [ {"127.0.0.1", 10017 } ]}
 ```
 
-The `riak_connect_with_defaults` function takes the IP and port number as parameters.
-For example:
+`riak_connect_with_defaults` 函数的参数为 IP 和端口号。例如：
 
 ```
   let pbhost = "127.0.0.1" in
@@ -86,8 +82,7 @@ For example:
      ...
 ```
 
-The Riak OCaml Client uses [Lwt](http://ocsigen.org/lwt/manual/) and the Lwt Syntax extension. The table below can give you an idea of how the syntax preprocesses OCaml to easily support Lwt:
-
+Riak 的 OCaml 客户端使用 [Lwt](http://ocsigen.org/lwt/manual/) 以及 Lwt 句法扩展。下面的表格可以让你了解一下 OCaml 的句法预处理机制是如何简单的支持 Lwt 的：
 
 Without Lwt           | With Lwt
 ----------------------|---------------------
@@ -96,12 +91,12 @@ try                   | try_lwt
 match expr with       | match_lwt expr with
 while expr do         | while_lwt expr do
 raise exn             | raise_lwt exn
-assert expr	           | assert_lwt expr
+assert expr	          | assert_lwt expr
 
 
-### Storing Data in Riak
+### 把数据存入 Riak
 
-Next, we will store some simple data in Riak. Buckets, keys, and values are stored as strings:
+下面，我们要把一些示例数据存入 Riak。Bucket、键和值都是以字符串的形式存储的：
 
 ```
 let my_bucket = "MyBucket" in
@@ -110,23 +105,18 @@ let my_value = "Bar" in
 lwt _result = riak_put conn bucket (Some key) value [] in
 ```
 
-The last parameter, an empty list in this case, specifies the Riak *put options*. 
+最后一个参数，即上述代码中的空列表，指定的是 Riak 的 *put* 选项。
 
-For example, to specify the `Put_return_body` options, use the following:
+例如，要指定 `Put_return_body` 选项，可以这么写：
 
 ```
 let put_options = [Put_return_body true] in
 lwt _result = riak_put conn bucket (Some key) value put_options in
 ```
 
+### 从 Riak 中读取数据
 
-### Fetching Data from Riak
-
-Next, we can fetch data from Riak using a bucket and key. Since the the
-`riak_get` function might not find a value at the specified key, you'll have
-to pattern match against the `Maybe` value returned. If a value exists at the
-specified key, you'll have to pattern match against `Maybe` as well to
-retrieve the actual content at that key.
+我们可以使用 bucket 和键取出数据。因为 `riak_get` 函数可能无法找到指定键对应的值，我们要对返回的 `Maybe` 值进行模式匹配。如果指定的键上有对应的值，还是要对 `Maybe` 进行模式匹配，以保证获取的是该键对应的真实值。
 
 ```
  lwt obj = riak_get conn bucket key [] in
@@ -141,9 +131,9 @@ retrieve the actual content at that key.
                 return ()
 ```
 
-Also, note the `return ()` from Lwt at the end of each clause. 
+注意每个分支结尾处由 Lwt 提供的 `return ()`。
 
-To specify options for the get operation:
+要为获取操作指定选项，可以这么做：
 
 ```
 let get_options = [Get_basic_quorum false; Get_head true] in
@@ -151,10 +141,9 @@ lwt obj = riak_get conn bucket key get_options in
 ...
 ```
 
+### 从 Riak 中删除对象
 
-### Deleting Objects from Riak
-
-If you want to delete data from Riak, simply call the `riak_del` function:
+如果要从 Riak 中删除数据，直接调用 `riak_del` 函数即可：
 
 ```
 let key = "MyKey" in
@@ -163,6 +152,6 @@ lwt _ = riak_del conn bucket key del_options in
     return ()
 ```
 
-### Next steps
+### 下一步
 
-For documentation on all available functions in the Riak OCaml Client, check out the [project page](http://metadave.github.io/riak-ocaml-client/) and the [bundled test](https://github.com/metadave/riak-ocaml-client/blob/master/test/test.ml).
+如果想了解 Riak OCaml 客户端的所有功能，请查看[该项目的网站](http://metadave.github.io/riak-ocaml-client/)，以及[集成的测试](https://github.com/metadave/riak-ocaml-client/blob/master/test/test.ml)。

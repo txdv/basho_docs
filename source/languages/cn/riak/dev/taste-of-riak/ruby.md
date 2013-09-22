@@ -8,39 +8,41 @@ audience: beginner
 keywords: [developers, client, ruby]
 ---
 
-If you haven't set up a Riak Node and started it, please visit the [[Prerequisites|Taste of Riak: Prerequisites]] first.
+如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
 
-To try this flavor of Riak, a working installation of Ruby is required. 
+要使用本文介绍的 Riak 开发方法，必须先正确安装 Ruby。
 
-###Client Setup
-First, install the Riak Ruby client through `gem`.
+### 安装客户端
+
+首先，使用 `gem` 命令安装 Riak 的 Ruby 客户端。
 
 ```bash
 gem install riak-client
 ```
 
-Start IRB, the Ruby REPL, and let’s get setup.  Enter the following into IRB:
+打开 Ruby REPL，IRB，输入下面的命令：
 
 ```ruby
 require 'riak'
 ```
 
-If you are using a single local Riak node, use the following to create a new client instance:
+如果本地只有一个 Riak 节点，请使用下面的方法创建客户端实例：
 
 ```ruby
 client = Riak::Client.new(:protocol => "pbc", :pb_port => 8087)
 ```
 
-If you set up a local Riak cluster using the [[five minute install]] method, use this code snippet instead:
+如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请使用下面的方法创建客户端实例：
 
 ```ruby
 client = Riak::Client.new(:protocol => "pbc", :pb_port => 10017)
 ```
 
-We are now ready to start interacting with Riak.
+现在可以和 Riak 交互了。
 
-###Creating Objects In Riak
-First, let’s create a few objects and a bucket to keep them in.
+### 在 Riak 中创建对象
+
+首先，我们来创建一个 bucket，然后在其中创建几个对象。
 
 ```ruby
 my_bucket = client.bucket("test")
@@ -51,7 +53,7 @@ obj1.data = val1
 obj1.store()
 ```
 
-In this first example we have stored the integer 1 with the lookup key of ‘one’.  Next let’s store a simple string value of “two” with a matching key.
+上面的例子中我们存储了整数 1，查询所用的键设为“one”。下面我们要存储一个简单的字符串“two”，并设定一个键。
 
 ```ruby
 val2 = "two"
@@ -60,7 +62,7 @@ obj2.data = val2
 obj2.store()
 ```
 
-That was easy.  Finally, let’s store a bit of JSON.  You will probably recognize the pattern by now.
+上面的例子都很简单。下面来存储一些 JSON 数据。你现在应该已经熟知存储的过程了。
 
 ```ruby
 val3 = { myValue: 3 }
@@ -69,8 +71,9 @@ obj3.data = val3
 obj3.store()
 ```
 
-###Reading Objects From Riak
-Now that we have a few objects stored, let’s retrieve them and make sure they contain the values we expect.
+### 从 Riak 中读取对象
+
+我们已经存储了几个对象，下面我们要读取这些对象，确保保存的值是正确地。
 
 ```ruby
 fetched1 = my_bucket.get('one')
@@ -82,19 +85,20 @@ fetched2.data == val2
 fetched3.data.to_json == val3.to_json
 ```
 
-That was easy.  We simply request the objects by key.  In the last example we converted to JSON so we can compare a string key to a symbol key.
+很简单，只需通过键查询即可。最后一个例子，我们把数据转换成了 JSON 格式，这样才能比较字符串形式的键和 Symbol 形式的键。
 
+### 更新 Riak 中保存的对象
 
-###Updating Objects In Riak
-While some data may be static, other forms of data may need to be updated.  This is also easy to accomplish.  Let’s update the value of myValue in the 3rd example to 42.
+有些数据可能是静态的，但其他类型的数据或许需要更新。更新的过程也很简单。我们来把第三个例子中 myValue 的值改成 42。
 
 ```ruby
 fetched3.data["myValue"] = 42
 fetched3.store()
 ```
 
-###Deleting Objects From Riak
-As a last step, we’ll demonstrate how to delete data.  You’ll see that the delete message can be called either against the Bucket or the Object.
+### 从 Riak 中删除对象
+
+最后，我们来掩饰如何删除数据。你会看到，删除数据所用的方法既可以在 Bucket 上调用，也可以在对象上调用。
 
 ```ruby
 my_bucket.delete('one')
@@ -102,8 +106,9 @@ obj2.delete()
 obj3.delete()
 ```
 
-###Working With Complex Objects
-Since the world is a little more complicated than simple integers and bits of strings, let’s see how we can work with more complex objects.  Take for example, this Ruby hash that encapsulates some knowledge about a book.
+### 处理复杂对象
+
+对象往往都是很复杂的，不止简单的整数或字符串，下面来看一下如何处理更复杂地对象。举个例子，下面的 Ruby Hash 包含了一本书的信息。
 
 ```ruby
 book = {
@@ -115,7 +120,7 @@ book = {
 }
 ```
 
-Ok, so we have some information about our Moby Dick collection that we want to save.  Storing this to Riak should look familiar by now.
+我们要保存就是这本关于 Moby Dick 的书，存储的过程你现在应该很熟练了：
 
 ```ruby
 books_bucket = client.bucket('books')
@@ -124,30 +129,28 @@ new_book.data = book
 new_book.store()
 ```
 
-Some of you may be thinking “But how does the Ruby Riak client encode/decode my object”?  If we fetch our book back and print the raw data, we shall know:
+有些人可能会想，“Riak 的 Ruby 客户端是怎么编码和解码对象的呢？”我们把这本书的信息读出来，然后打印出原始数据就知道了：
 
 ```ruby
 fetched_book = books_bucket.get(book[:isbn])
 puts fetched_book.raw_data
 ```
 
-Raw Data:
+原始数据：
 
 ```javascript
 {"isbn":"1111979723","title":"Moby Dick","author":"Herman Melville",
 "body":"Call me Ishmael. Some years ago...","copies_owned":3}
 ```
 
-JSON!  The Ruby Riak client will serialize objects to JSON when it comes across structured data like hashes.
-For more advanced control over serialization you can use a library called [Ripple](https://github.com/basho/ripple), which is a rich Ruby modeling layer over the basic riak client.  Ripple falls outside the scope of this document but we shall visit it later.
+是 JSON 格式！如果存储的是结构化数据，比如 Hash，Riak 的 Ruby 客户端会把对象序列化成 JSON 格式。如果想全方位的控制序列化过程，可以使用 [Ripple](https://github.com/basho/ripple)，这个库是 Riak 基本客户端之上的高级 Ruby 模型层。对 Ripple 的介绍已经超出了本文范围，不过以后会说明。
 
-Now let’s clean up our mess:
+最后，做些善后工作：
 
 ```ruby
 new_book.delete()
 ```
 
-###Next Steps
-More complex use cases can be composed from these initial create, read, update, and delete (CRUD) operations. In the next chapter we will look at how to store and query more complicated and interconnected data, such as documents.  
+### 下一步
 
-
+更复杂的用法都可以通过基本的创建（create）、读取（read）、更新（update）和删除（delete）（这四个操作简称 CRUD）操作完成。下一篇我们要介绍如何存储和查询更复杂的互联数据，例如文档。

@@ -1,23 +1,23 @@
 ---
 cn:
   basho: Basho
-  visit_basho: Visit Basho
-  home: Home
-  downloads: Downloads
-  riak_docs: Riak Docs
-  tagline: "Product tutorials, how-tos, and fully-documented APIs."
-  keywords: Keywords
-  navigation: Navigation
-  all_projects: All Riak Projects
+  visit_basho: 访问 Basho 网站
+  home: 首页
+  downloads: 下载
+  riak_docs: Riak 文档
+  tagline: "产品教程，指南，以及完整注解的 API。"
+  keywords: 关键词
+  navigation: 导航
+  all_projects: 所有 Riak 项目
   docs_on_github: "These docs are available on GitHub. Please submit ideas and patches."
   secondary_header: "These May Also Interest You"
   faqs_link: "[[FAQs|Riak FAQs]]"
   apis_link: "[[APIs|HTTP API]]"
-  tutorial_nav: "Tutorial Nav"
+  tutorial_nav: "教程导航"
   previous: Prev
   next: Next
-  toc_contents: Contents
-  footer: "This work is licensed under a <a href=\"http://creativecommons.org/licenses/by/3.0/\" target=\"_blank\">Creative Commons Attribution 3.0 Unported License</a>"
+  toc_contents: 内容提要
+  footer: "本文档基于 <a href=\"http://creativecommons.org/licenses/by/3.0/\" target=\"_blank\">Creative Commons Attribution 3.0 Unported License</a> 协议发布"
   riak_ee:
     info:
       title: Riak Enterprise Only

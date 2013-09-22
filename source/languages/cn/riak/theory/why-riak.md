@@ -15,87 +15,87 @@ interest: [
 ]
 ---
 
-## What is Riak?
+## Riak 是什么？
 
-Riak is a distributed database designed for maximum availability: so long as your client can reach one server, it should be able to write data. In most failure scenarios the data you want to read should be available, albeit possibly stale.
+Riak 是一种分布式数据库，其设计目的是保持最大限度的可用性，只要客户端可以访问服务器，就能写入数据。如果失败了，大多数情况下数据还是可读的，只不过读出的数据可能过时了。
 
-This fundamental tradeoff, high availability in exchange for possibly outdated information, informs the key architectural decisions behind Riak. This idea of "eventual consistency" is a common one in distributed systems, with DNS and web caches as two notable examples.
+高度可用性的代价是可能过期的数据，这种妥协是 Riak 的关键架构方案。这种方案称为“最终一致性”，在分布式系统中很常见，比较著名的例子有 DNS 和 Web 缓存。
 
+### Basho 对 Riak 设定的目标
 
-### Basho's goals for Riak
-
-Goal | Description
+目标 | 说明
 -------|-------
-**Availability** | Riak writes to and reads from multiple servers to offer availability even when hardware or the network itself are experiencing failure conditions
-**Operational simplicity** | Add new machines to your Riak cluster easily without incurring a larger operational burden
-**Scalability** | Riak automatically distributes data around the cluster and yields a near-linear performance increase as you add capacity
-**Masterless** | Your requests are not held hostage to a specific server in the cluster that may or may not be available
+**可用性** | Rial 在多个服务器上进行读写操作，即使出现硬件或网络问题，也能保证数据库的可用性
+**操作便利性** | 在 Riak 集群中添加新设备的过程很简单，无需繁杂地操作
+**可扩放性** | Riak 能在集群中自动分发数据，并能随着数据量的增加提升近线性的性能
+**Masterless** | 对数据库的访问不会绑定到集群中特定的服务器上，避免单个服务器宕机造成无法访问
 
+### 适合使用 Riak 的场景
 
-### When Riak makes sense
+如果把数据放在单台服务器中无法满足要求，请考虑使用 Riak 吧。分布式数据库是一个老大难问题，不是任何人都能处理地这么好。
 
-You should definitely take a close look at Riak whenever your data does not fit on a single server.  Distributed databases are a **very** hard to problem to solve well.
+Riak 十分看重可用性，如果你无法接受宕机，Riak 就是个很好地选择。没人能保证 100% 在线，不过在设计 Riak 时就考虑到了如何避免因网络隔断和硬件失效导致无法访问数据库，这两个问题是中断大多数数据库服务的罪魁祸首。
 
-Riak's availability focus makes it a good fit whenever downtime is unacceptable. No one can promise 100% uptime, but Riak is designed to survive network partitions and hardware failures that would significantly disrupt most databases.
+Riak 一个很少提及的特性是可预知的延迟。因为对 Riak 的基本操作（读，写，删除）不涉及复杂地数据连接和锁定，处理起来速度很快。其他数据管理软件就是看中了这一点，经常使用 Riak 储存数据。
 
-A less-heralded feature of Riak is its predictable latency. Because its fundamental operations (read, write, delete) do not involve complex data joins or locks, it services those requests promptly, and thanks to this is often selected as a data storage backend for other data management software.
+### 不太适合使用 Riak 的场景
 
-### When Riak is less of a fit
+Basho 建议一个集群至少要有 5 台服务器，如果是小型数据库，使用 Riak 就大材小用了。如果你不知道是否需要分布式数据库，或许就不需要使用 Riak。
 
-Basho recommends no fewer than 5 servers in a cluster, so Riak is typically overkill for small databases. If you don't know that you need a distributed database, you probably don't need Riak.
+（虽然这么说，不过如果数据成爆炸式增长，还是建议提前为使用分布式数据库做好准备。网络中的扩放就像飞机飞行途中的检修一样，追求的是速度。）
 
-(Having said that, if explosive growth is a possibility, you are highly advised to prepare for that in advance. Scaling at Internet speeds is sometimes compared to overhauling an airplane mid-flight.)
+Riak 的数据模型很简单，基于键值对，这意味着要想保证性能，就要对数据做反正规化处理。大多数应用程序都能反正规化数据，一旦数据无法高效的使用键值对处理，可能就说明此时不太适合使用 Riak。
 
-Riak's simple data model, keys and values, means that to be reasonably performant your data must be denormalized. For most applications this is not a serious hurdle, but if your data simply cannot be effectively managed as keys and values, Riak will most likely not be the best fit for you.
+附加说明：Riak 虽然提供了多种方法查询符合条件的值，但如果你的应用程序需要做大量不通过键的查询，Riak 就不如其他数据库高效。Basho 提供了一个工具，名为 **basho_bench**，可以用来测试性能，通过测试结果你可以衡量 Riak 提供的高可用性和操作便利性是否盖过了它的弱势。
 
-Related: while Riak offers ways to find values that match certain criteria, if your application demands a high query load by any means other than the keys, Riak will not be as efficient as other databases. Basho offers a tool named **basho_bench** to help measure its performance so you can decide whether the availability and operational benefits of Riak outweigh its disadvantages.
+## Riak 集群是如何工作的？
 
-## How Does a Riak Cluster Work?
+### 什么是 Riak 节点？
 
-### What is a Riak node?
+Riak 节点和服务器并不完全是一回事，不过在生产环境中二者是等价的。开发者可以在一个笔记本电脑中运行多个节点，但在实际的集群中并不推荐这么做。
 
-A Riak node is not quite the same as a server, but in a production environment the two should be equivalent. A developer may run multiple nodes on a single laptop, but never would this be advisable in a real cluster.
+Riak 集群中的每个节点的地位相同，都包含完整，而且独立的 Riak 包，因此没有“主节点”的概念，各节点的作用完全一样。节点的一致性是 Riak 容错和扩放的基础。
 
-Each node in a Riak cluster is equivalent, containing a complete, independent copy of the Riak package. There is no "master." No node has more or different responsibilities. This uniformity provides the basis for Riak's fault-tolerance and scalability.
+各节点都会负责多个数据分区，详情如下。
 
-Each node is responsible for multiple data partitions as discussed below.
+### 性能扩充后 Riak 会自动重新分发数据
 
-### Riak Automatically Re-Distributes Data When Capacity is Added
+增加或减少设备后，无需停机，数据会自动进行负载平衡操作。新添加的设备只到拥有权完全传遍整个集群后才能认领数据，融入集群后，集群的最新状态会经由 Gossip 协议通知每个节点，此时新设备才能用来分发请求。这么做可以保证集群中的任何节点都能处理请求，开发者无需叨扰存储数据的底层结构。
 
-When you add (or remove) machines, data is rebalanced automatically with no downtime. New machines claim data until ownership is equally spread around the cluster, with the resulting cluster status updates shared to every node via a gossip protocol and used to route requests. This is what makes it possible for any node in the cluster to receive requests - developers don't need to deal with the underlying complexity of where data lives.
+### 一致性哈希
 
-### Consistent Hashing
+数据在节点之间的分发是通过一致性哈希进行的。一致性哈希能保证数据在集群中均匀分发，还能在集群扩放时实现数据自动重新分发。
 
-Data is distributed across nodes using consistent hashing. Consistent hashing ensures data is evenly distributed around the cluster and makes possible the automatic redistribution of data as the cluster scales.
+一致性哈希是如何工作的呢？Riak 使用简单的键值对存数数据。键和称为 bucket 的命名空间关联，在 Riak 中处理键和值时，会计算 bucket 和键结合后的哈希值，然后将哈希值映射到一个 160 比特的“整数空间”（integer space）上。整数空间可以设想成一个环，用来决定把数据存储在哪个物理设备上。
 
-How does consistent hashing work? Riak stores data using a simple key/value scheme. These keys are associated with a namespace called a bucket. When you perform key/value operations in Riak, the bucket and key combination is hashed. The resulting hash maps onto a 160-bit integer space. You can think of this integer space as a ring used to determine what data to put on which physical machines.
-
-How? Riak divides the integer space into equally-sized partitions. Each partition owns a range of values on the ring, and is responsible for all buckets and keys that, when hashed, fall into that range. Each partition is managed by a process called a virtual node (or "vnode"). Physical machines evenly divide responsibility for vnodes. Let's say you have a 4 node cluster with 32 partitions, managed by 32 vnode processes. Each of the four physical machines claim eight vnodes as illustrated below. Each physical machine thus becomes responsible for all keys represented by its eight vnodes.
+怎么决定呢？Riak 把整数空间分成大小相等的分区，分区对应环上特定的取值范围，bucket 和键结合后的哈希值计算出来后就知道落在哪个分区内。每个分区都由一个称为“虚拟节点”（virtual mode，简称 vnode）的进程管理。物理设备会均匀分配每个虚拟节点的任务。假设有一个包含 4 个节点的集群，分成 32 个分区，由 32 个虚拟节点管理。那么每个物理设备就会认领 8 个虚拟节点，负责处理这 8 个虚拟节点中的键，如下图所示。
 
 ![A Riak Ring](/images/riak-ring.png)
 
-### Intelligent Replication
+### 智能复制
 
-Riak's replication scheme means that if nodes go down, you can still read, write and update data. Riak allows you to set a replication number, "n". An _n_ value of 3 (default) means that each object is replicated 3 times. When an object's key is mapped onto a given partition, Riak won't stop there - it automatically replicates the data onto the next two partitions as well.
+Riak 的复制系统可以保证即使某个节点宕机了，仍然可以读写或更新数据。在 Riak 中可以设置复制次数“n”，如果 n 的值为 3（默认值），每个对象会复制三次。当对象的值映射到某个分区上时，Riak 不会就此打住，它会自动复制数据，将其保存在随后的两个分区中。
 
 ![A Riak Ring](/images/riak-data-distribution.png)
 
-## When Things Go Wrong
+## 异常处理
 
-Riak retains fault-tolerance, data integrity, and availability even in failure conditions like hardware failure and network partitions. Riak has a number of properties to address these scenarios and other bumps in the road, like version conflicts in data.
+即便是在异常情况下，例如硬件失效、网络隔断，Riak 也保有容错、数据集成和可用性。Riak 提供了很多功能来应对这些情况，以及使用过程中可能遇到的其他问题，例如数据的版本冲突。
 
-### Hinted Handoff
+### 提示移交
 
-Hinted handoff lets Riak handle node failure. If a node fails, a neighboring node will take over its storage operations. When the failed node returns, the updates received by the neighboring node are handed back to it. This ensures availability for writes and updates and happens automatically, minimizing the operational burden of failure conditions.
+提示移交（hinted handoff）用来处理 Riak 节点宕机。如果某个节点宕机了，临近的节点会接管数据存储操作。节点重新运行后，临近的节点会接到通知，交出处理权。提示移交可以保证写数据和更新数据的可用性，而且是自动进行的，把异常处理的过程变得十分简单。
 
-### Version Conflicts
+### 版本冲突
 
-In any system that replicates data, conflicts can arise - e.g., if two clients update the same object at the exact same time; or if not all updates have yet reached hardware that is experiencing lag. Further, in Riak, replicas are "eventually consistent" - while data is always available, not all replicas may have the most recent update at the exact same time, causing brief periods (generally on the order of milliseconds) of inconsistency while all state changes are synchronized.
+在任何有数据复制的系统中都会发生冲突，例如两个客户端同一时间更新同一对象，或者因为迟延不是所有更新都写入了硬件。而且在 Riak 中，数据复制是遵守“最终一致性”原则的，因为数据始终可达，并不是所有的复制操作都能使用最新的数据，因为状态更新是同步的，这样就会导致短暂时间（一般是毫秒级）的不一致性。
 
-How is divergence addressed? When you make a read request, Riak looks up all replicas for that object. By default, Riak will return the most updated version, determined by looking at the object's vector clock. Vector clocks are metadata attached to each replica when it is created. They are extended each time a replica is updated to keep track of versions. You can also allow clients to resolve conflicts themselves.
+那怎么解决冲突呢？发起读请求时，Riak 会查找对象的所有副本，默认情况下，根据对象的“向量时钟”（vector clock）找到数据的最新版本，返回给客户端。向量时钟是副本创建时生成的原数据，每次副本更新时都会得到扩展，以追踪版本。当然，你也可以交由客户端来处理冲突。
 
-### Read Repair
-Further, when an outdated replica is returned as part of a read request, Riak will automatically update the out-of-sync replica to make it consistent. Read repair, a self-healing property of the database, will even update a replica that returns a "not_found" in the event that a node loses it due to physical failure.
+### 读取修复
 
-### Reading and Writing Data in Failure Conditions
-In Riak, you can set an _r_ value for reads and a _w_ value for writes. These values give you control over how many replicas must respond to a request for it to succeed. Let's say you have an _n_ value of 3, but one of the physical nodes responsible for a replica is down. With r=2, only 2 replicas must return results for a successful read. This allows Riak to provide read availability even when nodes are down or laggy. The same applies for the _w_ in writes. If you don't specify, Riak defaults to quorum: the majority of nodes must respond. There will be more on [[CAP Controls]].
+如果读取请求得到的是过时的数据，Riak 会自动更新未同步的副本，以保证一致性。读取修复是 Riak 提供的自修复功能，甚至可以更新因节点物理失效导致的副本丢失。
+
+### 在异常情况下读写数据
+
+在 Riak 中可以为读操作设置一个“r”值，为写操作设置一个“w”值，这两个值表示副本数量，Riak 根据返回副本的数量决定请求是否成功。假设 _n_ 为 3，而且其中一个副本所在的物理节点宕机了，如果 r=2，必须返回两个副本才说明这次读操作是成功的。通过这个功能，即便节点宕机或出现了迟延，Riak 也能保证读操作的可用性。针对写操作的 _w_ 值类似。如果没有设定这两个值，Riak 会取最小值，集群中的大部分节点必须做出响应，详细说明参见 [[CAP Controls]]。

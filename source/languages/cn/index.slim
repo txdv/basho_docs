@@ -15,8 +15,8 @@ versions: false
     div.temp-banner-text
       == I18n.t(:ricon_ad)
 h1.center-text.extra-large
-  span.sans Welcome to Riak Docs
-h3.center-text Choose a project below
+  span.sans 欢迎访问 Riak 文档
+h3.center-text 选择您要查看的项目
 
 div#select-project
   - version = $production ? "latest" : nil
@@ -26,7 +26,7 @@ div#select-project
         | Riak&nbsp;
         strong Enterprise
       span.small
-        | Multi-datacenter replication + support
+        | 多数据中心同步 + 技术支持
 
   div.separator
     div.vert-line
@@ -35,7 +35,7 @@ div#select-project
     a href="/riak/#{version || $versions[:riak]}/"
       span.image
       span.small
-        | The open-source, distributed database
+        | 开源的分布式数据库
 
   div.separator
     div.vert-line
@@ -46,5 +46,5 @@ div#select-project
         | Riak&nbsp;
         strong Cloud Storage
       span.small
-        | Simple, available, s3-compatible
+        | 简单，方便，兼容 s3
 

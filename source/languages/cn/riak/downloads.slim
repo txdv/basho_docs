@@ -13,10 +13,10 @@ body_id: downloads
 - version = current_version(project)
 - downloads = Downloads.new(project, version)
 
-h1 Download #{project.capitalize} #{version}
+h1 下载 #{project.capitalize} #{version}
 
-p You should be able to find your operating system in the choices below.
-p If your OS is unlisted, you may download the [[source|Downloads#source]] at the bottom of this page, and follow the instructions to [[build Riak|Installing Riak from Source]].
+p 可以在下面的列表中找到适合你所用操作系统的下载链接。
+p 如果你所用的操作系统没有列出，请在本页下部下载 [[source|Downloads#source]]，然后根据 [[build Riak|Installing Riak from Source]] 中的说明安装。
 
 - for os, os_data in downloads
   - next unless downloads.files?(os_data)
@@ -40,7 +40,7 @@ p If your OS is unlisted, you may download the [[source|Downloads#source]] at th
             td.checksum
               - if arch_data['csum'].present?
                 a href=downloads.file_url(os, osv, arch_data['csum'], arch_data['static_csum'])
-                  img src="/images/layout/hash.png" title="SHA1 Checksum"
+                  img src="/images/layout/hash.png" title="SHA1 校验和"
   - if os_data['install'].present?
-    p.install_instruction Here are further instructions for [[#{os_data['install']}]]
-  
+    p.install_instruction 详细说明参照 [[#{os_data['install']}]]
+
