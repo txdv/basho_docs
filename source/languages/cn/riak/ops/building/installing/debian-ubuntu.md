@@ -13,70 +13,54 @@ download:
   name: "Debian or Ubuntu"
 ---
 
-Riak can be installed on Debian or Ubuntu based systems with a binary package or by [[compiling Riak from source code|Installing Riak from Source]]. The following steps have been tested to work with Riak on **Debian version 6.05** and **Ubuntu version 12.04**.
+在基于 Debian 或 Ubuntu 的系统中可以使用二进制安装包安装 Riak，也可以 [[compiling Riak from source code|Installing Riak from Source]]。下面介绍的安装方法在 **Debian 6.05** and **Ubuntu 12.04** 上测试可行。
 
-Installing From Apt-Get
------------------------
+## 使用 Apt-Get 安装
 
-If you wish to just install Riak and get on with your life, use `apt-get`.
+如果你只想简简单单的安装 Riak，就使用 `apt-get` 吧。
 
-First you must get the signing key.
+首先需要获得签名密钥。
 
 ```bash
 curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -
 ```
 
-Then add the Basho repository to your apt sources list (and update them).
+然后把 Basho 仓库添加到 apt 源列表（然后更新源）。
 
 ```
 sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"
 sudo apt-get update
 ```
 
-Now install riak.
+现在可以安装 Riak 了。
 
 ```bash
 sudo apt-get install riak
 ```
 
-That should be all.
+就这么简单。
 
-Installing From Package
------------------------
+## 使用包安装
 
-If you wish to install the deb packages by hand follow these instructions.
+如果想手动安装 deb 包，请阅读下面的说明。
 
-### Installing on Non-LTS Ubuntu Releases
+### 在非 LTS Ubuntu 上安装
 
-Typically we only package Riak for LTS releases to keep our build and
-testing matrix focused.  In some cases such as Ubuntu 11.04 (Natty),
-there are changes that affect how Riak is packaged so we will release a
-separate package for that non-LTS release.  In most other cases
-though, if you are running a non-LTS release (such as 12.10) it is
-safe to follow the below instructions for the LTS release prior to
-your release.  In the case of Ubuntu 12.10, follow the installation
-instructions for Ubuntu 12.04.
+为了集中精力开发和测试功能，我们一般只为 LTS 版本提供的安装包。某些情况下，例如 Ubuntu 11.04 (Natty)，系统的变动影响了 Riak 的打包方式，所以我们针对这一版的非 LTS 单独发布了安装包。大多数情况下，如果你使用的是非 LTS（例如 12.10），完全可以按照下面针对 LTS 的说明安装。如果使用的是 12.10，参照针对 Ubuntu 12.04 的说明即可。
 
-### SSL Library Requirement for Ubuntu
+### Ubuntu 对 SSL 库的需求
 
-Riak currently requires libssl version 0.9.8 on some versions of
-Ubuntu. Starting at Ubuntu 12.04 this is no longer an issue. Before
-installing Riak via package on Ubuntu, install the `libssl0.9.8`
-package. Note that this version of libssl can be safely installed
-alongside current/existing libssl installations.
+在某些 Ubuntu 版本中，Riak 需要 libssl 0.9.8 的支持。从 Ubuntu 12.04 开始就没有这种要求了。在 Ubuntu 上使用安装包安装 Riak 之前，请先安装 `libssl0.9.8` 包。注意，这个版本的 libssl 可以和现有的 libssl 安全并存。
 
-To install the libssl version 0.9.8 package, execute the following
-command:
+请执行下面的命令安装 libssl 0.9.8：
 
 ```bash
 sudo apt-get install libssl0.9.8
 ```
 
-After the libssl package installation, proceed to installing Riak from
-the pre-built package by executing the following commands as appropriate
-for the target platform:
+安装 libssl 后，安装预先编译好的安装包请执行下面针对各平台的命令。
 
-### Riak 64-bit Installation
+### 安装 64 位 Riak
 
 #### Ubuntu Lucid Lynx (10.04)
 
@@ -139,31 +123,34 @@ sudo dpkg -i riak_{{V.V.V}}-1_amd64.deb
 
 {{#1.2.1-1.3.9}}
 
-### Riak 32-bit Installation
+### 安装 32 位 Riak
 
 ```bash
 wget http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/ubuntu/lucid/riak_{{V.V.V}}-1_i386.deb
 sudo dpkg -i riak_{{V.V.V}}-1_i386.deb
 ```
 
-<div class="note"><div class="title">Upgrading Riak</div>If upgrading the Riak package, and the user named "riak" exists without a home directory, create a home directory (`/var/lib/riak`), and execute `chown riak:riak /var/lib/riak` before starting Riak.</div>
+<div class="note">
+<div class="title">升级 Riak</div>
+
+如果升级 Riak 包，用户 “riak” 将没有家目录，在启动 Riak 之前，请为其创建家目录（`/var/lib/riak`），然后执行 `chown riak:riak /var/lib/riak` 命令。
+</div>
 
 {{/1.2.1-1.3.9}}
 
-Installing Riak From Source
----------------------------
+## 从源码安装 Riak
 
-First, install Riak dependencies using apt:
+首先，使用 apt 安装 Riak 的依赖库：
 
 ```bash
 sudo apt-get install build-essential libc6-dev-i386 git
 ```
 
-Riak requires [Erlang](http://www.erlang.org/) R15B01. *Note: don't use Erlang version R15B02 or R15B03, for the moment, as it causes an [error with riak-admin status](https://github.com/basho/riak/issues/227) commands*.
-If Erlang is not already installed, install it before continuing (see:
-[[Installing Erlang]] for more information).
+Riak 需要 [Erlang](http://www.erlang.org/) R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-With Erlang installed, proceed to downloading and installing Riak:
+如果还没安装 Erlang，在继续阅读之前请先安装之。（详细方法请阅读 [[Installing Erlang]]）
+
+安装 Erlang 后，就可以下载、安装 Riak 了：
 
 ```bash
 wget http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}.tar.gz
@@ -172,15 +159,11 @@ cd riak-{{V.V.V}}
 make rel
 ```
 
-If the build was successful, a fresh build of Riak will exist in the
-`rel/riak` directory.
+如果编译成功，一个新 Riak 版本会出现在 `rel/riak` 目录中。
 
-Next Steps?
------------
+## 然后呢？
 
-Now that Riak is installed, check out the following resources:
+现在 Riak 已经安装好了，请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]: for checking Riak health after installation
--   [[Five Minute Install]]:
-    a guide that will show you how to go from one node to bigger than
-    Google!
+-   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
+-   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

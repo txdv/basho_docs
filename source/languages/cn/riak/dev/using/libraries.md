@@ -9,11 +9,11 @@ audience: intermediate
 keywords: [client, drivers]
 ---
 
-## Basho Supported Libraries
+## Basho 提供支持的代码库
 
-Basho officially supports a number of open-source client libraries for various programming languages and environments.
+Basho 官方支持多种编程语言的开源客户端和环境。
 
-| Language | Source                                                   | Documentation | Download      |
+| 语言      | 源码                                                     | 文档           | 下载      |
 |----------|----------------------------------------------------------|---------------|---------------|
 | Erlang   | [riak-erlang-client (riakc)](https://github.com/basho/riak-erlang-client)<br>[riak-erlang-http-client (rhc)](https://github.com/basho/riak-erlang-http-client) | [edoc](http://basho.github.com/riak-erlang-client/)          |               |
 | Java     | [riak-java-client](https://github.com/basho/riak-java-client)                                         | [javadoc](http://basho.github.com/riak-java-client), [wiki](https://github.com/basho/riak-java-client/wiki) | [Maven Central](http://search.maven.org/?#search%7Cgav%7C1%7Cg%3A%22com.basho.riak%22%20AND%20a%3A%22riak-client%22) |
@@ -22,111 +22,106 @@ Basho officially supports a number of open-source client libraries for various p
 | Ruby     | [riak-ruby-client](https://github.com/basho/riak-ruby-client)                                         | [rdoc](http://rdoc.info/gems/riak-client/frames), [wiki](https://github.com/basho/riak-ruby-client/wiki)    | [RubyGems](https://rubygems.org/gems/riak-client)      |
 
 
-All official clients use the integrated issue tracker on Github for bug reporting.
+所有官方支持的客户端都使用 GitHub 提供的问题追踪系统收集程序错误反馈。
 
-In addition to the official clients, Basho provides some unofficial
-client libraries, listed below. There are also many client libraries
-and related projects [[community projects]].
+除了官方支持的客户端，Basho 还提供了一些非官方的客户端代码库，如下所示。除此之外，还有很多客户端代码库和相关的项目，参见 [[community projects]]。
 
-| Language            | Source                 |
+| 语言                 | 源码                 |
 |---------------------|------------------------|
 | C/C++               | [riak-cxx-client](https://github.com/basho/riak-cxx-client)        |
 | Javascript (jQuery) | [riak-javascript-client](https://github.com/basho/riak-javascript-client) |
 
 
-*** Feature Matrix
-   Below is a series of tables that compares the functionality of our
-   official client libraries with the features exposed by Riak's API,
-   and also compares features that are desirable in well-developed
-   clients. We have developed this matrix in an effort to ensure
-   feature-parity across the different clients.
+## 功能比较
 
-   Legend:
-   - =✓= - has feature
-   - =✗= - lacks feature
-   - =text= - partially supports feature
-   - (blank) - unknown
+下面列出了很多表格，比较了官方客户端代码库对 Riak API 的支持情况，也比较了优秀客户端中应该实现的功能。我们编写这些表格的目的是要确保所有客户端实现相同的功能。
+
+说明：
+
+- ✓：已实现
+- ✗：尚未实现
+- 文本：部分实现
+- 空白：未知
 
 ### HTTP
 
-| Bucket Operations          | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
-|----------------------------|------------------------|------|------------------------|---------|------|
-| List buckets               | ✓                      | ✓    | ✓                      | ✓       | ✓    |
-| List keys                  | ✓                      | ✓    | ✓                      | ✓       | ✓    |
-| Get Bucket Properties      | partial                | ✓    | ✓                      | ✓       | ✓    |
-| Set Bucket Properties      | partial                | ✓    | ✓                      | ✓       | ✓    |
+| Bucket 相关操作    | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
+|-------------------|------------------------|------|------------------------|---------|------|
+| 列出所有 bucket    | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 列出所有键          | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 读取 bucket 属性    | 部分实现                | ✓    | ✓                      | ✓       | ✓    |
+| 设置 bucket 属性    | 部分实现                | ✓    | ✓                      | ✓       | ✓    |
 
-| Object/Key Operations      | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
-|----------------------------|------------------------|------|------------------------|---------|------|
-| Fetch Object (get)         | ✓                      | ✓    | ✓                      | ✓       | ✓    |
-| Fetch w/quorums            | no PR                  | ✓    | no PR                  | ✓       | ✓    |
-| Store Object (put)         | ✓                      | ✓    | ✓                      | ✓       | ✓    |
-| Store w/quorums            | no PW                  | ✓    | no PW                  | ✓       | ✓    |
-| Delete Object              | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 对象/键相关操作     | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
+|-------------------|------------------------|------|------------------------|---------|------|
+| 获取对象（get）     | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 获取最少数          | 无 PR                  | ✓    | 无 PR                  | ✓       | ✓    |
+| 存储对象（put）     | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 存储最少数          | 无 PW                  | ✓    | 无 PW                  | ✓       | ✓    |
+| 删除对象            | ✓                      | ✓    | ✓                      | ✓       | ✓    |
 
-| Query Operations           | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
-|----------------------------|------------------------|------|------------------------|---------|------|
-| Link Walking               | ✗                      | ✓    | ✗                      | ✗       | ✓    |
-| MapReduce                  | ✓                      | ✓    | ✓                      | ✓       | ✓    |
-| Secondary Indexes          | ✗                      | ✓    | ✓                      | ✓       | ✓    |
-| Search                     | emulated via MapReduce | ✓    | emulated via MapReduce | ✓       | ✓    |
+| 查询相关操作        | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
+|-------------------|------------------------|------|------------------------|---------|------|
+| Link Walking      | ✗                      | ✓    | ✗                      | ✗       | ✓    |
+| MapReduce         | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 二级索引           | ✗                      | ✓    | ✓                      | ✓       | ✓    |
+| 搜索               | 通过 MapReduce 模拟     | ✓    | 通过 MapReduce 模拟     | ✓       | ✓    |
 
-| Server Operations          | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
-|----------------------------|------------------------|------|------------------------|---------|------|
-| Ping                       | ✓                      | ✓    | ✓                      | ✓       | ✓    |
-| Status                     | partial                | ✓    | ✗                      | ✓ | ✓    |
-| List Resources             | ✗                      | ✗    | ✗                      | ✓ | ✓    |
+| 服务器相关操作      | Erlang (rhc)           | Java | PHP                    | Python  | Ruby |
+|-------------------|------------------------|------|------------------------|---------|------|
+| Ping              | ✓                      | ✓    | ✓                      | ✓       | ✓    |
+| 状态               | 部分实现                | ✓    | ✗                      | ✓       | ✓    |
+| 资源列表           | ✗                      | ✗    | ✗                      | ✓        | ✓    |
 
 ### Protocol Buffers
 
-*Note: The PHP client does not support Protocol Buffers and so is
-excluded from this matrix.*
+*注意：PHP 客户端不支持 Protocol Buffers，因此下列表格中没有对比 PHP。*
 
-| Bucket Operations                    | Erlang (riakc) | Java | Python  | Ruby |
-|--------------------------------------|----------------|------|---------|------|
-| List buckets                         | ✓              | ✓    | ✓       | ✓    |
-| List keys                            | ✓              | ✓    | ✓       | ✓    |
-| Get Bucket Properties                | ✓              | ✓    | ✓       | ✓    |
-| Set Bucket Properties                | ✓              | ✓    | ✓       | ✓    |
+| Bucket 相关操作         | Erlang (riakc) | Java | Python  | Ruby |
+|------------------------|----------------|------|---------|------|
+| 列出所有 bucket         | ✓              | ✓    | ✓       | ✓    |
+| 列出所有键              | ✓              | ✓    | ✓       | ✓    |
+| 读取 bucket 属性        | ✓              | ✓    | ✓       | ✓    |
+| 设置 bucket 属性        | ✓              | ✓    | ✓       | ✓    |
 
-| Object/Key Operations                | Erlang (riakc) | Java | Python  | Ruby |
-|--------------------------------------|----------------|------|---------|------|
-| Fetch Object (get)                   | ✓              | ✓    | ✓       | ✓    |
-| Fetch w/quorums                      | ✓              | ✓    | ✓       | ✓    |
-| Store Object (put)                   | ✓              | ✓    | ✓       | ✓    |
-| Store w/quorums                      | ✓              | ✓    | ✓       | ✓    |
-| Delete Object                        | ✓              | ✓    | ✓       | ✓    |
+| 对象/键相关操作          | Erlang (riakc) | Java | Python  | Ruby |
+|------------------------|----------------|------|---------|------|
+| 获取对象（get）          | ✓              | ✓    | ✓       | ✓    |
+| 获取最少数               | ✓              | ✓    | ✓       | ✓    |
+| 存储对象（put）          | ✓              | ✓    | ✓       | ✓    |
+| 存储最少数               | ✓              | ✓    | ✓       | ✓    |
+| 删除对象                 | ✓              | ✓    | ✓       | ✓    |
 
-| Query Operations                     | Erlang (riakc) | Java | Python  | Ruby |
-|--------------------------------------|----------------|------|---------|------|
-| MapReduce                            | ✓              | ✓    | ✓       | ✓    |
-| Secondary Indexes (emulated, native) | ✓✗             | ✓✗   | ✓✓      | ✓✓   |
-| Search (emulated, native)            | ✓✗             | ✓✗   | ✓✓      | ✓✓   |
+| 查询相关操作             | Erlang (riakc) | Java | Python  | Ruby |
+|---------- --------------|----------------|------|---------|------|
+| MapReduce               | ✓              | ✓    | ✓       | ✓    |
+| 二级索引（模拟的和内嵌的） | ✓✗             | ✓✗   | ✓✓      | ✓✓   |
+| 搜索（模拟的和内嵌的）     | ✓✗             | ✓✗   | ✓✓      | ✓✓   |
 
-| Server Operations                    | Erlang (riakc) | Java | Python  | Ruby |
-|--------------------------------------|----------------|------|---------|------|
-| Ping                                 | ✓              | ✓    | ✓       | ✓    |
-| Server Info                          | ✓              | ✗    | ✓ | ✓    |
-| Get Client ID                        | ✓              | ✓    | ✓       | ✓    |
-| Set Client ID                        | ✓              | ✓    | ✓       | ✓    |
+| 服务器相关操作            | Erlang (riakc) | Java | Python  | Ruby |
+|-------------------------|----------------|------|---------|------|
+| Ping                    | ✓              | ✓    | ✓       | ✓    |
+| 服务器信息                | ✓              | ✗    | ✓       | ✓    |
+| 获取客户端 ID             | ✓              | ✓    | ✓       | ✓    |
+| 设置客户端 ID             | ✓              | ✓    | ✓       | ✓    |
 
-### Additional features
+### 其他功能
 
-| Protocols                              | Erlang                    | Java | PHP     | Python  | Ruby          |
+| 协议                                    | Erlang                    | Java | PHP     | Python  | Ruby          |
 |----------------------------------------|---------------------------|------|---------|---------|---------------|
-| Cluster connections/pools              | ✗                         | ✓    | ✗       | ✓ | ✓             |
-| Retry failures (on other nodes)        | ✗                         | ✓    | ✗       |✓ ✓       | ✓ ✓           |
+| 集群连接/集群池                          | ✗                         | ✓    | ✗       | ✓       | ✓             |
+| 失败后到其他节点重试                      | ✗                         | ✓    | ✗       |✓ ✓      | ✓ ✓           |
 | Failure-sensitive node selection       | ✗                         | ✗    | ✗       | ✓       | ✓             |
-| Automatic protocol selection           | ✗                         | ✗    | ✗       | ✓      | ✓             |
+| 自动选择协议                             | ✗                         | ✗    | ✗       | ✓       | ✓             |
 
-| Media-Type Handling                    | Erlang                    | Java | PHP     | Python  | Ruby          |
+| 媒介类型处理                             | Erlang                    | Java | PHP     | Python  | Ruby          |
 |----------------------------------------|---------------------------|------|---------|---------|---------------|
-| Use arbitrary media types              | ✓                         | ✓    | ✓       | ✓       | ✓             |
-| JSON (de-)serialization                | ✗                         | ✓    | ✓       | ✓       | ✓             |
-| Other included (de-)serializers        | Erlang Binary Term Format | ✗    | ✗       | ✗       | YAML, Marshal |
-| Custom (de-)serializers                | ✗                         | ✓    | ✗       | ✓       | ✓             |
+| 使用任意的媒介类型                        | ✓                         | ✓    | ✓       | ✓       | ✓             |
+| 使用 JSON 序列及反序列化                  | ✗                         | ✓    | ✓       | ✓       | ✓             |
+| 包含的其他序列及反序列化方式               | Erlang 二进制              | ✗    | ✗       | ✗       | YAML, Marshal |
+| 自定义序列及反序列化方式                   | ✗                         | ✓    | ✗       | ✓       | ✓             |
 
-| Eventual Consistency                   | Erlang                    | Java | PHP     | Python  | Ruby          |
+| 最终一致性                              | Erlang                    | Java | PHP     | Python  | Ruby          |
 |----------------------------------------|---------------------------|------|---------|---------|---------------|
 | Exposes siblings                       | ✓                         | ✓    | ✓       | ✓       | ✓             |
 | Sibling resolution policies/strategies | ✗                         | ✓    | ✗       | ✓       | ✓             |
@@ -241,9 +236,9 @@ client process pool based on poolboy
 
 *Node.js*
 
-* [zukai](https://github.com/natural/zukai) - Riak ODM for Node.js from Troy Melhase 
+* [zukai](https://github.com/natural/zukai) - Riak ODM for Node.js from Troy Melhase
 * [riak-pb](https://github.com/CrowdProcess/riak-pb) - Riak Protocol Buffers Client for Node.js from the team at [CrowdProcess](http://crowdprocess.com)
-* [[node_riak|https://github.com/mranney/node_riak]] - Voxer's production Node.js client for Riak. 
+* [[node_riak|https://github.com/mranney/node_riak]] - Voxer's production Node.js client for Riak.
 * [[nodiak|https://npmjs.org/package/nodiak]] - Supports bulk get/save/delete, sibling auto-resolution, MapReduce chaining, Search, and 2i's.
 * [[resourceful-riak|https://github.com/admazely/resourceful-riak]] - A Riak engine to the [[resourceful|https://github.com/flatiron/resourceful/]] model framework from [[flatiron|https://github.com/flatiron/]].
 * [[Connect-Riak|https://github.com/frank06/connect-riak]] - Riak Session Store for Connect backed by [[Riak-js|http://riakjs.org/]]

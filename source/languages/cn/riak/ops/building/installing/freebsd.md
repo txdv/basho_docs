@@ -13,30 +13,32 @@ download:
   name: "FreeBSD"
 ---
 
-You can install Riak on FreeBSD for the AMD64 architecture with a binary package or by building from source code.
+在 AMD 64 位架构的 FreeBSD 系统上安装 Riak，可以使用二进制安装包或者从源码安装。
 
-## Installing From Binary Package
+## 使用二进制安装包安装
 
-<div class="info"><div class="title">Note</div>The Riak 1.2 binary package is supported on FreeBSD version 9. Users have reported success building Riak from source on a number of FreeBSD versions, however.</div>
+<div class="info">
+<div class="title">注意</div>
+Riak 1.2 的安装包只支持 FreeBSD 9。很多用户反馈，在很多其他版本中从源码安装能成功。
+</div>
 
-Installing Riak from a binary package is the simplest method with least required dependencies, and requires less time to complete than building from source.
+从安装包安装 Riak 是最简单的，需要最少的依赖库，也比从源码安装用时少。
 
-### Prerequisites and Dependencies
+### 要求和依赖库
 
-Riak depends on `sudo` to be installed if the Riak command line tools are to be executed by users other than the *riak* user. Please ensure that `sudo` is installed via packages or the ports collection prior to installing the Riak package.
+如果 Riak 命令行工具由 *riak* 之外的用户使用，需要 `sudo` 的支持。请确保在安装 Riak 包之前安装了 `sudo` 包。
 
-The Riak binary package also depends on a packaged version of OpenSSL. Prior to installing Riak 1.2 on FreeBSD 9, you'll need to install `openssl-1.0.0_7` either from package or the ports collection.
+Riak 安装包还需要 OpenSSL 的支持，在 FreeBSD 9 中安装 Riak 1.2 之前，需要先安装 `openssl-1.0.0_7`。
 
-### Installation
+### 安装
 
-You can install the Riak binary package on FreeBSD remotely using the
-`pkg_add` remote option. For this example, we're installing `riak-{{V.V.V}}-FreeBSD-amd64.tbz`.
+在 FreeBSD 上安装 Riak 安装包，可以使用 `pkg_add` 的远程选项。这里我们要安装的是 `riak-{{V.V.V}}-FreeBSD-amd64.tbz`。
 
 ```bash
 sudo pkg_add -r http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/freebsd/9/riak-{{V.V.V}}-FreeBSD-amd64.tbz
 ```
 
-When Riak is installed, a message is displayed with information about the installation and available documentation.
+Riak 安装成功后，会显示一个消息，列出安装信息和文档的位置。
 
 ```text
 Thank you for installing Riak.
@@ -59,37 +61,38 @@ scripts directly.
 Man pages are available for riak(1), riak-admin(1), and search-cmd(1)
 ```
 
-If instead of this message, you receive an error during installation regarding OpenSSL, similar to this one:
+如果没显示这个消息，在安装过程中却显示了一个和 OpenSSL 相关的错误信息，类似下面这个：
 
 ```text
 Package dependency openssl-1.0.0_7 for /tmp/riak-{{V.V.V}}-FreeBSD-amd64.tbz not found!
 ```
 
-Be sure that you've installed the required OpenSSL version from packages or the ports collection as described in the **Prerequisites and Dependencies** section.
+请确保按照**要求和依赖库**一节的说明安装了正确版本的 OpenSSL。
 
-## Installing From Source
+## 从源码安装
 
-Installing Riak from source on FreeBSD is a straightforward process which requires installation of more dependencies (such as Erlang) prior to building, and requires more time than a binary package installation.
+在 FreeBSD 上从源码安装 Riak 很显然在编译之前需要安装更多的依赖库（例如 Erlang），也比使用安装包用时久。
 
-That said, installing from source provides for greater flexibility with respect to configuration, data root locations, and more fine grained control over specific dependency versions.
+从源码安装可以更灵活的掌控设置，数据根目录，以及某些依赖库的版本。
 
-### Prerequisites and Dependencies
+### 要求和依赖库
 
-When building and installing Riak from source, you might be required to install some prerequisite software before proceeding with the build.
+从源码安装 Riak，在编译之前要安装一些依赖库。
 
-If you do not currently have the following software installed, please install it with packages or the ports collection before proceeding.
+如果还没有安装下面列出的软件，请通过包安装之。
 
-* Erlang (Can also be installed via Kerl as described in [[Installing Erlang]].
+* Erlang（也可以使用 kerl 安装，参见 [[Installing Erlang]]）
 * Curl
 * Git
-* OpenSSL (version 1.0.0_7)
+* OpenSSL（1.0.0_7）
 * Python
 * sudo
 
-### Installation
-First download the version you wish to install from [Basho downloads](http://basho.com/resources/downloads/).
+### 安装
 
-Next, unpack and build a release from source:
+首先从 [Basho 下载页面](http://basho.com/resources/downloads/)下载想要安装的版本。
+
+然后，解压并编译源码：
 
 ```bash
 tar zxf <riak-x.x.x>
@@ -97,7 +100,7 @@ cd riak-x.x.x
 gmake rel
 ```
 
-Upon conclusion of the build, the `rel/riak` directory will contain a full Riak node environment, including configuration, data, and log directories:
+编译成功后，在 `rel/riak` 目录中会包含一个完整的 Raik 节点环境，包含设置、数据和日志子目录。
 
 ```text
 bin               # Riak binaries
@@ -109,23 +112,24 @@ log               # Operational logs
 releases          # Release information
 ```
 
-If you'd prefer to build a development environment consisting of 4 nodes which can be run as a cluster on one machine, specify the `devrel` target instead of the `rel` target, like this:
+如果需要搭建一个包含 4 个节点的开发环境，变成集群，把编译的目标由 `rel` 改成 `devrel`，如下所示：
 
 ```bash
 gmake devrel
 ```
 
-## Next Steps?
-From here you might want to check out:
+## 然后呢？
 
-* [[Post Installation Notes|Post Installation]]: for checking Riak health after installation
-* [[Five Minute Install]]: a guide for setting up a 5 node cluster and exploring Riak’s main features.
-* [[Basic Configuration]]: a guide that will show you how to go from one node to bigger than Google!
+请阅读下面的文章：
 
-## References
+-   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
+-   [[Five Minute Install]]：介绍如何搭建一个包含 5 个节点的集群，并且概览了 Riak 的主要功能
+-   [[Basic Configuration]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
 
-* [Basho Downloads](http://basho.com/resources/downloads/)
+## 资源列表
+
+* [Basho 下载页面](http://basho.com/resources/downloads/)
 * [[Installing and Upgrading]]
 * [[Installing Erlang]]
-* [Using the FreeBSD Package System](http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/packages-using.html)
-* [Using the FreeBSD Ports Collection](http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html)
+* [使用 FreeBSD 的包系统](http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/packages-using.html)
+* [使用 FreeBSD 的 Ports Collection](http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html)

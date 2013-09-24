@@ -10,86 +10,80 @@ up:   "[[Installing and Upgrading]]"
 next: "[[Installing on Debian and Ubuntu]]"
 ---
 
-Riak requires [[Erlang|http://erlang.org/]] {{#1.2.0+}}R15B01{{/1.2.0+}}{{#1.2.0-}}R14B03{{/1.2.0-}}
+Riak 需要 [[Erlang|http://erlang.org/]] {{#1.2.0+}}R15B01{{/1.2.0+}}{{#1.2.0-}}R14B03{{/1.2.0-}} 的支持。
 
-For Erlang to build and install, you must have a GNU-compatible build system, and the development bindings of ncurses and openssl.
+为了能编译安装 Erlang，所用的操作系统必须安装兼容 GNU 的编译系统，还要绑定 ncurses 和 openssl。
 
 <div class="note">
-<div class="title">Erlang Version Note</div>
-The Riak binary packages for Debian and Ubuntu, Mac OS X, and RHEL and CentOS include an Erlang distribution, and do not require that you build Erlang from source. However, <strong>you must download and install Erlang if you are planning on completing the [[Five Minute Install]]</strong>.
+<div class="title">Erlang 版本提醒</div>
+针对 Debian、Ubuntu、Mac OS X、RHEL 和 CentOS 的 Riak 二进制安装包中已经包含了 Erlang，因此无需再编译 Erlang 源码。不过，<strong>如果要完成 [[Five Minute Install]] 中介绍的内容，必须下载安装 Erlang</strong>。
 </div>
 
-## Install using kerl
+## 使用 kerl 安装
 
-You can install different Erlang versions in a simple manner with the [kerl](https://github.com/spawngrid/kerl) script. This is probably the easiest way to install Erlang from source on a system, and typically only requires a few commands to do so. Install kerl by running the following command:
+如果想方便的安装不同的 Erlang 版本，可以使用 [kerl](https://github.com/spawngrid/kerl) 脚本。kerl 应该是从源码安装 Erlang 最简单的方式，一般只需执行几个命令即可。请执行下面的命令安装 kerl：
 
 ```bash
 curl -O https://raw.github.com/spawngrid/kerl/master/kerl; chmod a+x kerl
 ```
 
-To compile Erlang as 64-bit on Mac OS X, you need to instruct kerl to pass the correct flags to the `configure` command. The easiest way to do this is by creating a `~/.kerlrc` file with the following contents:
+若要在 Mac OS X 上安装 64 位 Erlang，必须明确告知 kerl，向 `configure` 命令传入正确的旗标。最简单的方法是创建 `~/.kerlrc` 文件，写入如下内容：
 
 ```text
 KERL_CONFIGURE_OPTIONS="--disable-hipe --enable-smp-support --enable-threads
                         --enable-kernel-poll  --enable-darwin-64bit"
 ```
 
-Note that when building Erlang on a FreeBSD/Solaris system (including SmartOS), HIPE should be disabled on these platforms as well with the above `--disable-hipe` option.
+注意，在 FreeBSD/Solaris（包括 SmartOS）系统上编译 Erlang 时，必须禁用 HIPE，通过上面所示的 --disable-hipe` 选项设定。
 
-Building with kerl on GNU/Linux has the same prerequisites that building from source does.
+在 GNU/Linux 上使用 kerl 编译和从源码编译的要求一样。
 
-Building the Erlang release of your choice is one command; as of Riak version 1.2, you should build and use Erlang version R15B01 like this:
+安装的 Erlang 版本是个硬性要求，从 Riak 1.2 其，必须使用 Erlang R15B01，命令如下：
 
 ```bash
 ./kerl build R15B01 r15b01
 ```
 
-This builds the Erlang distribution, and does all the steps required to manually install Erlang for you.
+上述命令会自动编译 Erlang，代替你执行手动安装所需的步骤。
 
-When successfully built you can install the build using:
+成功编译后，可以使用下面的命令安装：
 
 ```bash
 ./kerl install r15b01 ~/erlang/r15b01
 . ~/erlang/r15b01/activate
 ```
 
-The last line activates the Erlang build that was just installed into `~/erlang/r15b01`. See the [[kerl readme|https://github.com/spawngrid/kerl]] for more details on the available commands.
+最后一个命令激活了刚编译的 Erlang，并将其安装到 `~/erlang/r15b01`。更多可用的命令参见 [[kerl 自述文件|https://github.com/spawngrid/kerl]]。
 
-If you prefer to install Erlang manually from the source code, the following will show you how.
+如果你选择从源码手动安装 Erlang，请阅读下面的内容。
 
-## Installing on GNU/Linux
+## 在 GNU/Linux 上安装
 
-Most GNU/Linux distributions do not make the most recent Erlang release available, **so you will need to install from source**.
+大多数 GNU/Linux 发行版本自带的并不是最新的 Erlang 版本，**因此需要自行从源码安装**。
 
-First, make sure you have a compatible build system and have installed the
-necessary dependencies.
+首先，确保系统中安装了可用的编译系统，以及其他必要的依赖库。
 
-### Debian/Ubuntu Dependencies
+### Debian/Ubuntu 系统的依赖库
 
-Use this command to install the required dependency packages:
+使用下面的命令安装必要的依赖包：
 
 ```bash
 sudo apt-get install build-essential libncurses5-dev openssl libssl-dev fop xsltproc unixodbc-dev
 ```
 
-If you'll be using a graphical environment (such as for development purposes)
-and would like to use Erlang's GUI utilities, then you'll need to install
-some additional dependencies.
+如果你使用的是图形化环境（例如开发需要），而且想使用 Erlang 的 GUI 工具，还需要再安装一些依赖库。
 
-<div class="info">Note that these packages are not required for operation
-of a Riak node and notes in the build output about missing support for
-wxWidgets can be safely ignored when installing Riak in a typical
-non-graphical server environment.</div>
+<div class="info">注意，这些依赖库并不是操作 Riak 必须要安装的。如果在非图形化的服务器环境中安装 Riak，编译时提示缺少 wxWidgets，可以直接忽略。</div>
 
-To install packages for graphics support, use this command:
+要安装支持图形化界面的包，请执行下面的命令：
 
 ```bash
 sudo apt-get install libwxbase2.8 libwxgtk2.8-dev libqt4-opengl-dev
 ```
 
-### RHEL/CentOS Dependencies
+### RHEL/CentOS 系统的依赖库
 
-Use this command to install the required dependency packages:
+使用下面的命令安装必要的依赖包：
 
 ```bash
 sudo yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf
@@ -97,7 +91,7 @@ sudo yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf
 
 ### Erlang
 
-Next, download, build and install Erlang:
+然后，下载、编译 Erlang：
 
 ```bash
 wget http://erlang.org/download/otp_src_R15B01.tar.gz
@@ -106,13 +100,15 @@ cd otp_src_R15B01
 ./configure && make && sudo make install
 ```
 
-## Installing on Mac OS X
-You can install Erlang in several ways on OS X: from source, with Homebrew, or with MacPorts.
+## 在 Mac OS X 上安装
 
-### Source
-To build from source, you must have Xcode tools installed from the CD that came with your Mac or from the Apple [[Developer website|http://developer.apple.com/]].
+在 Mac OS X 上安装 Erlang 有几种方法：从源码安装，使用 Homebrew 安装，使用 MacPorts 安装。
 
-First, download and unpack the source:
+### 从源码安装
+
+要想从源码安装，必须安装 Mac 附带 CD 中的 Xcode 工具包（还可以从 [Apple 开发者网站](http://developer.apple.com/)上下载）。
+
+首先，下载然后解压源码：
 
 ```bash
 curl -O http://erlang.org/download/otp_src_R15B01.tar.gz
@@ -120,19 +116,20 @@ tar zxvf otp_src_R15B01.tar.gz
 cd otp_src_R15B01
 ```
 
-Next, configure Erlang.
+然后设置 Erlang。
 
-**Mountain Lion (OS X 10.8) and Lion (OS X 10.7)**
-If you're on Mountain Lion (OS X 10.8) or Lion (OS X 10.7) you can use LLVM (the default) or GCC to compile Erlang.
 
-Using LLVM:
+**Mountain Lion (OS X 10.8) 和 Lion (OS X 10.7)**
+如果你使用的是 Mountain Lion (OS X 10.8) 或 Lion (OS X 10.7)，可以使用 LLVM（默认）或 GCC 编译 Erlang。
+
+使用 LLVM：
 
 ```text
 CFLAGS=-O0 ./configure --disable-hipe --enable-smp-support --enable-threads \
 --enable-kernel-poll --enable-darwin-64bit
 ```
 
-If you prefer GCC:
+如果喜欢使用 GCC：
 
 ```text
 CC=gcc-4.2 CPPFLAGS='-DNDEBUG' MAKEFLAGS='-j 3' \
@@ -141,39 +138,41 @@ CC=gcc-4.2 CPPFLAGS='-DNDEBUG' MAKEFLAGS='-j 3' \
 ```
 
 **Snow Leopard (OS X 10.6)**
-If you're on Snow Leopard (OS X 10.6) or Leopard (OS X 10.5) with an Intel processor:
+如果你使用的是 Snow Leopard (OS X 10.6) 或 Leopard (OS X 10.5)，且处理器是英特尔的：
 
 ```bash
 ./configure --disable-hipe --enable-smp-support --enable-threads \
 --enable-kernel-poll  --enable-darwin-64bit
 ```
 
-If you're on a non-Intel processor or older version of OS X:
+如果处理器不是英特尔的，或者使用的是更旧版本的 OS X：
 
 ```bash
 ./configure --disable-hipe --enable-smp-support --enable-threads \
 --enable-kernel-poll
 ```
 
-Now build and install:
+然后编译安装：
 
 ```bash
 make && sudo make install
 ```
 
-You will be prompted for your sudo password.
+应该或提示你输入密码：
 
-### Homebrew
-If you want to install Riak with Homebrew, follow the [[Mac OS X Installation documentation|Installing-on-Mac-OS-X]], and Erlang will be installed automatically.
+### 使用 Homebrew 安装
 
-To install Erlang separately with Homebrew, use this command:
+如果使用 Homebre 安装 Riak，请参照 [[Mac OS X Installation documentation|Installing-on-Mac-OS-X]] 中的步骤，会自动安装 Erlang。
+
+要想使用 Homebrew 单独安装 Erlang，请执行下面的命令：
 
 ```bash
 brew install erlang
 ```
 
-### MacPorts
-Installing with MacPorts is easy:
+### 使用 MacPorts 安装
+
+使用 MacPorts 安装也很简单：
 
 ```bash
 port install erlang +ssl

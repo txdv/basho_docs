@@ -8,12 +8,9 @@ keywords: [tutorial, installing, upgrading]
 next: "[[Installing Erlang]]"
 ---
 
-Riak is supported on numerous popular operating systems and virtualized
-environments. The following information will help you to
-properly install or upgrade Riak in one of the supported environments.
+很多操作系统和虚拟环境都支持 Riak。下面的信息可以给你提供信息，以便正确地在所支持的环境中安装或升级 Riak。
 
-Click the link for your operating system or virtualized environment for
-detailed Riak installation instructions.
+请点选下面针对各操作系统或虚拟环境的链接查看安装 Riak 的详细说明。
 
   * [[Debian and Ubuntu|Installing on Debian and Ubuntu]]
   * [[RHEL and CentOS|Installing on RHEL and CentOS]]
@@ -22,12 +19,12 @@ detailed Riak installation instructions.
   * [[SUSE|Installing on SUSE]]
   * [[Windows Azure|Installing on Windows Azure]]
   * [[AWS Marketplace|Installing on AWS Marketplace]]
-  * [[From Source|Installing Riak from Source]] *(for unlisted-operating systems, requires [[Erlang installation|Installing Erlang]])*
+  * [[From Source|Installing Riak from Source]] *（针对未列出的操作系统，需要 [[Erlang installation|Installing Erlang]]）*
 
 ### Chef Cookbooks
 
   * [[Installing Riak With Chef]]
 
-### Upgrading
+### 升级
 
   * [[Rolling Upgrades]]

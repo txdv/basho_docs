@@ -8,86 +8,86 @@ audience: beginner
 keywords: [developers]
 ---
 
-The basic actions of Riak are the same CRUD (Create, Read, Update, Delete) operations as any key/value store.
+对 Riak 的基本操作和其他任何基于键值对的数据库一样，使用 CRUD（创建，读取，更新，删除）。
 
-## Object/Key Operations
+## 操作对象和键
 
-Riak organizes data into Buckets, Keys, and Values. Values (or objects) are identifiable by a unique key, and each key/value pair is stored in a bucket. Buckets are essentially a flat namespace in Riak and have little significance beyond their ability to allow the same key name to exist in multiple buckets and to provide some per-bucket configurability for things like replication factor and pre/post-commit hooks.
+Riak 中的数据依照 bucket、键和值的方式组织。值（或称对象）使用唯一的键标识，键值对都保存在 bucket 中。在 Riak 中，bucket 基本上就是一种命名空间，允许在不同的 bucket 中出现相同的键，还能针对各个 bucket 做设置，例如副本数量和提交前后钩子。
 
-Most of the interactions you'll have with Riak will be setting or retrieving the value of a key. Although we'll use the Riak HTTP API for illustrative purposes, Riak has [[supported client libraries|Client Libraries]] for Erlang, Java, PHP, Python, Ruby and C/C++. In addition, there are [[community-supported projects|Client Libraries#Community-Libraries]] for .NET, Node.js, Python, Perl, Clojure, Scala, Smalltalk, and many others.
+和 Riak 的交互基本上就是使用键存储和取出值。本文将使用 Riak HTTP API 做演示，Riak 还为 Erlang、Java、PHP、Python、Ruby 和 C/C++ 提供了客户端代码库（[[supported client libraries|Client Libraries]]）。.NET、Node.js、Python、Perl、Clojure、Scala、Smalltalk 等其他语言的代码库由社区维护（[[community-supported projects|Client Libraries#Community-Libraries]]）。
 
-### Read an Object
+### 读取对象
 
-Here is the basic command form for retrieving a specific key from a bucket.
+下面是从 bucket 中读取某个键对应对象的基本命令。
 
 ```bash
 GET /riak/BUCKET/KEY
 ```
 
-The body of the response will contain the contents of the object (if it exists).
+响应的主体中包含对象的值（如果对象存在的话）。
 
-Riak understands many HTTP-defined headers, like `Accept` for content-type negotiation (relevant when dealing with siblings, see [[the sibling examples for the HTTP API|HTTP Fetch Object#Siblings-examples]], and `If-None-Match`/`ETag` and `If-Modified-Since`/`Last-Modified` for conditional requests.
+Riak 能理解很多 HTTP 报头，例如 用于协商内容类型的 `Accept`（处理兄弟数据（sibling）时会用到，参见 [[the sibling examples for the HTTP API|HTTP Fetch Object#Siblings-examples]]），以及用于条件请求的 `If-None-Match`/`ETag` 和 `If-Modified-Since`/`Last-Modified`。
 
-Riak also accepts many query parameters, including `r` for setting the R-value for this GET request (R values describe how many replicas need to agree when retrieving an existing object in order to return a successful response). If you omit the the `r` query parameter, Riak defaults to `r=2`.
+Riak 还能接收很多请求参数，例如 `r`，设置当前 GET 请求的 R 值（R 值表示回返几个副本时表明响应是成功的）。如果省略请求参数 `r`，Riak 取默认值 2.
 
-Normal response codes:
+常规响应码：
 
 * `200 OK`
 * `300 Multiple Choices`
 * `304 Not Modified`
 
-Typical error codes:
+常见的错误代码：
 
 * `404 Not Found`
 
-So, with that in mind, try this command. This will request (GET) the key `doc2` from the bucket `test.`
+了解上述内容后，请运行如下命令，从 `test` bucket 中获取（GET）键 `doc2` 对应的值：
 
 ```bash
 $ curl -v http://localhost:8098/riak/test/doc2
 ```
 
-This should return a `404 Not Found` as the key `doc2` does not exist (you haven't created it yet).
+这个请求会返回 `404 Not Found`，因为键 `doc2` 不存在（还没创建）。
 
-### Store an object
+### 存储对象
 
-Your application will often have its own method of generating the keys for its data.  If so, storing that data is easy.  The basic request looks like this.
+应用程序一般都会定义一个方法，生成数据的键。如果生成了键，存储数据就简单了。基本的请求方式如下。
 
-*Note that this is not the only URL format available. Alternate forms can be found in the [[HTTP API]].*
+*这并不是唯一的 URL 格式，其他格式参见 [[HTTP API]]。*
 
 ```bash
 PUT /riak/BUCKET/KEY
 ```
 
-<div class="info"><code>POST</code> is also a valid verb, for compatibility's sake.</div>
+<div class="info">为了兼容，也可以使用 <code>POST</code>。</div>
 
-There is no need to intentionally create buckets in Riak.  They pop into existence when keys are added to them, and disappear when all keys have been removed from them.
+在 Riak 中，不用主动创建 bucket，把键存入时 bucket 就自动创建了，如果把 bucket 中的所有键都删掉了，bucket 也就不存在了。
 
-Some request headers are required for PUTs:
+必须为PUT 请求指定一些请求报头：
 
-* `Content-Type` must be set for the stored object. Set what you expect to receive back when next requesting it.
-* `X-Riak-Vclock` if the object already exists, the vector clock attached to the object when read; if the object is new, this header may be omitted
+* 必须为要存储的对象设定 `Content-Type`，设定值为事后想取出的类型。
+* 如果对象存在，`X-Riak-Vclock` 设定地向量时钟会附加到对象上；如果是新对象，可以省略 `X-Riak-Vclock`。
 
-Other request headers are optional for PUTs:
+以下报头对 PUT 请求是可选的：
 
-* `X-Riak-Meta-YOUR_HEADER` any additional metadata headers that should be stored with the object (eg. `X-Riak-Meta-FirstName`).
-* `Link` user and system-defined links to other resources. Read more about [[Links]].
+* `X-Riak-Meta-YOUR_HEADER` 指定要为存储对象设定地其他元数据（例如 `X-Riak-Meta-FirstName`）。
+* `Link` 指定用户和系统定义的指向其他资源的链接。详细说明参见 [[Links]]。
 
-Similar to how GET requests support the `r` query parameter, `PUT` requests also support these parameters:
+GET 请求可以接收请求参数 `r`，类似的，`PUT` 请求也能接收这些参数：
 
-* `r` (default is `2`) how many replicas need to agree when retrieving an existing object before the write
-* `w` (default is `2`) how many replicas to write to before returning a successful response
-* `dw` (default is `0`) how many replicas to commit to durable storage before returning a successful response
-* `returnbody` (boolean, default is `false`) whether to return the contents of the stored object
+* `r`（默认值为 `2`）：写入之前，要取出多少个已存对象的副本
+* `w`（默认值为 `2`）：返回成功的响应之前要写入多少个副本
+* `dw`（默认值为 `0`）：返回成功的响应之前要提交多少个副本到“持久存储”（durable storage）
+* `returnbody` （布尔值，默认为 `false`）：是否返回存储对象的内容
 
-Normal status codes:
+常规响应码：
 
 * `200 OK`
 * `204 No Content`
 * `300 Multiple Choices`
 
-If `returnbody=true`, any of the response headers expected from a `GET` request may be present. Like a `GET` request, `300 Multiple Choices` may be returned if siblings existed or were created as part of the operation, and the response can be dealt with similarly.
+如果 `returnbody=true`，任何一个 `GET` 请求的响应报头都可能出现在 `PUT` 请求的响应报头中。和 `GET` 请求一样，如果有兄弟数据，或者在请求中创建了兄弟数据，可能会返回 `300 Multiple Choices`。对响应报文的处理也和 `GET` 请求类似。
 
-Let's give it a shot. Try running this in a terminal.
+我们来试一下，在终端执行如下命令：
 
 ```
 $ curl -v -XPUT http://localhost:8098/riak/test/doc?returnbody=true \
@@ -96,23 +96,23 @@ $ curl -v -XPUT http://localhost:8098/riak/test/doc?returnbody=true \
   -d '{"bar":"baz"}'
 ```
 
-### Store a new object and assign random key
+### 存储新对象时指定随机键
 
-If your application would rather leave key-generation up to Riak, issue a `POST` request to the bucket URL instead of a PUT to a bucket/key pair:
+如果应用程序把生成键的权力交给 Riak，请不用向 bucket/键发起 `PUT` 请求，而要想 bucket 的 URL 发起 `POST` 请求：
 
 ```bash
 POST /riak/BUCKET
 ```
 
-If you don't pass Riak a "key" name after the bucket, it will know to create one for you.
+如果 bucket 后面没有指定键，Riak 就会自动生成一个。
 
-Supported headers are the same as for bucket/key PUT requests, though `X-Riak-Vclock` will never be relevant for these POST requests.  Supported query parameters are also the same as for bucket/key PUT requests.
+这种请求支持的报头和针对 bucket/键的 `PUT` 请求一样，不过用不到 `X-Riak-Vclock`。支持的请求参数也一样。
 
-Normal status codes:
+常规状态码：
 
 * `201 Created`
 
-This command will store an object, in the bucket `test` and assign it a key:
+下面的命令会把对象存入 bucket `test`，并自动生成一个键：
 
 ```
 $ curl -v -XPOST http://localhost:8098/riak/test \
@@ -120,61 +120,63 @@ $ curl -v -XPOST http://localhost:8098/riak/test \
   -d 'this is a test'
 ```
 
-In the output, the `Location` header will give the you key for that object. To view the newly created object, go to `http://localhost:8098/*_Location_*` in your browser.
+在输出中，`Location` 报头就是该对象的键。要想查看刚创建的对象，请在浏览器中打开 `http://localhost:8098/*_Location_*`。
 
-If you've done it correctly, you should see the value (which is "this is a test").
+如果一切顺利，应该看到存储的值（“this is a test”）。
 
-### Delete an object
+### 删除对象
 
-The delete command, as you can probably guess, follows a predictable pattern and looks like this:
+你可能已经猜到了，删除命令的结构和之前几个命令类似，如下：
 
 ```bash
 DELETE /riak/BUCKET/KEY
 ```
 
-The normal response codes for a `DELETE` operations are `204 No Content` and `404 Not Found`
+`DELETE` 操作常见的响应码有 `204 No Content` 和 `404 Not Found`。
 
-404 responses are *normal*, in the sense that `DELETE` operations are idempotent and not finding the resource has the same effect as deleting it.
+404 响应最常见，因为 `DELETE` 操作是幂等的。没找到对象就说明已经删除了。
 
-Try this:
+请尝试以下命令：
 
 ```bash
 $ curl -v -XDELETE http://localhost:8098/riak/test/test2
 ```
 
-## Bucket Properties and Operations
+## Bucket 的属性和操作
 
-Buckets are essentially a flat namespace in Riak. They allow the same key name to exist in multiple buckets and provide some per-bucket configurability.
+Buckets 在 Riak 中就是命名空间，允许相同的键出现在不同的 bucket 中，还可以针对特定的 bucket 做一些设置。
 
-<div class="info"><div class="title">How Many Buckets Can I Have?</div>
-Buckets come with virtually no cost <em>except for when you modify the default bucket properties</em>. Modified bucket properties are gossiped around the cluster and therefore add to the amount of data sent around the network. In other words, buckets using the default bucket properties are free.
+<div class="info">
+<div class="title">能创建多少个 bucket？</div>
+
+bucket 几乎没什么消耗，<em>除非要修改 bucket 的默认设置</em>。修改 bucket 的属性后要广播到整个集群，因此增加了网络数据传送量。也就是说，只要使用默认设置，就可以尽情使用 bucket。
 </div>
 
-### Setting a Bucket's Properties
+### 设置 bucket 的属性
 
-However, in addition to providing a namespace for keys, the properties of a bucket also define some of the behaviors that Riak will implement for the values stored in the bucket.
+bucket 除了作为键的命名空间，其属性还能影响其中保存的值。
 
-To set these properties, issue a `PUT` to the bucket's URL:
+想设置 bucket 的值，要对 bucket 的 URL 发起 `PUT` 请求：
 
 ```bash
 PUT /riak/BUCKET
 ```
 
-The body of the request should be a JSON object with a single entry "props".  Unmodified bucket properties may be omitted.
+请求主体为 JSON 对象，只有一个条目“props”。不想改动的属性可以省略。
 
-Important headers:
+重要的报头：
 
 * `Content-Type: application/json`
 
-The most important properties to consider for your bucket are:
+bucket 最重要的属性如下：
 
-* `n_val` (defaults to `3`) the number of replicas for objects in this bucket;
-  `n_val` should be an integer greater than 0 and less than the number of partitions in the ring.
-  <div class="note">If you change <code>n_val</code> after keys have been added to the bucket it may result in failed reads. The new value may not be replicated to all of the appropriate partitions.</div>
+* `n_val`（默认值为 `3`）：bucket 中对象的副本数量；
+  `n_val` 为整数，大于 0，且小于环中分区的数量。
+  <div class="note">如果 bucket 中存储了键，修改 <code>n_val</code> 可能会发生错误。新值可能不会应用到所有分区。</div>
 
-* `allow_mult` (boolean, defaults to `false`) With `allow_mult` set to `false`, clients will only get the most-recent-by-timestamp object. Otherwise, Riak maintains any sibling objects caused by concurrent writes (or network partitions).
+* `allow_mult`（布尔值，默认为 `false`）：如果为 `false`，客户端只能根据时间戳获取最新的对象；否则，Riak 会维护因并发写入（或网络隔断）导致的兄弟数据。
 
-Let's go ahead and alter the properties of a bucket. The following `PUT` will create a new bucket called `test` with a modified `n_val` of `5`.
+我们来修改一个 bucket 的属性。下面的 `PUT` 请求会创建一个新 bucket，名为 `test`，`n_val` 设为 `5`。
 
 ```
 $ curl -v -XPUT http://localhost:8098/riak/test \
@@ -182,25 +184,25 @@ $ curl -v -XPUT http://localhost:8098/riak/test \
   -d '{"props":{"n_val":5}}'
 ```
 
-### GET Buckets
+### 读取 bucket
 
-Here is how you use the [[HTTP API]] to retrieve (or `GET`) the bucket properties and/or keys:
+如果想使用 [[HTTP API]] 读取（`GET`） bucket 的属性或键，可以这么做：
 
 ```bash
 GET /riak/BUCKET
 ```
 
-The optional query parameters are:
+可选的请求参数有：
 
-* `props`: `true`|`false` - whether to return the bucket properties (defaults to `true`)
-* `keys`: `true`|`false`|`stream` - whether to return the keys stored in the bucket (defaults to `false`); see the [[HTTP API's list keys|HTTP List Keys]] for details about dealing with a `keys=stream` response
+* `props`: `true`|`false` - 是否返回 bucket 的属性，默认为 `true`
+* `keys`: `true`|`false`|`stream` - 是否返回 bucket 中保存的键，默认为 `false`；如何处理 `keys=stream` 形式的响应，请阅读 [[HTTP API's list keys|HTTP List Keys]]
 
-With that in mind, go ahead and run this command. This will `GET` the bucket information that we just set with the sample command above:
+知道上述内容后，请执行下面的命令，读取刚才设置的 bucket 信息：
 
 ```bash
 $ curl -v http://localhost:8098/riak/test
 ```
 
-You can also view this bucket information through any browser by going to `http://localhost:8098/riak/test`
+还可以在浏览器中查看 bucket 的信息，访问 `http://localhost:8098/riak/test` 即可。
 
-So, that's the basics of how the [[HTTP API]] works. An in depth reading of the HTTP API page is highly recommended. This will give you details on the headers, parameters, and status that you should keep in mind, even when using a client library.
+以上就是 [[HTTP API]] 的基本操作方式。强烈推荐您仔细阅读 HTTP API 文档，可以详细了解报头、请求参数以及响应码，即使使用客户端代码库对你也很有用。

@@ -13,28 +13,34 @@ download:
   name: "Mac OS X"
 ---
 
-The following steps are known to work with Mac OS X {{#1.4.0-}}10.5 and 10.6{{/1.4.0-}}{{#1.4.0+}}10.8{{/1.4.0+}}. You can install from source or download a precompiled tarball.
+下面介绍的步骤在 Mac OS X {{#1.4.0-}}10.5 和 10.6{{/1.4.0-}}{{#1.4.0+}}10.8{{/1.4.0+}} 上可用。可以从源码安装或者下载预先编译好的 tarball 压缩包。
 
-## Install Types
-  * Precompiled Tarballs
-  * Homebrew
-  * Source
+## 安装方式
 
-<div class="note"><div class="title">ulimit on OS X</div>OS X gives you a very small limit on open file handles, so even with a backend that uses very few file handles, it's possible to run out. See [[Open Files Limit]] for more information about changing the limit.</div>
+* 预先编译好的 tarball 压缩包
+* Homebrew
+* 源码
 
-## From Precompiled Tarballs
-To run Riak from our precompiled tarball, run these commands for the appropriate platform:
+<div class="note">
+<div class="title">OS X 上的 ulimit</div>
+
+OS X 中文件的打开句柄数很小，因此即便是文件句柄使用量很小的后台程序，也可能将其耗尽。更改句柄数量限制的方法参见 [[Open Files Limit]]。
+</div>
+
+## 使用预先编译好的 tarball 压缩包安装
+
+要想使用语言编译好的 tarball 压缩包安装 Riak，请运行针对相应平台的命令：
 
 {{#1.2.0-}}
 
-### 64-bit
+### 64 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V}}-osx-x86_64.tar.gz
 tar xzvf riak-{{V.V.V}}-osx-x86_64.tar.gz
 ```
 
-### 32-bit
+### 32 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}-osx-i386.tar.gz
@@ -44,14 +50,14 @@ tar xzvf riak-{{V.V.V}}-osx-i386.tar.gz
 {{/1.2.0-}}
 {{#1.2.0}}
 
-### 64-bit
+### 64 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.4/riak-{{V.V.V}}-osx-x86_64.tar.gz
 tar xzvf riak-{{V.V.V}}-osx-x86_64.tar.gz
 ```
 
-### 32-bit
+### 32 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.4/riak-{{V.V.V}}-osx-i386.tar.gz
@@ -61,14 +67,14 @@ tar xzvf riak-{{V.V.V}}-osx-i386.tar.gz
 {{/1.2.0}}
 {{#1.2.1}}
 
-### 64-bit
+### 64 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.4/riak-{{V.V.V}}-osx-x86_64.tar.gz
 tar xzvf riak-{{V.V.V}}-osx-x86_64.tar.gz
 ```
 
-### 32-bit
+### 32 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.4/riak-{{V.V.V}}-osx-i386.tar.gz
@@ -78,14 +84,14 @@ tar xzvf riak-{{V.V.V}}-osx-i386.tar.gz
 {{/1.2.1}}
 {{#1.3.0-1.3.2}}
 
-### 64-bit
+### 64 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.6/riak-{{V.V.V}}-osx-x86_64.tar.gz
 tar xzvf riak-{{V.V.V}}-osx-x86_64.tar.gz
 ```
 
-### 32-bit
+### 32 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.6/riak-{{V.V.V}}-osx-i386.tar.gz
@@ -95,14 +101,14 @@ tar xzvf riak-{{V.V.V}}-osx-i386.tar.gz
 {{/1.3.0-1.3.2}}
 {{#1.3.2-1.3.9}}
 
-### 64-bit
+### 64 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.8/riak-{{V.V.V}}-osx-x86_64.tar.gz
 tar xzvf riak-{{V.V.V}}-osx-x86_64.tar.gz
 ```
 
-### 32-bit
+### 32 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.8/riak-{{V.V.V}}-osx-i386.tar.gz
@@ -112,7 +118,7 @@ tar xzvf riak-{{V.V.V}}-osx-i386.tar.gz
 {{/1.3.2-1.3.9}}
 {{#1.4.0+}}
 
-### 64-bit
+### 64 位
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/osx/10.8/riak-{{V.V.V}}-OSX-x86_64.tar.gz
@@ -122,28 +128,29 @@ tar xzvf riak-{{V.V.V}}-osx-x86_64.tar.gz
 {{/1.4.0+}}
 After the release is untarred you will be able to cd into the riak directory and execute bin/riak start to start the Riak node.
 
-## Homebrew
+## 使用 Homebrew 安装
 
-<div class="note">Homebrew's Riak recipe is community supported, and thus is not always up to date with the latest Riak package. Please ensure that the current recipe is using the latest supported code (and don't be scared to update if it's not).</div>
+<div class="note">Homebrew 中安装 Riak 的脚本是由社区维护的，因此可能不是针对最新版 Riak 的。安装时请确保脚本安装的是最新版（如果不是最新版，也不用害怕，自己修改就是了）。</div>
 
-Installing with Homebrew is easy:
+使用 Homebrew 安装很简单：
 
 ```bash
 brew install riak
 ```
 
-Homebrew will install Erlang if you don't have it already.
+如果没有安装 Erlang，Homebrew 会自定为你安装。
 
-## From Source
-You must have Xcode tools installed from the CD that came with your Mac or from [[Apple's Developer website|http://developer.apple.com/]].
+## 从源码安装
 
-<div class="note">Riak will not compile with Clang. Please make sure your default C/C++ compiler is GCC.</div>
+必须先安装 Mac 附带 CD 中的 Xcode 工具包（还可以从 [Apple 开发者网站](http://developer.apple.com/)上下载）。
 
-Riak requires [[Erlang|http://www.erlang.org/]] R15B01. *Note: don't use Erlang version R15B02 or R15B03, for the moment, as it causes an [error with riak-admin status](https://github.com/basho/riak/issues/227) commands*.
+<div class="note">Riak 不兼容 Clang。请确保默认的 C/C++ 编译器是 GCC。</div>
 
-If you do not have Erlang already installed, see [[Installing Erlang]]. Don't worry, it's easy!
+Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-Next, download and unpack the source distribution.
+如果还没有安装 Erlang，请参照 [[Installing Erlang]]。不用担心，很简单！
+
+然后，下载解压源码：
 
 ```bash
 wget http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}.tar.gz
@@ -152,10 +159,11 @@ cd riak-{{V.V.V}}
 make rel
 ```
 
-If you get errors when building about "incompatible architecture", please verify that you built Erlang with the same architecture as your system (Snow Leopard and higher: 64bit{{#1.4.0-}}, everything else: 32bit{{/1.4.0-}}).
+如果编译时遇到关于“incompatible architecture”的错误，请确认编译 Erlang 时使用的架构是否和系统一致。（Snow Leopard 及以上版本：64 位{{#1.4.0-}}，其他版本：32 位{{/1.4.0-}}）
 
-## Next Steps?
-From here you might want to check out:
+## 然后呢？
 
-  * [[Post Installation]]: for checking Riak health after installation
-  * [[Five Minute Install]]: a guide that will show you how to go from one node to bigger than Google!
+请阅读下面的文章：
+
+-   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
+-   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

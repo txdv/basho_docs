@@ -13,25 +13,25 @@ download:
   name: "Red Hat or CentOS"
 ---
 
-When installing Riak on CentOS or Red Hat you can install from source or from our custom .rpm package.
+如果要在 CentOS 或 Red Hat 上安装 Riak，可以从源码安装，也可以使用我们提供的 .rpm 包。
 
-## Notes
+## 注意
 
-* CentOS enables SELinux by default and you may need to disable SELinux if you encounter errors.
-* Erlang OTP R15B01 and Riak Enterprise 1.2 do not work on CentOS 5.2, but do work on CentOS 5.3 and newer.
+* CentOS 默认启用了 SELinux，如果遇到错误，或许需要将其禁用。
+* Erlang OTP R15B01 和 Riak Enterprise 1.2 无法在 CentOS 5.2 上使用，但在 CentOS 5.3 及其以上版本中可以正常使用。
 
-## Installing From Our Custom .rpm Package
+## 使用我们提供的 .rpm 包安装
 
-### For Centos 5 / RHEL 5
+### 针对 Centos 5 / RHEL 5
 
-You can either install using yum *(recommended)*,
+你可以使用 yum 安装（*推荐*），
 
 ```
 sudo yum install http://yum.basho.com/gpg/basho-release-5-1.noarch.rpm
 sudo yum install riak
 ```
 
-...or install the rpm package manually.
+也可以手动安装 rpm 包。
 
 {{#1.2.0-}}
 
@@ -50,16 +50,16 @@ sudo rpm -Uvh riak-{{V.V.V}}-2.el5.x86_64.rpm
 
 {{/1.2.0+}}
 
-### For Centos 6 / RHEL 6
+### 针对 Centos 6 / RHEL 6
 
-You can either install using yum *(recommended)*,
+你可以使用 yum 安装（*推荐*），
 
 ```
 sudo yum install http://yum.basho.com/gpg/basho-release-6-1.noarch.rpm
 sudo yum install riak
 ```
 
-...or install the rpm package manually.
+也可以手动安装 rpm 包。
 
 {{#1.2.0-}}
 
@@ -79,26 +79,26 @@ sudo rpm -Uvh riak-{{V.V.V}}-2.el6.x86_64.rpm
 {{/1.2.0+}}
 
 
-## Installing From Source
+## 从源码安装
 
-Riak requires [[Erlang|http://www.erlang.org/]] R15B01. *Note: don't use Erlang version R15B02 or R15B03, for the moment, as it causes an [error with riak-admin status](https://github.com/basho/riak/issues/227) commands*.
+Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-If you do not have Erlang already installed, see our guide to [[Installing Erlang]]. Don’t worry, it’s easy!
+如果还没有安装 Erlang，请参照 [[Installing Erlang]]。不用担心，很简单！
 
-Building from source will require the following packages:
+编译源码需要安装以下包：
 
 * gcc
 * gcc-c++
 * glibc-devel
 * make
 
-You can install these with yum:
+可以使用 yum 安装这些包：
 
 ```bash
 sudo yum install gcc gcc-c++ glibc-devel make git
 ```
 
-Now we can download and install Riak:
+现在可以下载安装 Riak 了：
 
 ```bash
 wget http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}.tar.gz
@@ -107,11 +107,11 @@ cd riak-{{V.V.V}}
 make rel
 ```
 
-You will now have a fresh build of Riak in the `rel/riak` directory.
+一个新 Riak 版本会出现在 `rel/riak` 目录中。
 
-## Next Steps?
+## 然后呢？
 
-From here you might want to check out:
+请阅读下面的文章：
 
-* [[Post Installation]]: for checking Riak health after installation
-* [[Five Minute Install]]: a guide that will show you how to go from one node to bigger than Google!
+-   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
+-   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
