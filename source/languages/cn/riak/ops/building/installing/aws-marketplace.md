@@ -10,82 +10,82 @@ up:   "[[Installing and Upgrading]]"
 next: "[[Installing Riak from Source]]"
 ---
 
-## Launching Riak VMs via the AWS Marketplace
+## 在 AWS Marketplace 上运行 Riak VM
 
-In order to launch a Riak virtual machine via the AWS Marketplace, you will first need to sign up for an [Amazon Web Services] (http://aws.amazon.com) account.
+要想在 AWS Marketplace 上运行 Riak 虚拟机，先要注册 [Amazon Web Services](http://aws.amazon.com) 账户。
 
-1. Navigate to [https://aws.amazon.com/marketplace/] (https://aws.amazon.com/marketplace/) and sign in with your Amazon Web Services account.
+1. 访问 [https://aws.amazon.com/marketplace/](https://aws.amazon.com/marketplace/)，使用你的 Amazon Web Services 账户登录
 
-2. Locate Riak in the "Databases & Caching" category or search for Riak from any page.
+2. 在“Databases & Caching”分类中找到 Riak，或者在任意页面搜索 Riak
 
-3. Set your desired AWS region, EC2 instance type, firewall settings, and key pair
+3. 选择想使用的 AWS 地区，EC2 实例类型，防火墙设置和配对密钥
 
     ![AWS Marketplace Instance Settings](/images/aws-marketplace-settings.png)
 
-4. Click the "Accept Terms and Launch with 1-Click" button.
+4. 点击“Accept Terms and Launch with 1-Click”按钮
 
-### Security Group Settings
+### 安全组设置
 
-Once the virtual machine is created you should verify your selected EC2 security group is configured properly for Riak.
+虚拟机创建好后，应该确保为 Riak 正确地设置了所选的 EC2 安全组。
 
-1. In the AWS EC2 Management Console, click "Security Groups", then click the name of the security group for your Riak VM.
+1. 在 AWS EC2 Management Console 中，点击“Security Groups”，然后点击 Riak VM 的安全组名字
 
-2. Click on the "Inbound" tab in the lower pane.  Your security group should include the following open ports:
+2. 在下部的面板中点击“Inbound”选项卡。安全组应该包含如下的打开端口：
     - 22 (SSH)
     - 8087 (Riak Protocol Buffers Interface)
     - 8098 (Riak HTTP Interface)
 
-3. You will need to add additional rules within this security group to allow your Riak instances to communicate.  For each port range below, create a new "Custom TCP rule" with the source set to the current security group ID (found on the "Details" tab).
+3. 你必须为这个安全组添加额外的规则，运行和 Riak 实例通信。为下面列出的每个端口范围创建一个新“Custom TCP rule”，把源设为安全组的 ID（可以在“Details”选项卡中找到）。
     - Port range: 4369
     - Port range: 6000-7999
     - Port range: 8099
 
-4. When complete, your security group should contain all of the rules listed below.  If you are missing any rules, add them in the lower panel and then click the "Apply Rule Changes" button.
+4. 完成后，安装在应该包含下面列出的所有规则。如果落下的某个规则，在页面下部的面板中添加，然后点击“Apply Rule Changes”按钮
 
     ![EC2 Security Group Settings](/images/aws-marketplace-security-group.png)
 
-You can read more about Riak's [[Security and Firewalls]].
+更多内容参见 [[Security and Firewalls]]。
 
-## Clustering Riak on AWS
+## 在 AWS 上搭建 Riak 集群
 
-You will need need to launch at least 3 instances to form a Riak cluster.  When the instances have been provisioned and the security group is configured you can connect to them using SSH or PuTTY as the ec2-user.
+要搭建集群至少要有 3 个实例。实例准备好，安全组也设置好后，可以使用 SSH 或 PuTTY 以用户 ec2-user 的角色连接集群。
 
-You can find more information on connecting to an instance on the official [Amazon EC2 instance guide](http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/AccessingInstances.html).
+连接实例的更多信息可以在 [Amazon EC2 官方的实例指南](http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/AccessingInstances.html)中查看。
 
-<div class="note">The following clustering setup will *not* be resilient to instance restarts unless deployed in Amazon VPC.</div>
+<div class="note">下面搭建集群的过程，除非在 Amazon VPC 上部署，否则实例重启后就会失效。</div>
 
-1. On the first node obtain the internal IP address:
+1. 在第一个节点中获得内部 IP 地址：
 
     ```text
     curl http://169.254.169.254/latest/meta-data/local-ipv4
     ```
 
-2. For all other nodes, use the internal IP address of the first node:
+2. 其他的节点，使用第一个节点的内部 IP 地址即可：
 
     ```text
     sudo riak-admin cluster join riak@<ip.of.first.node>
     ```
 
-3. After all of the nodes are joined, execute the following:
+3. 加入所有的节点后，执行下面的命令：
 
     ```text
     sudo riak-admin cluster plan
     ```
 
-    If this looks good:
+    如果对上述命令的输出结果满意，请再执行下面的命令：
 
     ```text
     sudo riak-admin cluster commit
     ```
 
-    To check the status of clustering use:
+    使用下面的命令查看集群的状态：
 
     ```text
     sudo riak-admin member_status
     ```
 
-You now have a Riak cluster on AWS.
+至此，我们就在 AWS 上搭建了一个 Riak 集群。
 
-Further Reading:
+进一步阅读：
 
 - [[Basic Riak API Operations|The Basics]]

@@ -9,93 +9,76 @@ prev: "[[Installing Riak From Source]]"
 up:   "[[Installing and Upgrading]]"
 ---
 
-After you've installed Riak, you might next wish to check the liveness of
-each node and ensure that requests are being properly served.
+安装好 Riak 后，你可能想查看各节点的生存状态，确保能正确处理请求。
 
-The following are common ways to verify that your Riak nodes are operating
-correctly. After you've determined that your nodes are functioning and you're
-ready to put Riak to work, be sure to check out the resources in the
-**Now What?** section below.
+下面介绍的是查看 Riak 节点可正常使用的常见方法，确认节点可以正常工作，要开始使用 Riak时，请阅读一下“接下来呢？”一节列出的文章。
 
-## Starting a Riak Node
+## 启动 Riak 节点
 
-<div class="note"><div class="title">Note about source installations</div>
-<p>To start a Riak node that was installed by compiling the source code, you
-can add the Riak binary directory from the installation directory you've
-chosen to your PATH.</p> <p>For example, if you compiled Riak from source in
-the `/home/riak` directory, then you can add the binary directory
-(`/home/riak/rel/riak/bin`) to your PATH so that Riak commands can be
-used in the same manner as with a packaged installation.</p></div>
+<div class="note">
+<div class="title">从源码安装的请注意</div>
+<p>从源码安装的 Riak，要想启动 Riak 节点，可以把 Riak 的可执行文件目录加入 PATH。</p>
+<p>例如，如果在 `/home/riak` 目录中编译 Riak，可以把可执行文件所在的目录（`/home/riak/rel/riak/bin`）加入 PATH，这样 Riak 相关的命令就能和通过安装包安装一样使用了。</p>
+</div>
 
-To start a Riak node, use the `riak start` command:
+要启动 Riak 节点，请执行 `riak start` 节点：
 
 ```bash
 riak start
 ```
 
-A successful start will return no output. If there is a problem starting the
-node, an error message is printed to standard error.
+如果启动成功，不会有任何输出。如果启动时出错了，会在标准错误中输出错误信息。
 
-To run Riak with an attached interactive Erlang console:
+如果要打开附带 Erlang 控制台的 Riak，请执行：
 
 ```bash
 riak console
 ```
 
-A Riak node is typically started in console mode as part of debugging or
-troubleshooting to gather more detailed information from the Riak startup
-sequence. Note that if you start a Riak node in this manner, it is running as
-a foreground process which will be exited when the console is closed.
+Riak 节点经常使用控制台模式启动，这样可以从 Riak 启动序列中获取更详细的信息，有利于调试和查错。注意，如果使用这种方式启动 Riak 节点，节点是以前台程序的形式运行的，退出控制台后节点也会关闭。
 
-You can close the console by issuing this command at the Erlang prompt:
+关闭控制台可以在 Erlang 终端输入如下命令：
 
 ```erlang
 q().
 ```
 
-Once your node has started, you can initially check that it is running with
-the `riak ping` command:
+节点启动后，可以通过 `riak ping` 命令确认其确实在运行：
 
 ```bash
 riak ping
 pong
 ```
 
-The command will respond with **pong** if the node is running, or **pang** if
-it is unreachable for any reason.
+如果节点正在运行，上述命令会返回 **pong**，如果由于某些原因节点不可连通，就返回 **pang**。
 
-<div class="note"><div class="title">Open Files Limit</div>
-As you may have noticed, if you haven't adjusted your open files limit (`ulimit -n`), Riak will warn you at startup about the limit. You're advised
-to increase the operating system default open files limit when running Riak.
-You can read more about why in the [[Open Files Limit]] documentation.</div>
+<div class="note">
+<div class="title">打开文件限制</div>
+你可能注意到了，如果没有调整打开文件限制的话（`ulimit -n`），启动时 Riak 会警告限制数量太少。运行 Riak 时建议你增加操作系统默认的文件打开限制。这么做的原因请参阅 [[Open Files Limit]]。
+</div>
 
-## Does it work?
+## 节点可以工作吗？
 
-One convenient means to test the readiness of an individual Riak node and
-its ability to read and write data is with the `riak-admin test` command:
+测试单个 Riak 节点是否准备好读写数据的一个简单方式是使用 `riak-admin test` 命令：
 
 ```bash
 riak-admin test
 ```
 
-Successful output from `riak-admin test` looks like this:
+`riak-admin test` 成功后的输出如下所示：
 
 ```text
 Attempting to restart script through sudo -H -u riak
 Successfully completed 1 read/write cycle to 'riak@127.0.0.1'
 ```
 
-You can also test whether Riak is working by using the `curl` command-line
-tool. Now that you have Riak running on a node, try this command to retrieve
-the `test` bucket and its properties:
+要查看 Riak 是否工作也可以使用 `curl` 命令行工具。现在有一个运行着的节点，我们可以运行下面的命令试着从获取 `test` bucket 及其属性：
 
 ```bash
 curl -v http://127.0.0.1:8098/riak/test
 ```
 
-Replace `127.0.0.1` in the example above with your Riak node's IP address or
-fully qualified domain name; you should get a response from the command that
-looks like this:
+请把上述命令中的 `127.0.0.1` 改成你的 Riak 节点 IP 地址，或者完整的域名。这个命令应该会输出以下响应：
 
 ```text
 * About to connect() to 127.0.0.1 port 8098 (#0)
@@ -124,32 +107,26 @@ looks like this:
  "w":"quorum","young_vclock":20}}
 ```
 
-The above output shows a successful response (HTTP 200 OK) and additional
-details from the verbose option. The response also contains the bucket
-properties for Riak's test bucket.
+上面的输出是一个成功响应（HTTP 200 OK），列出了各报头的内容，还显示了这个 bucket 的属性。
 
 {{#1.3.0+}}
 ## Riaknostic
 
-It is a good idea to also verify some basic configuration and general health
-of the Riak node after installation by using Riak's built-in diagnostic
-utility *Riaknostic*.
+安装之后最好验证以下基本设置及 Riak 几点的常规状态，这些操作可以使用 Riak 提供的诊断工具 *Riaknostic* 完成。
 
-Ensure that Riak is running on the node, and issue the following command:
+确保 Riak 节点正常运行，请执行下面的命令：
 
 ```
 riak-admin diag
 ```
-
-Make the recommended changes from the command output to ensure optimal node
-operation.
+确保该命令输出的结果符合最优节点的设置。
 {{/1.3.0+}}
 
-## Now what?
+## 然后呢？
 
-You have a working Riak node!
+你的 Riak 节点可以正常的运行！
 
-From here you might want to check out the following resources.
+接下来你或许想阅读下面的文章。
 
-* Check out the [[Client Libraries]] to use Riak with your favorite programming language
+* 阅读 [[Client Libraries]]，学习如何通过你最喜欢的编程语言使用 Riak
 * [[Learn about the high level concepts of Riak|Concepts]]

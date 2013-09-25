@@ -13,24 +13,25 @@ download:
   name: "any OS in Source Form"
 ---
 
+如果没有针对你所用平台的安装包，或者想对 Riak 开发做贡献，那就应该从源码安装 Riak。
 
-Riak should be installed from source if you are building on a platform for which a package does not exist or you are interested in contributing to Riak.
+## 依赖库
 
-## Dependencies
-Riak requires [[Erlang|http://www.erlang.org/]] R15B01. *Note: don't use Erlang version R15B02 or R15B03, for the moment, as it causes an [error with riak-admin status](https://github.com/basho/riak/issues/227) commands*.
+Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-If you do not have Erlang already installed, see [[Installing Erlang]]. Don't worry, it's easy!
+如果还没有安装 Erlang，请参照 [[Installing Erlang]]。不用担心，很简单！
 
-Riak depends on source code located in multiple Git repositories; ensure that
-Git is also installed on the target system before attempting the build.
+Riak 依赖存储在多个 Git 仓库中的源码，在编译之前请确保系统中安装了 Git。
 
-<div class='note'>Riak will not compile with Clang. Please make sure your default C/C++ compiler is GCC.</div>
+<div class='note'>Riak 不兼容 Clang，请确保 C/C++ 的默认编译器是 GCC。</div>
 
-## Installation
-The following instructions generate a complete, self-contained build of Riak in `$RIAK/rel/riak` where `$RIAK` is the location of the unpacked or cloned source.
+## 安装
 
-### Installing from source package
-Download the Riak source package from the [[Download Center|http://basho.com/resources/downloads/]] and build:
+下面介绍的方法会安装一个完整的 Riak，保存在 `$RIAK/rel/riak` 目录中，其中 `$RIAK` 是源码解压后的目录，或者克隆的源码所在目录。
+
+### 从源码包安装
+
+从 [Download Center|http://basho.com/resources/downloads/]] 下载 Riak 源码包，然后编译：
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}.tar.gz
@@ -40,12 +41,13 @@ make rel
 ```
 
 {{#1.4.0-}}
-<div class='note'> If you see the error `fatal: unable to connect to github.com` see the following instructions for building on systems with no internet availability </div>
+<div class='note'>如果遇到错误 `fatal: unable to connect to github.com`，请查看如下的说明，介绍如何在没有网络连接的系统上安装。</div>
 
-### Installation on Closed Networks
-The error `fatal: unable to connect to github.com` when building from source is caused by building on a system with no network connection to Github. Either the port is turned off for security reasons, or the source build is happening on a computer with no outside internet access.  To rectify this problem, an additional file will need to be deployed along with the source tarball.
+### 在无网络连接的系统中安装
 
-Download the following `leveldb` archive for Riak version {{VERSION}}:
+编译源码时遇到 `fatal: unable to connect to github.com` 错误是因为所在的系统无法连接到 GitHub。不是基于安全考虑关闭了端口，就是碰巧所用电脑无法连接到外部网络。要解决这个问题，下载源码时还要下载一个额外的文件。
+
+下载针对 Riak {{VERSION}} 的 `leveldb`：
 
 {{#1.3.0+}}`https://github.com/basho/leveldb/zipball/{{VERSION}}`{{/1.3.0+}}
 
@@ -55,9 +57,9 @@ Download the following `leveldb` archive for Riak version {{VERSION}}:
 
 {{#1.3.0-}}
 
-The instructions going forward will assume Riak 1.2.0, replace the appropriate file for your version.
+以下的步骤基于 Riak 1.2.0，请把相应文件修改为针对你所安装的版本。
 
-Deploy the file to the system with the build error and run the following commands.
+下载完后，执行下面的命令：
 
 ```bash
 $ mv 2aebdd9173a7840f9307e30146ac95f49fbe8e64 riak-1.2.0/deps/eleveldb/c_src/leveldb.zip
@@ -71,9 +73,9 @@ $ make rel
 {{/1.3.0-}}
 {{#1.3.0+}}
 
-The instructions going forward will assume Riak 1.3.0, replace the appropriate file for your version.
+以下的步骤基于 Riak 1.3.0，请把相应文件修改为针对你所安装的版本。
 
-Deploy the file to the system with the build error and run the following commands.
+下载完后，执行下面的命令：
 
 ```bash
 $ mv {{VERSION}} riak-{{VERSION}}/deps/eleveldb/c_src/leveldb.zip
@@ -91,10 +93,11 @@ $ make rel
 {{/1.3.0+}}
 {{/1.4.0-}}
 
-### Installing from GitHub
-The [[Riak Github repository|http://github.com/basho/riak]] has much more information on building and installing Riak from source. To clone and and build Riak from source, follow these steps:
+### 从 GitHub 安装
 
-Clone the repository using [[Git|http://git-scm.com/]] and build:
+[[Riak 在 Github 上的仓库|http://github.com/basho/riak]] 有从源码编译安装 Riak 更详细的介绍。克隆源码编译，请参照如下的步骤：
+
+使用 [[Git|http://git-scm.com/]] 克隆仓库，然后编译：
 
 ```bash
 git clone git://github.com/basho/riak.git
@@ -102,21 +105,24 @@ cd riak
 make rel
 ```
 
-## Platform Specific Instructions
-For instructions about specific platforms, see:
+## 针对特定平台的说明
+
+针对特定平台的说明请参阅：
 
   * [[Installing on Debian and Ubuntu]]
   * [[Installing on Mac OS X]]
   * [[Installing on RHEL and CentOS]]
   * [[Installing on SUSE]]
 
-If you are running Riak on a platform not in the list above and need some help getting it up and running, join The Riak Mailing List and inquire about it there. We are happy to help you get up and running with Riak.
+如果你要安装 Riak 的平台没有列出了，而且需要一些帮助，请加入 Riak 邮件列表，然后发起新讨论。我们很乐意帮助你安装 Riak。
 
 ### Windows
-Riak is not currently supported on Microsoft Windows.
 
-## Next Steps?
-From here you might want to check out:
+Riak 现在无法在 Microsoft Windows 上安装。
 
-* [[Post Installation Notes|Post Installation]]: for checking Riak health after installation
-* [[Five Minute Install]]: a guide that will show you how to go from one node to bigger than Google!
+## 然后呢？
+
+请阅读下面的文章：
+
+-   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
+-   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

@@ -10,141 +10,139 @@ up:   "[[Installing and Upgrading]]"
 next: "[[Installing on AWS Marketplace]]"
 ---
 
-Steps to install Riak on Centos VMs using the Windows Azure platform.
+下面介绍如何在 Windows Azure 平台中使用 Centos VM 安装 Riak。
 
-## Creating CentOS VMs
+## 创建 CentOS VM
 
-In order to create a virtual machine, you will first need to sign up for the Windows Azure Virtual Machines preview feature. You can also sign up for a free trial account if you do not have a Windows Azure account.
+如果要创建虚拟机，必须先注册 Windows Azure Virtual Machines “预览功能”（preview features）。如果还没有 Windows Azure 账户可以注册一个试用账户。
 
-1. Navigate to [https://account.windowsazure.com](https://account.windowsazure.com/) and sign in with your Windows Azure account.
+1. 访问 [https://account.windowsazure.com](https://account.windowsazure.com/)，使用你的 Windows Azure 账户登录；
 
-2. Click "preview features" to view the available previews.
+2. 点击“preview features”，查看可用的预览；
 
     ![](/images/antares-iaas-preview-01.png)
 
-3. Scroll down to Virtual Machines & Virtual Networks and click "try it now".
+3. 下拉到 Virtual Machines & Virtual Networks，点击“try it now”；
 
     ![](/images/antares-iaas-preview-02.png)
 
-4. Select your subscription and click "Check".
+4. 选择你要订购的合约，然后点击“Check”；
 
     ![](/images/antares-iaas-preview-04.png)
 
-### Create a virtual machine running CentOS Linux
+### 创建运行 CentOS Linux 的虚拟机
 
-1. Login to the Windows Azure (Preview) Management Portal using your Windows Azure account.
+1. 使用你的 Windows Azure 账户登录 Windows Azure (Preview) Management Portal；
 
-2. In the Management Portal, at the bottom left of the web page, click ""+New"", click "Virtual Machine", and then click "From Gallery".
+2. 在 Management Portal 页面的左下角，点击“"+New"”，然后点击“Virtual Machine”，再点击“From Gallery”；
 
     ![](/images/createvm_small.png)
 
-3. Select a CentOS virtual machine image from Platform Images, and then click the next arrow at the bottom right of the page.
+3. 从 Platform Images 中选择 CentOS 虚拟机镜像，然后点击页面右下角的下一步箭头；
 
     ![](/images/vmconfiguration0.png)
 
-4. On the VM Configuration page, provide the following information:
-    - Virtual Machine Name, such as "testlinuxvm".
-    - New User Name, such as "newuser", which will be added to the Sudoers list file.
-    - New Password box - type a strong password.
-    - In the Confirm Password box, retype the password.
-    - Select the appropriate Size from the drop down list.
-    - Click the next arrow to continue.
+4. 在 VM Configuration 页面，填写如下信息：
+    - Virtual Machine Name（虚拟机名称），例如“testlinuxvm”
+    - New User Name（新用户名），例如“newuser”，这个用户会加入拥有 sudo 权限的列表文件中
+    - New Password（新密码），输入一个很难破解的密码
+    - 在 Confirm Password（密码确认）输入框中再次输入密码
+    - 从 SIZE（大小）下拉列表中选择合适的大小
+    - 点击下一步箭头继续
 
     ![](/images/vmconfiguration1.png)
 
-5. On the VM Mode page, provide the following information:
-    - **If this is the first node**, select the "STANDALONE VIRTUAL MACHINE" radio button. **Otherwise**, select the "CONNECT TO EXISTING VIRTUAL MACHINE" radio button, and select the first node in the drop down list.*
-    - In the DNS Name box, type a valid DNS address, e.g "testlinuxvm".
-    - In the Storage Account box, select "Use Automatically Generated Storage Account".
-    - In the Region/Affinity Group/Virtual Network box, select a region where this virtual image will be hosted.
-    - Click the next arrow to continue.
+5. 在 VM Mode 页面，填写如下信息：
+    - **如果这是第一个节点**，选择“STANDALONE VIRTUAL MACHINE”单选按钮。**否则**，选择“CONNECT TO EXISTING VIRTUAL MACHINE”单选按钮，然后再下拉列表中选择第一个节点
+    - 在 DNS Name（DNS 名字）输入框中填写一个可用的 DNS 地址，例如“testlinuxvm”
+    - 在 Storage Account（存储账户）下拉列表中，选择“Use Automatically Generated Storage Account”
+    - 在 Region/Affinity Group/Virtual Network 下拉列表中选择这个虚拟机要放在那个地区
+    - 点击下一步箭头继续
 
     ![](/images/vmconfiguration2.png)
 
-6. On the VM Options page, select "(none)" in the Availability Set box. Click the check mark to continue.
+6. 在 VM Options 页面，在 Availability Set 下拉列表中选择“(none)”。点击对号按钮继续。
 
     ![](/images/vmconfiguration3.png)
 
-7. Wait while Windows Azure prepares your virtual machine.
+7. 等待 Windows Azure 准备好你的虚拟机。
 
-### Configure Endpoints
+### 设置端点（endpoint）
 
-Once the virtual machine is created you must configure endpoints in order to remotely connect.
+创建好虚拟机后，必须设置端点才能远程连接。
 
-1. In the Management Portal, click "Virtual Machines", then click the name of your new VM, then click "Endpoints".
+1. 在 Management Portal 页面，点击“Virtual Machines”，然后点击新创建的 VM 名字，然后点击“Endpoints”
 
-2. **If this is the first node**, click "Add Endpoint", leave "Add Endpoint" checked, hit the right arrow and fill out the next form as follows:
+2. **如果这是第一个节点**，点击“Add Endpoint”，选中“Add Endpoint”，然后点击向右的箭头，在出现的表单中填写如下信息：
     - Name: riak_web
-    - Protocol: leave set to 'TCP'
+    - Protocol: 不变，TCP
     - Public Port: 8098
     - private Port: 8098
 
-## Connect to CentOS VMs using PuTTY or SSH
+## 通过 PuTTY 或 SSH 连接到 CentOS VM
 
-When the virtual machine has been provisioned and the endpoints configured you can connect to it using SSH or PuTTY.
+虚拟机创建好，端点也设置好后，就可以通过 SSH 或 PuTTY 连接了。
 
-### Connecting Using SSH
+### 使用 SSH 连接
 
-**For Linux & Mac Users:**
+**针对 Linux 和 Mac 用户：**
 
     $ ssh newuser@testlinuxvm.cloudapp.net -o ServerAliveInterval=180
-Enter the user's password.
 
-**For Windows Users, use PuTTY:**
+然后输入用户的密码。
 
-If you are using a Windows computer, connect to the VM using PuTTY. PuTTY can be downloaded from the [PuTTY Download Page](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html).
+**针对 Windows 用户，使用 PuTTY：**
 
-1. Download and save putty.exe to a directory on your computer. Open a command prompt, navigate to that folder, and execute putty.exe.
+如果你使用的是 Windows 系统，请使用 PuTTY 连接 VM。PuTTY 可以在 [PuTTY 下载页面](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) 下载。
 
-2. Enter the SSH DETAILS as found on the Node's Dashboard, i.e., "testlinuxvm.cloudapp.net" for the Host Name and "22" for the Port.
+1. 下载 putty.exe，保存到电脑的一个文件夹中。打开命令行，进入这个文件夹，然后执行 putty.exe
+
+2. 填写在 Node's Dashboard 页面 SSH DETAILS  区域看到的信息，例如 Host Name（主机名）为“testlinuxvm.cloudapp.net”，Port（端口）为“22”
 
     ![](/images/putty.png)
 
-## Configure Centos and Riak using a shell script
+## 使用 shell 脚本设置 CentOS 和 Riak
 
-1. On each node, once you've connected using the steps above:
-
-Execute:
+1. 在每一个节点中，使用上面介绍的方法连上虚拟机之后，执行如下命令
 
     sudo su -
 
     curl -s https://raw.github.com/glickbot/riak_on_azure/master/azure_install_riak.sh | sh
 
-**FOR THE FIRST NODE**, note the "INTERNAL IP ADDRESS" listed on the right in the nodes dashboard.
+**对第一个节点**，注意节点控制台右侧列出的“INTERNAL IP ADDRESS”
 
+**对其他节点**，使用第一个节点的“INTERNAL IP ADDRESS”
 
-**FOR ALL OTHER NODES**, use the "INTERNAL IP ADDRESS"" of the first node:
-
-Execute:
+执行：
 
     riak-admin cluster join riak@<ip.of.first.node>
 
-## Cluster Riak & load test data
+## 搭建 Riak 集群，加载测试数据
 
-After all the nodes are installed, and joined using the steps above, connect to one of the nodes using SSH or PuTTY and execute the following:
+所有节点都创建好后，使用上面的方法合并，然后使用 SSH 或 PuTTY 连入其中一个节点，执行下面的命令：
 
     riak-admin cluster plan
 
-If this looks good:
+如果对上述命令的输出结果满意，请再执行下面的命令：
 
     riak-admin cluster commit
 
-To check the status of clustering use:
+使用下面的命令查看集群的状态：
 
     riak-admin member_status
 
-You now have a Riak cluster on Azure
+至此，我们就在 Azure 上搭建了一个 Riak 集群。
 
-### Load test data
+### 加载测试数据
 
-Execute on any one of the nodes:
+在任意一个节点中执行下面的命令：
 
     curl -s http://rekon.basho.com | sh
 
-Visit DNS address listed on the dashboard, at the port we opened as an endpoint:
+访问控制台中显示的 DNS 地址，端口为设置的端点：
 
     http://testlinuxvm.cloudapp.net:8098/riak/rekon/go
 
-Further Reading:
+进一步阅读：
 
 - [[Basic Riak API Operations|The Basics]]
