@@ -7,183 +7,92 @@ toc: true
 keywords: [planning, cluster]
 ---
 
-This is a short document that outlines the various elements and
-variables that should be considered when planning your Riak cluster.
-Your use case and environment variables will obviously be specific to
-what you're building, but this document should set you on the right path
-to planning and launching the suitable Riak cluster.
+这篇文档很短，介绍规划 Riak 集群时要考虑的方方面面。具体的使用情况和环境变量肯定要看你的规划，这篇文档会帮助你正确地规划、搭建合用的 Riak 集群。
 
-RAM
----
+## RAM
 
-[RAM](http://en.wikipedia.org/wiki/Random-access_memory) should be
-viewed as the most important resource when sizing your Riak cluster.
-Aside from helping you keep more data closer to your users, memory will
-also be required when running complex MapReduce queries, and caching
-data to provide low latency request times.
+在规划 Riak 集群时，[RAM](http://en.wikipedia.org/wiki/Random-access_memory) 是最重要的考虑因素。RAM 可以把数据存储在离用户更近的内存中，也是运行复杂 MapReduce 查询的先决条件，还能缓存数据减少请求迟延。
 
-### Bitcask and Memory Requirements
+### Bitcask 及其内存需求
 
-Your choice of local storage backend for Riak directly impacts your RAM
-needs. Though Riak has pluggable backend storage, it ships with Bitcask
-by default, and this is the recommended production backend. Why? Because
-it's purpose built for:
+选择使用的存储后台直接影响着 RAM 用量。Riak 支持可插入式存储后台，默认使用 Bitcask，这也是生产环境推荐使用的后台。为什么呢？因为开发 Bitcask 的目的是为了：
 
-* low latency request times
-*  high throughput
-*  the ability to handle data sets much larger than RAM w/o degradation
+* 减少请求迟延
+* 大吞吐量
+* 不影响性能的处理大于 RAM 的数据
 
-Bitcask's one major requirement, however, is that it must keep the
-entire “keydir” in memory. The “keydir” is a hash table that maps each
-concatenated bucket+key name in a Bitcask (“a Bitcask” is the name for
-each file contained within each Bitcask backend ) to a fixed-size
-structure giving the file, offset, and size of the most recently written
-entry for that bucket+key on disk.
+不过 Bitcask 最主要的要求是要把整个“keydir”放在内存中。“keydir”是个哈希表，把一个 Bitcask（“一个 Bitcask”是指每个 Bitcask 后台中存储的所有文件）中的 bucket+key 映射到一个大小固定的结构上，这个结构表示了这个 bucket+key 所对应存储在硬盘上的文件，及其偏移和大小。
 
-If you want to read more about what the keydir is and what it entails,
-and some more about Bitcask in general, go
-[here](http://blog.basho.com/2010/04/27/hello-bitcask/) and
-[here](http://downloads.basho.com/papers/bitcask-intro.pdf). (You should
-read these.)
+如果你想更深入的了解 keydir 是什么，其中包含的内容，更详细的了解 Bitcask，请访问[这个地址](http://blog.basho.com/2010/04/27/hello-bitcask/)和[这份文件](http://downloads.basho.com/papers/bitcask-intro.pdf)。（建议你一定要阅读）
 
-When you calculate that your RAM needs will exceed your hardware resources,
-(In other words, if you can't afford the RAM to enable you to use Bitcask.),
-we recommend you use LevelDB.
+如果算出的 RAM 用量超出了硬件资源（也就是说无力承担能使用 Bitcask 的 RAM），建议你使用 LevelDB。
 
-Check out [[Bitcask Capacity Planning]] for more details on designing a bitcask backed cluster.
+规划使用 Bitcask 作为后台的集群，更详细的内容请阅读 [[Bitcask Capacity Planning]]。
 
 ### LevelDB
 
-If RAM requirements for Bitcask are prohibitive, Basho recommends use of the
-LevelDB backend. While LevelDB doesn't require a large amount of RAM to
-operate, supplying it with the maximum amount of memory available will
-lead to higher performance.
+如果无法提供能使用 Bitcask 的 RAM 容量，Basho 推荐你使用 LevelDB 做后台。LevelDB 不需要太大的 RAM，给它能提供的最大内存量就能得到很好地性能。
+
 
 <div class="info">
-For more information see [[LevelDB]].
+详细内容请阅读 [[LevelDB]]。
 </div>
 
-Disk
-----
+## 硬盘
 
-Now that you have an idea of how much RAM you'll need, it's time to
-think about disk space. Disk space needs are much easier to calculate
-and essentially boil down to this simple equation:
+现在你知道要用多大的 RAM 了，接下来要考虑硬盘容量了。硬盘容量的需求更容易计算，可以归纳成下面的公式：
 
 <div class="info">
-Estimated Total Objects * Average Object Size * n_val
-
+预计存储的对象总量 * 对象的平均大小 * n_val
 </div>
-For example with:
 
-* 50,000,000 objects
-* an average object size of two kilobytes (2,048 bytes)
-* the default n_val of 3
+例如：
 
-then you would need just over approximately **286 GBs** of disk space in
-the entire cluster to accommodate your data.
+* 存储 50,000,000 个对象
+* 对象的平均大小为 2KB（2,048 字节）
+* 使用默认的 n_val，3
 
-(Here at Basho, we believe that databases should be durable out of the
-box. When we built Riak, we did so in a way that you could write to disk
-while keeping response times below your users' expectations. So this
-calculation assumes you'll be keeping the entire data set on disk.)
+那么你大概需要 **286GB** 的硬盘来存储整个集群的数据。
 
-Many of the considerations taken when configuring a machine to serve a
-database can be applied to configuring a node for Riak as well. Mounting
-disks with noatime and having separate disks for your OS and Riak data
-lead to much better performance. See [[System Planning|Planning for a Riak System]] for more
-information.
+（在 Basho，我们相信数据库应该很耐用。考虑到这一点，开发时，我们要求 Riak 在能够写入硬盘的同时，把响应时间保持在用户的期待值之下。所以这个计算公式假设所有的数据都保存在硬盘上。）
 
-Read/Write Profile
-------------------
+把电脑设置成可以提供数据库服务的设备时的很多考虑点都可以应用在设置 Riak 节点上。挂载硬盘时不记录访问时间，以及把 OS 和 Riak 数据放在不同的硬盘可以更进一步提升性能。详细内容请阅读 [[System Planning|Planning for a Riak System]]。
 
-Read/write ratios, as well as the the distribution of key access, should
-influence the configuration and design of your cluster. If your use case
-is write heavy you will need less RAM for caching, in addition if only a
-certain portion of keys is accessed regularly, such as a [pareto
-distribution](http://en.wikipedia.org/wiki/Pareto_distribution), you
-won't need as much RAM available to cache those keys' values.
+## 读写性能分析
 
-Number of Nodes
----------------
-The number of nodes (i.e. physical servers) in your Riak Cluster depends
-on the number of times data is [[Replicated|Replication]] across the cluster.
-To ensure that the cluster is always available to respond to read and write requests, Basho recommends
-a "sane default" of N=3 replicas.  This requirement can be met with a three
-or four node cluster (you can tweak nodes installed through the [[Five Minute Install]]).
-However, for production deployments we recommend using no fewer than 5 nodes, as node failures
-in smaller clusters can compromise the fault-tolerance of the system.  Additionally, in clusters smaller than
-5 nodes, a high percentage of the nodes (75-100% of them) will need to respond to each request, putting undue load on the
-cluster that may degrade performance.  For more details on this recommendation, see this [blog post](http://basho.com/blog/technical/2012/04/27/Why-Your-Riak-Cluster-Should-Have-At-Least-Five-Nodes/).
+读写的比例，以及键访问的分布，会影响到集群的设置和架构。如果更多的是写操作，就不需要太多的缓存 RAM；而且如果只是经常访问某个特定区域中的键，例如[帕累托分布](http://en.wikipedia.org/wiki/Pareto_distribution)，就无需使用太多的 RAM 缓存这些键。
 
+## 节点的数量
 
-Ring Size/Number of Partitions
-------------------------------
+集群中节点的数量取决于数据复制的次数（参阅 [[Replicated|Replication]]）。为了保证集群总是能处理读写请求，Basho 推荐把副本数 N 设为 3。集群中包含 3 个或 4 个节点都可以（调整节点数量的方法参见 [Five Minute Install]]）。不过，在生产环境中部署时，我们建议最少要有 5 个节点，因为数量很小就违背了系统的容错功能。而且，在少于 5 个节点的集群中，响应请求的节点比例会很高（75-100%），集群中过度的负载可能会降低性能。关于这个推荐设置的详细信息请阅读[这篇博文](http://basho.com/blog/technical/2012/04/27/Why-Your-Riak-Cluster-Should-Have-At-Least-Five-Nodes/)。
 
-Ring size is the number of partitions that make up your Riak Cluster.
-This is a number that is configured before you cluster is started, and
-is set in your app.config file under the
-[[ring_creation_size|Configuration Files#app-config]]
-parameter.
+## 环的大小和分区数量
 
-The default number of partitions in a Riak cluster is 64. This works for
-smaller clusters, but if you plan to grow your cluster past 5 nodes it
-is recommended you consider a larger ring size. Ring sizes must be a
-power of 2. The minimum number of partitions recommended per node is 10,
-and you can determine the number of partitions that will be allocated
-per node by dividing the number of partitions by the number of nodes.
+环的大小是组成 Riak 集群的分区数量。这个数量在集群启动之前设置，在 app.config 文件的 [[ring_creation_size|Configuration Files#app-config]] 参数下面。
+
+Riak 集群的默认分区数是 64，这个数字对小型的集群足够了，如果你计划扩建集群就要选择一个更大的数字。环的大小必须是 2 的幂数。每个节点的推荐分区数量是 10，每个节点分配的分区数量可以用分区的数量除以节点的数量得到。
 {{#<1.4.0}}
-**At the moment, the ring size you choose will be the same for the life
-of the cluster, so taking growth into consideration is extremely
-important.**{{/<1.4.0}}
+**现在，你选择的环的大小在集群整个生命周期内都会保持不变，所以考虑增长需求是很重要的。**{{/<1.4.0}}
 
-For most moderate-sized Riak clusters (8-16 nodes) 128, 256, and 512
-partitions are excellent options that will allow you to incrementally
-grow (or shrink) your cluster. If you're unsure about the best number of
-partitions to use, [consult the Riak Mailing
-List](http://lists.basho.com/mailman/listinfo/riak-users_lists.basho.com)
-for some suggestions.
+对于大多数中型 Riak 集群（8-16 个节点），128、256、512 个分区都是不错的选择，可以递增或递减集群。如果你无法确定要使用多少个分区，可以在 [Riak 邮件列表](http://lists.basho.com/mailman/listinfo/riak-users_lists.basho.com)中询问。
 
-Other Factors
--------------
+## 其他因素
 
-Riak is built to run in a clustered environment and while it will
-compensate for network partitions they cause increased load on the
-system. In addition, running in a virtualized environment that lacks low
-latency IO access can drastically decrease performance. Before putting
-your Riak cluster in production is recommended you gain a full
-understanding of your environment's behavior so you know how your
-cluster performs under load for an extended period of time. Doing so
-will help you size your cluster for future growth and lead to optimal
-performance.
+Riak 是位集群环境而生的，这可以弥补网络隔断导致的问题，但却增加了系统的负担。而且，在缺少低迟延的 IO 访问的虚拟环境中运行可以大幅度的降低性能。把 Riak 集群部署到生产环境之前，建议你完全理解所用环境的功能，这样才能知道集群如何应对长时间负载。这么做可以帮助你为后续的增长设定集群的大小，获取最优性能。
 
-Basho recommends using [[Basho Bench]] for benchmarking the performance of your cluster.
+Basho 推荐你使用 [[Basho Bench]] 测评集群的性能。
 
-### Bandwidth
+### 带宽
 
-Riak uses Erlang's built in distribution capabilities to provide
-reliable access to data. A Riak cluster can be deployed in many
-different network topologies, but it is recommended to have as little
-latency between nodes as possible. High latency leads to sub-optimal
-performance. It is not recommended to deploy a single Riak cluster
-across two data centers. If you need this capability Basho offers an
-inter-datacenter replication option that is built to keep multiple Riak
-clusters in sync across several geographically diverse deployments.
+Riak 使用 Erlang 内建的分发能力提供了对数据的可靠访问性。Riak 集群可以部署到很多网络拓扑结构，不过建议尽量减少节点之间的迟延。高延迟带来的是次优性能。不建议把一个 Riak 集群部署到两个数据中心。如果你需要这种功能，Basho 提供了数据中心之间的复制选项，可以在多个不同地理位置的数据中心间同步数据。
 
-* [Learn more about Riak Enterprise](http://basho.com/products/riak-overview/).
+* [更详细的了解 Riak Enterprise](http://basho.com/products/riak-overview/).
 
 ### IO
 
-In general the biggest bottleneck for Riak will be the amount of IO
-available to it, especially in the case of write-heavy work loads. Riak
-functions much like any other database and the design of your disk
-access should take this into account. Because Riak is clustered and your
-data is stored on multiple physical nodes, you can consider forgoing a
-tradition RAID setup for redundancy and focus on providing the least
-latency possible using SATA Drives or SSDs, for example.
+一般来说，Riak 最大的瓶颈是可用的 IO 量，特别是写操作很多的情况。在这一点上，Riak 和其他数据库很像，在选择硬盘时一定要考虑到 IO 问题。因为 Riak 是集群式的，而且数据存储在多个物理节点中，你应该考虑放弃使用传统的 RAID 创建冗余，把目光转向降低迟延，例如使用 SATA 驱动或 SSD。
 
-Additional resources
---------------------
+## 进一步阅读
 
 * [[System Planning|Planning for a Riak System]]
 * [[Basho Bench]]

@@ -8,58 +8,58 @@ audience: intermediate
 keywords: [planning, os]
 ---
 
-Here are some steps and recommendations designing and configuring your Riak cluster.
+面试搭建 Riak 集群的步骤，以及推荐使用的架构设计和设置。
 
-## Backend
+## 后台
 
-A Riak backend is the mechanism by which values are persisted. Different backends have strengths and weaknesses, so if you are unsure of which backend you need, read through the [[Choosing a Backend]] tutorial.
+Riak 的后台是指存储数据的机制。不同的后台各有利弊，如果你无法确定要使用哪种后台，请阅读 [[Choosing a Backend]] 后台。
 
 * [[Bitcask]]
 * [[LevelDB]]
 * [[Memory]]
 * [[Multi]]
 
-## Capacity
+## 容量
 
-[[Cluster Capacity Planning]] outlines the various elements and variables that should be considered when planning your Riak cluster.
+[[Cluster Capacity Planning]] 疑问大概介绍了规划 Riak 集群时要考虑的方方面面。
 
-If you have chosen [[Bitcask]] as your backend, you will also want to run through the [[Bitcask Capacity Planning]] to help you calculate a reasonable capacity.
+如果你选择使用 [[Bitcask]] 做后台，请阅读 [[Bitcask Capacity Planning]] 了解如何计算适合的容量。
 
-## Operating Systems
+## 操作系统
 
-We recommend deploying Riak on a mainstream Unix-like operating system. Mainstream distributions have larger support communities making solutions to common problems easier to find. Basho provides binary packages of Riak for the following distributions:
+我们推荐把 Riak 部署在主流的类 Unix 操作系统上。主流的发行版本有较大的社区支持，更容易解决常见问题。Basho 为下列的发行版本提供了 Riak 安装包：
 
-* **Red Hat based:** Red Hat Enterprise Linux, CentOS, Fedora Core
-* **Debian based:** Debian, Ubuntu
-* **Solaris based:** Sun Solaris, OpenSolaris
+* **基于 Red Hat 的系统：** Red Hat Enterprise Linux, CentOS, Fedora Core
+* **基于 Debian 的系统：** Debian, Ubuntu
+* **基于 Solaris 的系统：** Sun Solaris, OpenSolaris
 
-## Software
+## 软件
 
-If you use [[Basho's Riak packages|http://downloads.basho.com/riak/]], there is no need for additional software packages. If you build Riak from source, you need to have Erlang installed on your systems. See [[Installing Erlang]] for instruction on building and installing Erlang.
+如果你下载的是 [Basho 提供的 Riak 安装包](http://downloads.basho.com/riak/)，就无需额外的软件包了。如果从源码编译 Riak，需要在系统中安装 Erlang。Erlang 的编译和安装说明请参阅 [[Installing Erlang]]。
 
-## Hardware
+## 硬件
 
-Riak is designed to scale horizontally -- that is, to improve performance as you add nodes -- but it can always take advantage of more powerful hardware. The following are some general hardware recommendations:
+在设计 Riak 时考虑了横向扩放，即添加节点时自动提升性能，不过用更强大的硬件总没坏处。下面是推荐使用的硬件：
 
-* **Multi-core 64-bit CPU** - Because Riak is built on Erlang, more cores means more concurrency and thus greater performance. Riak also performs certain numerical computations more efficiently on 64-bit architectures.
-* **Minimum 4 GB RAM** - More RAM means more data can be held in main memory, resulting in greater read, write, and [[MapReduce|Using MapReduce]] performance. Insufficient RAM will increase swap utilization, causing performance degradation as memory operations begin to contend with normal disk operations. You can use tools, such as our [[Bitcask calculator|Bitcask Capacity Planning]], to calculate how much memory your nodes need to fit your dataset into Bitcask. Be sure to read [[Cluster Capacity Planning]] for more information on memory and disk usage.
-* **Multiple Fast Hard Disks (RAID and/or SSD)** - Because many operations in Riak are I/O-bound, it is important to have fast hard disks to achieve good performance. Configuring disks RAID0 for increased read/write performance may be helpful as well.
-* **Fast Network (Gigabit +)** - Riak uses the network heavily for storage operations and for cluster status (ring-state gossip, handoff, etc).  Fast connections between nodes and between clients and the cluster will improve performance.
+* **64 位多核 CPU** - Riak 使用 Erlang 开发，多核就意味着更多的并发，因此性能也更好。在 64 位架构上 Riak 还能更高效的进行数字计算。
+* **至少 4GB RAM** - 更大的 RAM 就能在主内存中存储更多的数据，提升读写性能和 [[MapReduce|Using MapReduce]] 的性能。内存不足的话就会增加交换文件的使用，导致性能下降，因为内存操作变成了常规的硬盘操作。你可以使用类似 [[Bitcask calculator|Bitcask Capacity Planning]] 的工具计算节点需要多少内存才能满足 Bitcask 存储数据的需求。关于内存和硬盘使用更多的信息请阅读 [[Cluster Capacity Planning]]
+* **多个高速硬盘（RAID 和/或 SSD）** - 因为 Riak 的很多操作是受 IO 限制的，所以要得到好的性能就要使用高速硬盘。你还可以把硬盘改造成 RAID0 来提升读写性能。
+* **快速的网络连接（GB 级以上）** - Riak 严重依靠网络处理存储操作和集群状态（环的状态广播，移交处理等），节点直接、客户端和集群之间的很快的话就能提升性能。
 
-## Virtualization
+## 虚拟化
 
-Like most datastores, **Riak will run best when not virtualized**. Virtual machines (VMs) can suffer from poor I/O and network performance, depending on how they are configured and the environment in which they run.  That said, here are some recommendations for running Riak in VPS or cloud environments:
+和大多数数据存储程序一样，**没有被虚拟化的 Riak 性能是最好的**。虚拟机的 IO 和网络性能都不太好，这和其设置及所在的环境有关。下面是针对在 VPS 或云环境中运行 Riak 的一些建议：
 
-* **Choose the Largest VM You can Afford** - Better hardware means better performance.  Larger virtual machines are less likely to share hardware resources with other customers' virtual machines.
-* **Deploy VMs Within the Same Datacenter or Region Where Possible** - Some hosting providers allow you to choose the location of your servers. Choosing to provision within the same datacenter or region will usually reduce network latency and increase throughput, resulting in greater performance.
+* **选择你可以负担起的最大的 VM** - 好的硬件意味着好的性能。大型的虚拟机很少会和其他客户分享使用硬件资源。
+* **尽量把 VM 部署在同一个数据中心或者同一地区** - 有些服务器提供商允许你选择服务器所在的位置，选择放在同一数据中心或者地区一般会减少网络迟延，提升吞吐量，因此性能也好。
 
-## Network Configuration / Load Balancing
+## 网络设置 / 负载均衡
 
-There are at least two acceptable strategies for load-balancing requests across your Riak cluster, **virtual IPs** and **reverse-proxy**.
+至少有两种策略可以增进整个集群的负载均衡，**虚拟 IP** 和**反向代理**。
 
-For **virtual IPs**, we recommend using any of the various VIP implementations. We don't recommend VRRP behavior for the VIP because you'll lose the benefit of spreading client query load to all nodes in a ring.
+对**虚拟 IP**来说，我们推荐使用任意一种 VIP 实现方式。但是不推荐使用 VRRP，因为这样做就无法把客户端的请求传遍一个环中的所有节点。
 
-For **reverse-proxy** configurations (HTTP interface), any one of these should work adequately:
+对**反向代理**设置（HTTP 接口）来说，下面任何一种都能满足需求：
 
 * haproxy
 * squid
