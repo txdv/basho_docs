@@ -8,73 +8,48 @@ audience: beginner
 keywords: [operators, building, configuration]
 ---
 
-This document captures the parameters that are commonly tweaked when
-setting up a new cluster, but it is highly advisable to review the
-detailed [[Configuration Files]] document before moving a cluster into
-production.
+这篇文档介绍了架构新集群时经常修改的选项，强烈推荐你在把集群部署到生产环境之前阅读内容更详细的 [[Configuration Files]] 文档。
 
-All configuration values discussed here are managed via the
-`app.config` file on each node, and a node must be restarted for any
-changes to take effect.
+本文讲到的所有设置都在各节点的 `app.config` 文件中，设置在节点重启后才能生效。
 
-It is advisable to make as many of the changes below as practical
-**before** joining the nodes together as a cluster. Once `app.config`
-has been configured on each node, refer to [[Basic Cluster Setup]] to
-complete the clustering process.
+在合并组成集群之前，建议你把本文介绍的所有设置都做了。设置好 `app.config` 后，请阅读 [[Basic Cluster Setup]]，完成集群的架构。
 
-Use [[riak-admin member-status|riak-admin Command Line#member-status]]
-to determine whether any given node is a member of a cluster.
+要想知道节点是否属于集群，可以使用 [[riak-admin member-status|riak-admin Command Line#member-status]] 命令。
 
-## Ring size
+## 环的大小
 
-The ring size in Riak parlance is the number of data partitions which
-comprise the cluster. This quantity impacts the scalability and
-performance of a cluster, and importantly, **it must be established
-before the cluster starts receiving data**.
+Riak 中环的大小是构成集群的数据分区的数量。这个数会影响集群的稳定性和性能，而且**必须在集群开始接收数据之前设置好**。
 
-If the ring size is too large for the number of servers, disk I/O will
-be negatively impacted by the excessive number of concurrent databases
-running on each server.
+如果环的太大，硬盘 的 IO 就会受到各服务器上同时运行的过量数据库造成的负面影响。
 
-If the ring size is too small, the servers' other resources (primarily
-CPU and RAM) will go underutilized.
+如果环太小，服务器上其他的资源（主要指 CPU 和 RAM）就得不到充分利用。
 
-See [[Planning for a Riak System]] and
-[[Scaling and Operating Riak Best Practices]] for more details on
-choosing a ring size.
+如何正确设置环的大小，请阅读 [[Planning for a Riak System]] 和 [[Scaling and Operating Riak Best Practices]]。
 
-The steps involved in changing the ring size depend on whether the
-servers (nodes) in the cluster have already been joined together.
+修改环大小的步骤取决于集群中的服务器（节点）是否已经合并了。
 
-### Cluster already in active use
+### 集群已经启用
 
-If you have a cluster in use and need to preserve its data while
-resizing the ring, you may either migrate your data to a new cluster
-or contact Basho to discuss the possibility of performing a dynamic
-ring resizing operation.
+如果集群已经启用了，在修改环大小时需要保护数据，可以把数据迁移到另一个集群，或者联系 Basho 讨论进行动态环大小修改操作的方法。
 
-### Cluster joined, but no data needs to be preserved
+### 集群已合并，但无需保护数据
 
-1.  Uncomment the `ring_creation_size` parameter (by removing the `%`
-that precedes it) in the `riak_core` section in `app.config` on each
-node and set the appropriate quantity
-2.  Stop all nodes
-3.  Remove the ring data file on each node (see [[Backing up Riak]] for the location of this file)
-4.  Start all nodes
-5.  Re-add each node to the cluster (see [[Adding and Removing Nodes|Adding and Removing Nodes#Add-a-Node-to-an-Existing-Cluster]]) or finish reviewing this document and proceed to [[Basic Cluster Setup]]
+1. 去掉 `ring_creation_size` 参数的注释（去掉前面的 `%`），位于每个节点 `app.config` 文件的 `riak_core` 区，然后设置合适的值
+2. 停掉所有节点
+3. 删掉各节点的环数据文件（该文件的位置请查看 [[Backing up Riak]]）
+4. 启动所有节点
+5. 重新把各节点加入集群（详情请阅读 [[Adding and Removing Nodes|Adding and Removing Nodes#Add-a-Node-to-an-Existing-Cluster]]，或者读完本文，然后完成 [[Basic Cluster Setup]] 中的设置）
 
-### New servers, have not yet joined a cluster
+### 新服务器，还没合并成集群
 
-1.  Uncomment the `ring_creation_size` parameter (by removing the `%`
-that precedes it) in the `riak_core` section in `app.config` on each
-node and set the appropriate quantity
-2.  Stop all nodes
-3.  Remove the ring data file on each node (see [[Backing up Riak]] for the location of this file)
-4.  Finish reviewing this document and proceed to [[Basic Cluster Setup]]
+1. 去掉 `ring_creation_size` 参数的注释（去掉前面的 `%`），位于每个节点 `app.config` 文件的 `riak_core` 区，然后设置合适的值
+2. 停掉所有节点
+3. 删掉各节点的环数据文件（该文件的位置请查看 [[Backing up Riak]]）
+4. 读完本文，然后完成 [[Basic Cluster Setup]] 中的设置
 
-### Verifying ring size
+### 查看环的大小
 
-The `riak-admin` command can verify the ring size:
+使用 `riak-admin` 命令可以查看环的大小：
 
     $ sudo /usr/sbin/riak-admin status | egrep ring
     ring_members : ['riak@10.160.13.252']
@@ -82,46 +57,29 @@ The `riak-admin` command can verify the ring size:
     ring_ownership : <<"[{'riak@10.160.13.252',8}]">>
     ring_creation_size : 8
 
-If `ring_num_partitions` and `ring_creation_size` do not agree, that
-means that the `ring_creation_size` value was changed too late and the
-proper steps were not taken to start over with a new ring.
+如果 `ring_num_partitions` 和 `ring_creation_size` 的值不一致，就说明 `ring_creation_size` 的值修改的太晚了，设置新值时某个步骤漏掉了。
 
-Note that Riak will not allow two nodes with different ring sizes to
-be joined into a cluster.
+注意，Riak 不允许两个环大小不一样的节点合并到集群中。
 
-## Backend
+## 后台
 
-The most critical decision to be made is the backend to use. The
-choice of backend strongly influences the performance characteristics
-and feature set for a Riak environment.
+最难决定的就是选择合适的后台了。所选的后台会严重影响 Riak 的性能和功能。
 
-See [[Choosing a Backend]] for a list of supported backends; each
-referenced document includes the necessary configuration bits.
+可选的后台参见 [[Choosing a Backend]]，文中列出了针对各种后台设置文档的链接。
 
-As with ring size, changing the backend will result in all data being
-effectively lost, so spend the necessary time up front to evaluate and
-benchmark backends.
+和修改环的大小一样，变更后台也可能会丢失所有数据，所以在操作之前无比要用足够的时间计算、测评各种后台。
 
-If still in doubt, consider using the [[Multi]] backend for future
-flexibility.
+如果还是有疑问，请使用 [[Multi]] 后台，以便提供后期可扩展性。
 
-If you do change backends from the default (typically [[Bitcask]])
-make certain you change it across all nodes. It is possible but
-generally unwise to use different backends on different nodes; this
-would limit the effectiveness of backend-specific features.
+如果真的要变更默认的后台（一般是 [[Bitcask]]），请确保修改了所有节点的设置。虽然可以，但节点之间使用不同的后台可不明智，这样做会限制后台功能的效力。
 
-## Default bucket properties
+## 默认的 bucket 属性
 
-Bucket properties are also very important to performance and
-behavioral characteristics.
+bucket 的属性对性能和行为特性也很重要。
 
-The properties for any individual bucket can be configured
-dynamically, but default values for those properties can be defined in
-`app.config`, in the `riak_core` section.
+针对各 bucket 的属性可以动态修改，属性的默认值在 `app.config` 文件的 `riak_core` 区中设定。
 
-Below is an example of setting default bucket properties (admittedly,
-in this example to the values which Riak would define to them in the
-absence of such a configuration).
+下面是 bucket 默认设置的示例（如果没有设定这些设置，Riak 会自动为我们设置）。
 
 ```
 {default_bucket_props, [
@@ -133,34 +91,22 @@ absence of such a configuration).
     ]}
 ```
 
-In short: replicate data 3 times, require that 2 of those 3 replicas
-respond before any read or write is considered successful, and do not
-present conflicting values to the application for resolution.
+简要说明一下这个设置：副本数为 3，必须收到 3 个副本中的 2 个才能把读或写操作视为成功的，不在应用程序中输出有冲突的值。
 
-The `r` and `w` values can be overridden with each request, and few
-users need to change `n_val`, but choosing an appropriate value for
-`allow_mult` is vital for a robust application.
+`r` 和 `w` 值在每次请求中都可以重设，`n_val` 很少需要修改，但选择一个适当的 `allow_mult` 值对一个稳健的应用程序来说就很重要了。
 
-For more on the implications of these settings, please see
-[[Eventual Consistency]], [[Replication]], and the Basho blog series,
-"Understanding Riak's Configurable Behaviors":
-[[Part 1|http://basho.com/understanding-riaks-configurable-behaviors-part-1/]],
-[[Part 2|http://basho.com/riaks-config-behaviors-part-2/]],
-[[Part 3|http://basho.com/riaks-config-behaviors-part-3/]],
-[[Part 4|http://basho.com/riaks-config-behaviors-part-4/]], and the
-[[Epilogue|http://basho.com/riaks-config-behaviors-epilogue/]].
+关于这些设置的详细介绍，请阅读 [[Eventual Consistency]] 和 [[Replication]]，以及 Basho 博客中的“Understanding Riak's Configurable Behaviors”系列文章：
+[[第一部分|http://basho.com/understanding-riaks-configurable-behaviors-part-1/]],
+[[第二部分|http://basho.com/riaks-config-behaviors-part-2/]],
+[[第三部分|http://basho.com/riaks-config-behaviors-part-3/]],
+[[第四部分|http://basho.com/riaks-config-behaviors-part-4/]] 和
+[[后记|http://basho.com/riaks-config-behaviors-epilogue/]]。
 
-If the default bucket properties are modified in `app.config` and the
-node restarted, any existing buckets will **not** be directly
-impacted, although the mechanism described in
-[[HTTP Reset Bucket Properties]] can be used to force them to pick up
-the new defaults.
+如果修改了 `app.config` 文件中 bucket 的默认属性，而且也重启了节点，但现有的 bucket **不会** 受到直接影响。不过可以使用 [[HTTP Reset Bucket Properties]] 中介绍的方法强制使用新的默认值。
 
-## System tuning
+## 系统调校
 
-Please review the following documents before conducting any
-[[benchmarking|Basho Bench]] and/or rolling out a live production
-cluster.
+在进行评测（[[benchmarking|Basho Bench]]）和部署集群之前，请阅读下面的文档。
 
 * [[Open Files Limit]]
 * [[File System Tuning]]
@@ -168,6 +114,6 @@ cluster.
 * [[AWS Performance Tuning]]
 * [[Configuration Files]]
 
-## Joining the nodes together
+## 把节点合并起来
 
-Please see [[Basic Cluster Setup]] for the cluster creation process.
+集群搭建的过程参见 [[Basic Cluster Setup]] 一文。

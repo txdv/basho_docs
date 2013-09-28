@@ -10,16 +10,13 @@ next: "[[Bitcask]]"
 interest: false
 ---
 
-A key feature of Riak KV is the pluggable storage backends. These allow the
-ability to choose a low-level storage engine that suits specific operational
-needs. For example, if one needs maximum throughput coupled with data
-persistence and has a bounded keyspace, Bitcask is a good choice. On the other hand, if one needs to store a large number of keys, then LevelDB would be a better backend recommendation.
+Riak KV 的一个显著特性是可插入式的存储后台。这样就可以根据特殊测操作需求选择合适的底层存储引擎。例如，如果需要最大限度的吞吐量外加永久性数据存储和有限的密钥空间，Bitcask 是不错的选择。而如果需要存储数量巨大的键，LevelDB 是更好地选择。
 
-These backends are supported:
+Riak 支持以下后台：
 
 * [[Bitcask]]
 * [[LevelDB]]
 * [[Memory]]
 * [[Multi]]
 
-Riak supports the use of custom storage backends as well. See the storage [[Backend API]] for more details.
+Riak 也支持自定义存储后台。详细信息请阅读 [[Backend API]]。

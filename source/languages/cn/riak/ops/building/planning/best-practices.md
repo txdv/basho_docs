@@ -8,68 +8,62 @@ audience: intermediate
 keywords: [operator, best-practices]
 ---
 
-## Disk Capacity
+## 硬盘容量
 
-Filling up disks is bad, in general you should look to add capacity immediately when either:
+把硬盘装满数据可不是个好主意，遇到下列情况时就要增加容量了：
 
- - The disk becomes greater than 80% full.
- - You have less than 10 days capacity remaining at current rates of growth.
+ - 硬盘空间使用量超过 80%
+ - 按照当前的增速，容量不够 10 天使用
 
+## RAID 等级
 
-## RAID Levels
+Riak 通过内建的冗余提供了数据恢复能力。
 
-Riak provides resilience through its built in redundancy.
+ - RAID0 可用来提升性能，但要随时一整个节点的可用性
+ - RAID5/6 可用了提升硬 RAID0 损失的可用性，而且还比单个硬盘的性能要高
+ - 你应该选择一个自己觉得合用的 RAID 等级（或者不用 RAID）
 
- - RAID0 can be used to increase the performance at the expense of single node reliability.
- - RAID5/6 can be used to increase the reliability over RAID0 but still higher performance than single disks.
- - You should choose a RAID level (or no RAID) that you’re comfortable with.
+## 要预留多少硬盘空间
 
+ - 添加新节点会立即增加集群的总容量，但要留有足够的内网容量，这样移交现有数据的速度才会超过新进数据
+ - 一旦达到了特定的比例，新进数据量远小于集群的总容量，就可以在需要时添加新的节点
+ - 我们建议预留一到两周的时间，如果预计会用完所有容量，还有足够的时间添加节点，在容量用完之前做好移交处理
+ - 对大型存储来说，用完 80% 容量时就要谨慎考虑增加容量了
 
-## How much disk leeway to have
+## 要预留多少 CPU 容量
 
- - Adding new nodes instantly increases the total capacity of the cluster, but you should allow enough internal network capacity so that handing off existing data outpaces the arrival of new data.
- - Once you’ve reached a certain scale, where the amount of new data arriving is a small fraction of the clusters total capacity, you can add new nodes when you need them.
- - We would recommend having a week or two leeway, so if you estimate you are likely to run out of capacity you have plenty of time to add nodes and have handoff occur before the disks reach capacity.
- - For large volumes of storage it's probably prudent to add more capacity once you reach 80%.
+ - 在稳定的状态下，除掉其他进程，CPU 利用率的峰值要小于 30%
+ - 这样就用足够的空间运行其他进程，例如备份和移交
 
+## 要预留多少网络容量
 
-## How much CPU capacity leeway to have
+ - 网络流量突发性很强，和很多因素有关，变化也快
+ - 常规负载时，10 分钟内的平均值要小于最大容量的 20%
+ - Riak 会产生 3-5 倍的节点内部流量，称之为入站流量，在设计时要考虑这一点
 
- - In a steady state, your peak CPU utilization ignoring other processes should be less than 30%.
- - This way you’ll have spare capacity to handle other process, like backups and handoff.
+## 什么时候添加节点
 
+*遇到下列情况时要添加更多的节点：*
 
-## How much Network Capacity leeway to have
+ - 使用了 80% 的存储容量
+ - 距填满集群还有不到 10 天
+ - 当前节点的 IO/CPU 使用率比某段时间内的平均值高，特别是使用 Map/Reduce 操作时
+ - 如果不想添加节点还可以增加现有节点的存储容量
+   - 只有明确网络和 CPU 容量还有结余时，才应该扩容现有节点
+   - Riak 中的节点地位是相等的。不允许只为某些节点扩容，事实上，如果没有为所有节点扩容，添加容量是不起作用的
 
- - Network traffic tends to be “bursty”, that is, it varies a lot, and quickly.
- - Your normal load, as averaged over a 10 minute period should be no more than 20% of the maximum capacity.
- - Riak generates 3-5 times the amount of intra-node traffic as inbound traffic, you should allow for this in your network design.
+## 如何添加节点
 
+ - 应该一次性添加所需的节点
+ - 如果要添加多个节点，不要一次只加一个
+ - 可以限制传输率，把优先权给到访客的流量
 
-## When to add Nodes
+## 扩放
 
-*You should add more nodes:*
- - When you have reached 80% storage capacity.
- - When you have less than 10 days leeway before you expect the cluster to fill up.
- - When current node IO/CPU activity is higher than average for extended period of time--for Map/Reduce operations especially.
- - An alternative to adding more nodes is to add more storage to the existing nodes.
-   - You should only add more storage to existing nodes if you’re confident that there is plenty of spare network and CPU capacity.
-   - Riak always treats all nodes equally. It doesn't make any allowances for some nodes having more storage capacity, so effectively you don't get any benefit from additional storage until all the nodes have had their storage increased.
-
-
-## How to add Nodes
-
- - You should add as many additional nodes as you require in one operation.
- - Don’t add nodes one at a time if you’re adding multiple nodes.
- - You can limit the transfer rate so that priority is given to live customer traffic.
-
-
-## Scaling
-
- - All large scale systems are bound by availability of some resource.
- - From a stability point of view the best state for a busy Riak cluster to be in is:
-   - New network connections limited to ensure that:
-   - Existing network connections consume most network bandwidth
-   - CPU at < 30%
-   - Disk IO at < 90%
- - You should use HAProxy or your application servers to limit new network connections to keep network and IO below 90% and CPU below 30%
+ - 所有大型系统的扩放都要舍弃某些资源的可用性
+ - 稳健起见，繁忙的 Riak 集群应该放置在：
+   - 新网络连接限制了：
+   - 现有的网络连接消耗了大多数网络带宽
+   - CPU 使用率 < 30%
+   - 硬盘 IO 使用率 < 90%
+ - 可以使用 HAProxy，或应用程序服务器，限制新网络连接，把网络和 IO 使用率限制在 90% 以下，CPU 使用率则要小于 30%
