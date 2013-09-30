@@ -8,82 +8,61 @@ audience: beginner
 keywords: [operator, benchmark]
 ---
 
-Basho Bench is a benchmarking tool created to conduct accurate and
-repeatable performance tests and stress tests, and produce performance
-graphs.
+Basho Bench 是一个测评工具，用来进行精确且可重复的性能测试和压力测试，最终会输出性能图表。
 
-Originally developed by Dave Smith (Dizzy) to benchmark Riak, Basho's
-key/value datastore, it exposes a pluggable driver interface and has
-been extended to serve as a benchmarking tool against a variety of
-projects. New drivers can be written in Erlang and are generally less
-than 200 lines of code.
+Basho Bench 最开始由 Dave Smith (Dizzy) 开发，用来测评 Basho 的键值对数据库 Riak。
+它提供了一个可插入式驱动接口，基于这个接口 Basho Bench 已经得到扩展，可以测评很多项目。
+驱动使用 Erlang 开发，一般都会少于 200 行代码。
 
-Download
---------
+## 下载
 
-The main repository for basho_bench is [http://github.com/basho/basho_bench/](http://github.com/basho/basho_bench/).
+basho_bench 的主仓库地址是 [http://github.com/basho/basho_bench/](http://github.com/basho/basho_bench/)。
 
-Documentation
--------------
+## 文档
+
 
 <div class="info">
-<div class="title">Note on Documentation</div>
+<div class="title">关于文档的说明</div>
 
-This topic replaces the documentation that was in the basho_bench
-repository under `docs/Documentation.org` prior to February 2011.
+本文可用来代替 2011 年 2 月份以前 basho_bench 仓库中的 `docs/Documentation.org` 文档。
 </div>
 
-### How does it work?
 
-When Basho Bench starts (basho_bench.erl), it reads the configuration
-(basho_bench_config.erl), creates a new results directory, then sets
-up the test. (basho_bench_app.erl/basho_bench_sup.erl)
+### basho_bench 是怎么工作的？
 
-During test setup, Basho Bench creates:
+Basho Bench 启动时（basho_bench.erl），会读取设置文件（basho_bench_config.erl），
+新建一个文件夹用来保存结果，然后进行测试（basho_bench_app.erl/basho_bench_sup.erl）。
 
--   One **stats process** (basho_bench_stats.erl). This receives
-    notifications when an operation completes, plus the elapsed time of
-    the operation, and stores it in a histogram. At regular intervals,
-    the histograms are dumped to `summary.csv` as well as
-    operation-specific latency CSVs (e.g. `put_latencies.csv` for the
-    'put' operation).
--   N **workers**, where N is specified by the [[concurrent|Basho Bench#concurrent]] configuration setting.
-    (basho_bench_worker.erl). The worker process wraps a driver
-    module, specified by the [[driver|Basho Bench#driver]] configuration setting. The driver is randomly
-    invoked using the distribution of operations as specified by the
-    [[operations|Basho Bench#operations]] configuration
-    setting. The rate at which the driver invokes operations is governed
-    by the [[mode|Basho Bench#mode]] setting.
+在测试阶段，Basho Bench 创建了：
 
-Once these processes have been created and initialized, Basho Bench
-sends a run command to all worker processes, causing them to begin the
-test. Each worker is initialized with a common seed value for random
-number generation to ensure that the generated workload is reproducible
-at a later date.
+-   一个**状态进程**（basho_bench_stats.erl）。这个进程会接受操作完成后的提醒，
+    以及操作所用时间，然后把结果保存成一个柱状图。一定时间后，柱状图会被转换成 `summary.csv` 和
+    针对某项操作的迟延 CSV 文件（例如，`put` 操作的迟延文件是 `put_latencies.csv`）。
+-   n 个 **worker**，n 的值由 [[concurrent|Basho Bench#concurrent]] 设置设定（basho_bench_worker.erl）。
+    worker 包裹了一个驱动模块，这个模块由 [[driver|Basho Bench#driver]] 设置设定。
+    驱动是根据操作的分布情况随机调用的，由 [[operations|Basho Bench#operations]] 设置设定。
+    驱动调用操作的比例是由 [[mode|Basho Bench#mode]] 设定的。
 
-During the test, the workers repeatedly call `driver:run/4`, passing in
-the next operation to run, a keygen function, a valuegen function, and
-the last state of the driver. The worker process times the operation,
-and reports this to the stats process when the operation has completed.
+这些经常创建并初始化之后，Basho Bench 会向所有的 worker 进程发送运行命令，开始进行测试。
+每个 worker 初始化时都使用了相同的初始值，随机生成数字，确保生成的工作量以后可以再次生成。
 
-Finally, once the test has been run for the duration specified in the
-config file, all workers and stats processes are terminated and the
-benchmark ends. The measured latency and throughput of the test can be
-found in `./tests/current/`. Previous results are in timestamped
-directories of the form `./tests/YYYYMMDD-HHMMSS/`.
+测试时，worker 会重复调用 `driver:run/4`，传入接下来要进行的操作，生成键的函数，生成值
+的函数，以及驱动的最终状态。worker 进程会对操作计时，等操作完成后把结果传给状态进程。
 
-Installation
-------------
+只要测试运行的时间达到了设置文件中的指定值，所有 worker 和状态进程都会终止，测评也就结束了。
+测出的迟延和吞吐量保存在 `./tests/current/` 文件夹中。以前的测试结果保存在以时间戳命名的
+文件夹中，也就是 `./tests/YYYYMMDD-HHMMSS/` 这种形式。
 
-### Prerequisites
+## 安装
 
--   Erlang must be installed. See [[Installing Erlang]] for instructions and versioning requirements.
--   [R statistics language](http://www.r-project.org/) must be installed if you wish to generate graphs (see the [[Generating Benchmark Graphs|Basho Bench#Generating-Benchmark-Graphs]] section, below).
+### 前提条件
 
-### Building from Source
+-   必须先安装 Erlang。Erlang 的安装方法和版本要求参见 [[Installing Erlang]]
+-   如果想生成图表，必须先安装[统计语言 R](http://www.r-project.org/)（详情参见下面的 [[Generating Benchmark Graphs|Basho Bench#Generating-Benchmark-Graphs]] 一节)
 
-Basho Bench is currently available as source code only. To get the
-latest code, clone the basho_bench repository:
+### 从源码编译
+
+Basho Bench 现在只有源码，要获取最新的代码，请克隆 basho_bench 的仓库：
 
 ```bash
 git clone git://github.com/basho/basho_bench.git
@@ -91,77 +70,67 @@ cd basho_bench
 make
 ```
 
-Usage
------
+## 用法
 
-Run basho_bench:
+运行 basho_bench 命令：
 
 ```bash
 ./basho_bench myconfig.config
 ```
 
-This will generate results in `tests/current/`. You will need to create
-a configuration file. The recommended approach is to start from a file
-in the `examples` directory and modify settings using the
-[[Configuration|Basho Bench#Configuration]] section
-below for reference.
+上述命令会把测试结果保存到 `tests/current/` 文件夹中。运行这个命令前要先创建设置文件。
+建议以 `examples` 文件夹中的某个文件为样本，然后根据下面 [[Configuration|Basho Bench#Configuration]] 一节
+的说明进行修改。
 
-Generating Benchmark Graphs
----------------------------
+## 生成测评图表
 
-The output of basho_bench can be used to create graphs showing:
+basho_bench 的结果可以生成图表，显示：
 
--   Throughput - Operations per second over the duration of the test.
--   Latency at 99th percentile, 99.9th percentile and max latency for
-    the selected operations.
--   Median latency, mean latency, and 95th percentile latency for the
-    selected operations.
+-   吞吐量 - 测试运行的时间段内每秒执行的操作数
+-   99 百分位的迟延，某些操作可达到 99.9 百分位或者更高
+-   迟延中值，迟延均值，以及某些操作的 95 百分位迟延
 
-### Prerequisites
+### 前提条件
 
-The R statistics language is needed to generate graphs. Note: If necessary, R can be installed on a different machine than the one running basho_bench, and the performance data can be copied (via rsync, for example) from the load testing machine to the one that will be generating and viewing the graphs (such as a desktop).
+要生成图表，必须安装统计语言 R。注意：如果需要，可以在运行 basho_bench 之外的另一台电脑
+上安装 R，相关数据会从加载测试的电脑（例如，使用 rsync）复制到生成和查看图表的电脑（例如一个桌面电脑）。
 
--   More information: [[http://www.r-project.org/]]
--   Download R: [[http://cran.r-project.org/mirrors.html]]
+-   更多信息：[[http://www.r-project.org/]]
+-   下载 R：[[http://cran.r-project.org/mirrors.html]]
 
-Follow the instructions for your platform to install R.
+请按照针对你所用平台的说明安装 R。
 
-### Generating Graphs
+### 生成图表
 
-To generate a benchmark graph against the current results, run:
+要想为当前的测试结果生成图表，请运行：
 
 ```bash
 make results
 ```
 
-This will create a results file in `tests/current/summary.png`.
+上述命令会生成 `tests/current/summary.png`。
 
-You can also run this manually:
+也可以手动运行下面的命令：
 
 ```bash
 priv/summary.r -i tests/current
 ```
 
-## Configuration
+## 设置
 
-Basho Bench ships with a number of sample configuration files, available
-in the /examples/ directory.
+Basho Bench 提供了很多示例设置文件，都在 /examples/ 文件夹中。
 
-### Global Config Settings
+### 全局设置
 
 #### mode
 
-The **mode** setting controls the rate at which workers invoke the
-`{driver:run/4}` function with a new operation. There are two possible
-values:
+**mode** 控制 worker 使用新方法调用 `{driver:run/4}` 的频率。可选值有两个：
 
-* `{max}` --- generate as many ops per second as possible
-* `{rate, N}` --- generate N ops per second, with exponentially
-distributed interarrival times
+* `{max}` --- 每秒生成尽可能多得操作
+* `{rate, N}` --- 每秒生成 N 个操作，N 的值是时间间隔的指数
 
-Note that this setting is applied to each driver independently. For
-example, if `{rate, 5}` is used with 3 concurrent workers, basho_bench
-will be generating 15 (i.e. 5 * 3) operations per second.
+注意，这个设置各驱动都是独立设定地。例如，使用 3 个并发 worker，**mode** 设为 `{rate, 5}`，
+basho_bench 每秒就会生成 15（=5*3）个操作。
 
 ```bash
 % Run at max, i.e.: as quickly as possible
@@ -173,9 +142,7 @@ will be generating 15 (i.e. 5 * 3) operations per second.
 
 #### concurrent
 
-The number of concurrent worker processes. The default is 3 worker
-processes. This determines the number of concurrent clients running
-requests on API under test.
+并发的 worker 进程数，默认为 3。这个设置决定了请求 API 的并发客户端数量。
 
 ```bash
 % Run 10 concurrent processes
@@ -184,7 +151,7 @@ requests on API under test.
 
 #### duration
 
-The duration of the test, in minutes. The default is 5 minutes.
+测试持续的时间，单位为分钟。默认为 5 分钟。
 
 ```bash
 % Run the test for one hour
@@ -193,25 +160,17 @@ The duration of the test, in minutes. The default is 5 minutes.
 
 #### operations
 
-The possible operations that the driver will run, plus their "weight" or
-likelihood of being run. Default is `[{get,4},{put,4},{delete, 1}]`
-which means that out of every 9 operations, 'get' will be called four
-times, 'put' will be called four times, and 'delete' will be called once,
-on average.
+驱动要进行的操作，以及权重或者被执行的可能性。默认值为 `[{get,4},{put,4},{delete, 1}]`，
+也就是说，平均每 9 次操作中，`get` 会运行 4 次，`put` 会运行 4 次，`delete` 会运行 1 次。
 
 ```bash
 % Run 80% gets, 20% puts
 {operations, [{get, 4}, {put, 1}]}.
 ```
+这一设置也是每个驱动分开设定的。并不是所有的驱动都会实现前面提到的 "get"/"put" 操作。
+具体实现的操作请阅读驱动的源码。假如要测试 HTTP 接口，相应的操作就是 get 和 update。
 
-Operations are defined on a **per-driver** basis. Not all drivers will
-implement the "get"/"put" operations discussed above. Consult the driver
-source to determine the valid operations. E.g., if you're testing the
-HTTP interface, the corresponding operations are "get" and "update"
-respectively.
-
-If a driver does not support a specified operation ("asdfput" in this
-example) you may see errors like:
+如果驱动不支持某个操作（这里以 asdfput 为例），会看到如下的错误：
 
 ```bash
 DEBUG:Driver basho_bench_driver_null crashed: {function_clause,
@@ -228,74 +187,54 @@ DEBUG:Driver basho_bench_driver_null crashed: {function_clause,
 
 #### driver
 
-The module name of the driver that basho_bench will use to generate
-load. A driver may simply invoke code in-process (such as when measuring
-the performance of DETS) or may open network connections
-and generate load on a remote system (such as when testing a Riak
-server/cluster).
+生成负载时 basho_bench 使用的驱动模块名。驱动可以之间在进程中调用代码（例如
+测试 DETS 的性能时），或者打开网络连接从远程系统加载数据（例如测试 Riak 服务器/集群时）。
 
-Available drivers include:
+可以使用的驱动如下：
 
--   `basho_bench_driver_http_raw` - Uses Riak's HTTP interface to
-    get/update/insert data on a Riak server
--   `basho_bench_driver_riakc_pb` - Uses Riak's Protocol Buffers
-    interface to get/put/update/delete data on a Riak server
--   `basho_bench_driver_riakclient` - Uses Riak's Distributed Erlang interface
-    to get/put/update/delete data on a Riak server
--   `basho_bench_driver_bitcask` - Directly invokes the Bitcask API
--   `basho_bench_driver_dets` - Directly invokes the DETS API
+-   `basho_bench_driver_http_raw` - 使用 Riak 的 HTTP 接口，对 Riak 服务器进行 get/update/insert 操作
+-   `basho_bench_driver_riakc_pb` - 使用 Riak 的 Protocol Buffers 接口，对 Riak 服务器进行 get/put/update/delete 操作
+-   `basho_bench_driver_riakclient` - 使用 Riak 的 Distributed Erlang 接口，对 Riak 服务器进行 get/put/update/delete 操作
+-   `basho_bench_driver_bitcask` - 直接调用 Bitcask API
+-   `basho_bench_driver_dets` - 直接调用 DETS API
 
-On invocation of the `driver:run/4` method, the driver may return one of
-the following results:
+调用 `driver:run/4` 方法时，驱动可能会返回下列的结果：
 
--   `{ok, NewState}` - operation completed successfully
--   `{error, Reason, NewState}` - operation failed but the driver can
-    continue processing (i.e. recoverable error)
--   `{stop, Reason}` - operation failed; driver can't/won't continue
-    processing
--   `{'EXIT', Reason}` - operation failed; driver crashed
+-   `{ok, NewState}` - 操作成功完成
+-   `{error, Reason, NewState}` - 操作失败，但驱动可以继续运行（例如，可复原的错误）
+-   `{stop, Reason}` - 操作失败，驱动无法继续运行
+-   `{'EXIT', Reason}` - 操作失败，驱动挂机
 
 #### code_paths
 
-Some drivers need additional Erlang code in order to run. Specify the
-paths to this code using the **code_paths** configuration setting.
+某些驱动必须加载额外的 Erlang 代码才能运行。这些代码的路径就由 **code_paths** 设置指定。
 
 #### key_generator
 
-The generator function to use for creating keys. Generators are defined
-in `basho_bench_keygen.erl`. Available generators include:
+生成键的函数。在 `basho_bench_keygen.erl` 中定义。可用的函数有：
 
--   `{sequential_int, MaxKey}` - generates integers from 0..MaxKey in
-    order and then stops the system. Note that each instance of this
-    keygen is specific to a worker.
--   `{partitioned_sequential_int, MaxKey}` - same as `{sequential_int}`,
-    but splits the keyspace evenly among the worker processes. This is
-    useful for pre-loading a large dataset.
--   `{partitioned_sequential_int, StartKey, NumKeys}` - same as
-    `partitioned_sequential_int`, but starting at the defined `StartKey`
-    and going up to `StartKey + NumKeys`.
--   `{uniform_int, MaxKey}` - selects an integer from uniform
-    distribution of 0..MaxKey. I.e. all integers are equally probable.
--   `{pareto_int, MaxKey}` - selects an integer from a Pareto
-    distribution, such that 20% of the available keys get selected 80%
-    of the time. Note that the current implementation of this generator
-    MAY yield values larger than MaxKey due to the mathematical
-    properties of the Pareto distribution.
--   `{truncated_pareto_int, MaxKey}` - same as `{pareto_int}`, but will
-    NOT yield values above MaxKey.
--   `{function, Module, Function, Args}` - specifies an external
-    function that should return a key generator function. The worker
-    `Id` will be prepended to `Args` when the function is called.
--   `{int_to_bin, Generator}` - takes any of the above `_int` generators
-    and converts the number to a 32-bit binary. This is needed for some
-    drivers that require a binary key.
--   `{int_to_str, Generator}` - takes any of the above `_int` generators
-    and converts the number to a string. This is needed for some drivers
-    that require a string key.
+-   `{sequential_int, MaxKey}` - 按 0..MaxKey 的顺序生成整数，然后终止系统。
+    注意，该方法的每个实例都专属于一个 worker
+-   `{partitioned_sequential_int, MaxKey}` - 和 `{sequential_int}` 一样，
+    但在所有的 worker 进程中平均分配键的取值范围。这个函数常用于要预先加载大型数据的情况。
+-   `{partitioned_sequential_int, StartKey, NumKeys}` - 和
+    `partitioned_sequential_int` 一样，但从 `StartKey` 开始，直到 `StartKey + NumKeys`
+-   `{uniform_int, MaxKey}` - 从 0..MaxKey 范围内选择一个唯一值，所有值被选中的概率相等
+-   `{pareto_int, MaxKey}` - 从帕累托分布中选择一个整数，所以所有键中的 20% 有 80% 的
+    机会被选中。注意，当前实现的这个函数可能会生成大于 MaxKey 的值，这是由帕累托分布的
+    数学性质导致的。
+-   `{truncated_pareto_int, MaxKey}` - 和 `{pareto_int}` 一样，但不会生成
+    比 MaxKey 大的值
+-   `{function, Module, Function, Args}` - 指定一个外部函数用来生成键。调用这个函数时，
+    worker 的 `Id` 会传入 `Args`。
+-   `{int_to_bin, Generator}` - 接受上述任何一个以 `_int` 结尾的函数做参数，然后把
+    生成的结果转换成 32 位二进制。需要二进制键的驱动就要用这个函数。
+-   `{int_to_str, Generator}` - 接受上述任何一个以 `_int` 结尾的函数做参数，然后把
+    生成的结果转换成字符串。需要字符串形式的键的驱动就要用这个函数。
 
-The default key generator is `{uniform_int, 100000}`.
+默认用来生成键的函数是 `{uniform_int, 100000}`。
 
-Examples:
+示例：
 
 ```bash
 % Use a randomly selected integer between 1 and 10,000
@@ -311,24 +250,20 @@ Examples:
 
 #### value_generator
 
-The generator function to use for creating values. Generators are
-defined in `basho_bench_valgen.erl`. Available generators include:
+生成值的函数。在 `basho_bench_valgen.erl` 中定义。可用的函数有：
 
--   `{fixed_bin, Size}` - generates a random binary of Size bytes. Every
-    binary is the same size, but varies in content.
--   `{exponential_bin, MinSize, Mean}` - generates a random binary which
-    has an exponentially-distributed size. Most values will be
-    approximately MinSize + Mean bytes in size, with a long-tail of
-    larger values.
--   `{uniform_bin, MinSize, MaxSize}` - generates a random binary which
-    has an evenly-distributed size between MinSize and MaxSize.
--   `{function, Module, Function, Args}` - specifies an external
-    function that should return a value generator function. The worker
-    `Id` will be prepended to `Args` when the function is called.
+-   `{fixed_bin, Size}` - 生成随机的二进制对象，字节数由 Size 指定。
+    生成的每个值长度一样，知识内容不同。
+-   `{exponential_bin, MinSize, Mean}` - 生成随机的二进制对象，大小呈指数变化。
+    大多数值的大小近似 MinSize + Mean 个字节，较大值会有长尾。
+-   `{uniform_bin, MinSize, MaxSize}` - 生成随机的二进制对象，大小
+    在 MinSize 和 MaxSize 之间等价分布。
+-   `{function, Module, Function, Args}` - 指定一个外部函数用来生成值。调用这个函数时，
+    worker 的 `Id` 会传入 `Args`。
 
-The default value generator is `{value_generator, {fixed_bin, 100}}`.
+默认使用的函数是 `{value_generator, {fixed_bin, 100}}`。
 
-Examples:
+示例：
 
 ```bash
 % Generate a fixed size random binary of 512 bytes
@@ -341,11 +276,9 @@ Examples:
 
 #### rng_seed
 
-The initial random seed to use. This is explicitly seeded, rather than
-seeded from the current time, so that a test can be run in a
-predictable, repeatable fashion.
+要使用的初始随机值。这些值会显式注入，而不是在当前时间注入，这样测试就可以预测，重复执行。
 
-Default is `{rng_seed, {42, 23, 12}}`.
+默认值为 `{rng_seed, {42, 23, 12}}`。
 
 ```bash
 % Seed to {12, 34, 56}
@@ -354,12 +287,11 @@ Default is `{rng_seed, {42, 23, 12}}`.
 
 #### log_level
 
-The **log_level** setting determines which messages Basho Bench will
-log to the console and to disk.
+ **log_level**  决定 Basho Bench 要把哪些消息输出到终端并写入硬盘。
 
-Default level is **debug**.
+默认值是 **debug**。
 
-Valid levels are:
+可用的值有：
 
 -   debug
 -   info
@@ -368,21 +300,19 @@ Valid levels are:
 
 #### report_interval
 
-How often, in seconds, should the stats process write histogram data to
-disk. Default is 10 seconds.
+状态进程隔多久要把柱状图写入硬盘，单位为秒。默认值为 10 秒。
 
 #### test_dir
 
-The directory in which to write result data. The default is `tests/`.
+测试结果保存的文件夹。默认为 `tests/`。
 
 ### basho_bench_driver_riakclient Settings
 
-These configuration settings apply to the
-`basho_bench_driver_riakclient` driver.
+这些设置针对 `basho_bench_driver_riakclient` 驱动。
 
 #### riakclient_nodes
 
-List of Riak nodes to use for testing.
+列出测试时要使用的 Riak 节点。
 
 ```bash
 {riakclient_nodes, ['[riak1@127.0.0.1](mailto:riak1@127.0.0.1)',
@@ -391,18 +321,15 @@ List of Riak nodes to use for testing.
 
 #### riakclient_cookie
 
-The Erlang cookie to use to connect to Riak clients. Default is
-`'riak'`.
+用来连接到 Riak 客户端的 Erlang cookie。默认值是 `'riak'`。
 
 ```bash
-
 {riakclient_cookie, riak}.
 ```
 
 #### riakclient_mynode
 
-The name of the local node. This is passed into
-[net_kernel:start/1](http://erlang.org/doc/man/net_kernel.html).
+本地节点的名称。会传入 [net_kernel:start/1](http://erlang.org/doc/man/net_kernel.html)。
 
 ```bash
 {riakclient_mynode,
@@ -411,8 +338,7 @@ The name of the local node. This is passed into
 
 #### riakclient_replies
 
-This value is used for R-values during a get operation, and W-values
-during a put operation.
+这个值在 get 操作时代表 R 值，在 put 操作时代表 W 值。
 
 ```bash
 % Expect 1 reply.
@@ -421,22 +347,20 @@ during a put operation.
 
 #### riakclient_bucket
 
-The Riak bucket to use for reading and writing values. Default is
-`<<"test">>`.
+读写操作使用的 Riak bucket。默认为 `<<"test">>`。
 
 ```bash
 % Use the "bench" bucket.
 {riakclient_bucket, &lt;&lt;"bench"&gt;&gt;}.
 ```
 
-### basho_bench_driver_riakc_pb Settings
+### 针对 basho_bench_driver_riakc_pb 驱动的设置
 
 #### riakc_pb_ips
 
-List of IP addresses to connect the workers to. A random IP will be
-chosen for each worker.
+worker 要连接的 IP 地址。每个 worker 会选择一个随机的 IP。
 
-Default is `{riakc_pb_ips, [{127,0,0,1}]}`
+默认值是 `{riakc_pb_ips, [{127,0,0,1}]}`。
 
 ```bash
 % Connect to a cluster of 3 machines
@@ -445,24 +369,23 @@ Default is `{riakc_pb_ips, [{127,0,0,1}]}`
 
 #### riakc_pb_port
 
-The port on which to connect to the PBC interface.
+连接到 PBC 接口的端口号。
 
-Default is `{riakc_pb_port, 8087}`
+默认值为 `{riakc_pb_port, 8087}`。
 
 #### riakc_pb_bucket
 
-The bucket to use for testing.
+测试时使用的 bucket。
 
-Default is `{riakc_pb_bucket, <<"test">>}`
+默认值是 `{riakc_pb_bucket, <<"test">>}`。
 
-### basho_bench_driver_http_raw Settings
+### 针对 basho_bench_driver_http_raw 驱动的设置
 
 #### http_raw_ips
 
-List of IP addresses to connect the workers to. Each worker makes
-requests to each IP in a round-robin fashion.
+worker 要连接的 IP 地址。每个 worker 会循环的向各 IP 地址发起请求。
 
-Default is `{http_raw_ips, ["127.0.0.1"]}`
+默认值为 `{http_raw_ips, ["127.0.0.1"]}`。
 
 ```bash
 % Connect to a cluster of machines in the 10.x network
@@ -471,9 +394,9 @@ Default is `{http_raw_ips, ["127.0.0.1"]}`
 
 #### http_raw_port
 
-Select the default port to connect on for the HTTP server.
+连接到 HTTP 服务器的默认端口。
 
-Default is `{http_raw_port, 8098}`.
+默认值为 `{http_raw_port, 8098}`。
 
 ```bash
 % Connect on port 8090
@@ -482,9 +405,9 @@ Default is `{http_raw_port, 8098}`.
 
 #### http_raw_path
 
-Base path to use for accessing riak - usually "/riak/<bucket>"
+连接 Riak 时使用的基路径，一般是 "/riak/<bucket>"。
 
-Defaults is `{http_raw_path, "/riak/test"}`.
+默认值为 `{http_raw_path, "/riak/test"}`。
 
 ```bash
 % Place test data in another_bucket
@@ -493,10 +416,9 @@ Defaults is `{http_raw_path, "/riak/test"}`.
 
 #### http_raw_params
 
-Additional parameters to add to the end of the URL. This can be used to
-set riak r/w/dw/rw parameters as as desired.
+添加到 URL 尾部的参数。这个值可用来设置所需的 r/w/dw/rw 参数。
 
-Default is `{http_raw_params, ""}`.
+默认值为 `{http_raw_params, ""}`。
 
 ```bash
 % Set R=1, W=1 for testing a system with n_val set to 1
@@ -505,11 +427,9 @@ Default is `{http_raw_params, ""}`.
 
 #### http_raw_disconnect_frequency
 
-How often, in seconds or number of operations, the HTTP clients
-(workers) should forcibly disconnect from the server.
+多长时间（秒）或多少次操作后要强制中断 HTT 客户端（worker）和服务器之间的连接。
 
-Default is `{http_raw_disconnect_frequency, infinity}`. (never forcibly
-disconnect)
+默认值为 `{http_raw_disconnect_frequency, infinity}`。（从不强制中断）
 
 ```bash
 % Disconnect after 60 seconds
@@ -519,10 +439,9 @@ disconnect)
 {http_raw_disconnect_frequency, {ops, 200}}.
 ```
 
-Custom Driver
--------------
+## 自定义驱动
 
-A custom driver must expose the following callbacks.
+自定义驱动必须提供下面的回调函数。
 
 ```erlang
 % Create the worker
@@ -532,7 +451,4 @@ new(ID) -> {ok, State} or {error, Reason}.
 % Run an operation
 run(Op, KeyGen, ValueGen, State) -> {ok, NewState} or {error, Reason, NewState}.
 ```
-
-See the [existing
-drivers](https://github.com/basho/basho_bench/tree/master/src) for more
-details.
+详细信息请参照[现有的驱动](https://github.com/basho/basho_bench/tree/master/src)。
