@@ -8,44 +8,41 @@ audience: advanced
 keywords: [operator, performance, os]
 ---
 
-This guide describes recommended performance and
-tuning, failure and recovery, and benchmarking information useful for
-operators of new and existing Riak clusters.
+这篇文档介绍了推荐在 Riak 集群中使用的性能调整方法，常见的错误和修正方法，以及评测。
 
-Riak's primary bottleneck is disk and network I/O. Riak's I/O
-pattern tends to operate on small blobs from many places on the disk. The
-negative effects of this pattern can be mitigated by adding RAID over
-multiple volumes, using solid state drives (SSD), and/or choosing the
-Bitcask backend if secondary indexes are not needed for the application.
+Riak 重要的瓶颈是硬盘和网络 IO。Riak 使用的 IO 模式可以更好的处理硬盘上散布的
+小型二进制文件。可以通过下列方式减轻这种模式的负面影响：为多卷添加 RAID 支持，
+使用固态硬盘（SSD），如果应用程序不需要支持二级索引，还可以使用 Bitcask 作为
+存储后台。
 
-In any case, proper benchmarking and tuning are needed to achieve the desired
-level of performance. Following the information in this guide should help you
-with both.
+不管使用那种方法，都要适当的做些评测和调整，这样才能获得性能提升。这篇文档
+就会告诉你如何做评测和调整。
 
-<div class="info"><div class="title">Tip</div>For performance and tuning recommendations specific to running Riak clusters on the Amazon Web Services EC2 environment, see [[AWS Performance Tuning]].</div>
+<div class="info">
+<div class="title">提示</div>
+针对运行在 Amazon Web Services EC2 环境中的 Riak 集群进行性能调整的推荐做法，
+请阅读 [[AWS Performance Tuning]]。
+</div>
 
-## Linux Tuning
+## 调整 Linux
 
-While Linux can be tuned to be a good server operating system, many
-distributions come out of the box tuned for desktop or light use.
-Many of the kernel, network, and disk settings should be altered
-to run as a production database server.
+Linux 可以调整成一个很好的服务器操作系统，也可以作为桌面系统使用。Linux 系统
+的很多组件，例如内核、网络和硬盘设置，都应做适当调整，这样才能作为生成环境的
+数据库服务器使用。
 
-### Open Files Limit
+### 打开文件限制
 
-Riak and the tools can consume a large number of open file handles during
-normal operation.  For stability, increasing the number of open-files limit
-is necessary.  See [[Open Files Limit]] for the details.
+Riak 及相关工具在常规操作时会消耗很多的文件句柄。为了性能的稳定，很有必要提升
+打开文件限制。详细方法请阅读 [[Open Files Limit]]。
 
-### Kernel and Network Tuning
+###调整内核和网络
 
-The following settings are minimally sufficient to improve many aspects
-of Riak usage on Linux, and should be added or updated in `/etc/sysctl.conf`:
+下列设置可以最小限度地提升 Riak 在 Linux 系统中的性能，应该添加到 `/etc/sysctl.conf` 文件：
 
-<div class="note"><div class="title">Note</div>
-In general, these recommended values should be compared with the system defaults
-and only changed if benchmarks or other performance metrics indicate that
-networking is the bottleneck.
+<div class="note">
+<div class="title">注意</div>
+一般来说，应该把这些推荐的设置应该和系统的默认值比较一下，只有当测评结果显示
+网络是瓶颈时才应该修改。
 </div>
 
 ```text
@@ -60,8 +57,7 @@ net.ipv4.tcp_keepalive_intvl = 30
 net.ipv4.tcp_tw_reuse = 1
 ```
 
-The following settings are optional, but may improve performance on
-a 10Gb network:
+下面的设置是可选的，可以提升 10GB 网络的性能：
 
 ```text
 net.core.rmem_default = 8388608
@@ -71,149 +67,125 @@ net.core.wmem_max = 8388608
 net.core.netdev_max_backlog = 10000
 ```
 
-<div class="info"><div class="title">Tip</div>Tuning of these values
-will be required if they are changed, as they affect all network
-operations.</div>
+<div class="info">
+<div class="title">提示</div>
+如果修改了这些设置，一定要做调试，因为这影响到所有网络操作。
+</div>
 
-### Swap Space
+### 交换空间
 
-Due to the heavily I/O-focused profile of Riak, swap usage can result in
-the entire server becoming unresponsive. Disable swap or otherwise
-implement a solution for ensuring Riak's process pages are not swapped.
+由于 Riak 严重依赖 IO 性能，交换空间的使用可能会导致整个服务器拒绝响应。
+请禁用交换空间，或者找到一种方法确保 Riak 进程页不被交换。
 
-Basho recommends that the Riak node be allowed to be killed by the kernel
-if it uses too much RAM. If swap is completely disabled, Riak will
-simply exit when it is unable to allocate more RAM and leave a crash dump
-(named `erl_crash.dump`) in the `/var/log/riak` directory which can be used
-for forensics (by Basho Client Services Engineers if you are a customer).
+Basho 建议，如果 Riak 节点使用过多的 RAM 就要允许内核终止这个节点的运行。
+如果完全禁止了交换空间，如果无法分配更多的 RAM，Riak 会直接退出，
+在 `/var/log/riak` 文件夹中保存一个故障转储文件（名为 `erl_crash.dump`），
+用来查证信息（如果你是我们的客户，查找工作由 Basho 客户服务工程师进行）。
 
-### Mounts and Scheduler
+### 挂载和调度方法
 
-Riak makes heavy use of disk I/O for its storage operations. It is
-important to mount volumes that Riak will be using for data storage with
-the **noatime** flag, meaning that filesystem [inodes](http://en.wikipedia.org/wiki/Inode)
-on the volume will not be touched when read. This flag can be set temporarily
-using the following command:
+存储数据时，Riak 会大量使用硬盘的 IO。所以在挂载用来存储 Riak 数据的卷时，
+一定要使用  **noatime** 旗标，意思是读取数据时不要修改文件系统
+的 [inodes](http://en.wikipedia.org/wiki/Inode)。可以使用下面的命令
+临时设定这个旗标：
 
 ```bash
 mount -o remount,noatime <riak_data_volume>
 ```
 
-Replace &lt;riak_data_volume&gt; in the above example with your actual
-Riak data volume. The **noatime** can be set in `/etc/fstab` to
-mount permanently.
+请把上述命令中的 &lt;riak_data_volume&gt; 换成你用来存储 Riak 数据的卷。
+如想永久设置，可以在 `/etc/fstab` 中设定。
 
-The default disk I/O scheduler (elevator) on Linux is completely fair
-queuing or `cfq`, which is designed for desktop use. Basho recommends
-using the `noop` or `deadline` schedulers for Riak data volumes,
-which are better for server loads.
+Linux 上默认的硬盘 IO 调度方法是“完全公平队列”（completely fair
+queuing，`cfq`），被设计用来处理桌面应用。Basho 推荐在存储 Riak 数据的卷上
+使用 `noop` 或 `deadline` 调度方法，这样可以更好的利用服务器。
 
-To check the scheduler in use for block device **sda**, for example, use the
-following command:
+例如，如果要查看设备 **sda** 所用的调度方法，可以使用下面的命令：
 
 ```bash
 cat /sys/block/sda/queue/scheduler
 ```
 
-To set the scheduler to deadline, use the following command:
+要把调度方法设为 deadline，可以使用下面的方法：
 
 ```bash
 echo deadline > /sys/block/sda/queue/scheduler
 ```
 
-### Filesystem
+### 文件系统
 
-Basho recommends using advanced journaling filesystems like ZFS and XFS
-for greater reliability and recoverability. However, the ext3 and ext4
-filesystems are sufficient on operating systems where ZFS or XFS are not
-available.
+为了系统的稳定性和可恢复性，Basho 推荐使用高级的日志文件系统，
+例如 ZFS 和 XFS。不过，在无法使用 ZFS 或 XFS 的系统中也可以使用 ext3 和 ext4。
 
-<div class="note"><div class="title">Note</div>Basho
-<strong>does not</strong> currently recommend production use of the
-<a href="http://zfsonlinux.org/">ZFS On Linux</a> project.</div>
+<div class="note">
+<div class="title">注意</div>
+Basho <strong>不推荐</strong>现在就在生产环境中使用 <a href="http://zfsonlinux.org/">ZFS On Linux</a> 项目。
+</div>
 
-The ext4 file system defaults include two options that increase
-integrity, but slow performance. Because Riak's integrity is based on
-multiple nodes holding the same data, these two options can be changed
-to boost I/O performance. We recommend setting: `barrier=0` and
-`data=writeback` when using the ext4 filesystem.
+ext4 文件系统默认包含了两个选项用来增进集成度，但会降低性能。因为 Riak 的集成度
+是通过多个节点保存相同数据实现的，为了提升 IO 性能，可以修改一下这两个选项。
+使用 ext4 文件系统时，我们建议做以下设置：`barrier=0`，`data=writeback` 。
 
-As with the `noatime` setting, these settings should be added to
-`/etc/fstab` so that they are persisted across server restarts.
+`noatime` 设置应该加入 `/etc/fstab` 文件，这样即使服务器重启设置依然存在。
 
-## Cluster size
+## 集群规模
 
-Deployments of five nodes or greater will provide a foundation for the
-best performance and growth as the cluster expands. Since Riak scales
-linearly with the addition of more nodes, users find improved
-performance, reliability, and throughput with larger clusters. Smaller
-deployments can compromise the fault-tolerance of the system: with the
-default (3 copies) replication requirement for availability, node
-failures in smaller clusters mean that replication requirements may not
-be met.
+集群中包含 5 个或 5 个以上节点可以获得最好的性能，还能适时添加新节点。Riak 的
+扩放性是随着节点的数量增多成线性增长的，所以用户会发现更大的起群能提供更好的
+性能、可靠性和吞吐量。部署小型的集群违反了 Riak 的容错机制：为了满足可用性
+而默认设定的副本数量（3 个），在小型集群中可能无法实现。
 
-The fewer nodes you have, the more work each node must perform as a
-percentage of the cluster. If you have 3 nodes, and require all 3 to
-replicate, 100% of your nodes will respond to a single request. If you
-have 5, only 60% need respond. Note that the recommended number of nodes
-for a cluster is without regard to the size of the instance chosen,
-since a large node loss still must be balanced by the remaining system.
+集群中节点的数量越少，各节点的工作量就越多。如果有 3 个节点，需要提供 3 个副本，
+那么所有的节点都要响应请求。如果有 5 个节点，只有 60% 的节点需要响应。注意，
+集群中推荐包含的节点数量没有考虑所选实例的大小，因为大量节点的损耗还要由系统的
+其他部分评估。
 
-### Partitions (vnodes)
+### 分区（vnode）
+和集群规模有直接关系的是集群中分区的数量，这个值在搭建集群时永久设定，而且必须
+是 2 的幂数（64，128，256 等）。每个分区中保存的键值对数量几乎相等（数据均匀
+的分布在集群中），而且还会保存特定范围内键的副本。
 
-Related to the cluster size is the number of partitions in the cluster,
-which is set permanently at cluster creation time and must be a power of
-2 (64, 128, 256, etc). Each partition is responsible for an
-approximately equal number of keys/values as its peers (data is spread
-evenly around the cluster), and contains replicas for a fixed range of
-keys.
+如果分区太少，就限制了集群增长肯能达到的最大规模，而且还会限制 IO 的并发数，
+因为分区负责很大一部分的键区间。如果分区太多，单个节点因过多的状态转换而超载，
+还会争夺 IO 资源。
 
-With too few partitions, a cluster is limited in the maximum size to
-which it can grow and I/O concurrency is also limited because partitions
-are responsible for a larger portion of the keyspace. With too many
-partitions, individual nodes may become overloaded with too much
-context-switching and contention for I/O resources.
+Basho 建议集群中的每个节点使用 8 -64 个分区。例如，如果集群中有 5 个节点，那么
+就应该有 256 或 512 个分区。如果有 512 个分区，有 5 个节点的集群就可以在被换掉
+之前顺利的增长到包含 64 个节点。
 
-Basho recommends between 8 and 64 partitions per node in the cluster.
-For example, this means that a 5-node cluster should be initialized with
-256 or 512 partitions. With 512 partitions, a 5 node cluster could
-conceivably grow to 64 nodes before needing replacement.
+详细信息请阅读 [[Cluster Capacity Planning]]。
 
-You can find more information on [[Cluster Capacity Planning]].
+## Riak 设置和调整
 
-## Riak Configuration and Tuning
-Riak uses sensible defaults for configuration, but a few items need
-changing for a given deployment. Most importantly, the number of partitions
-in the cluster should be applied before starting any participant node.
+Riak 的设置都很明智，但针对特定的部署还是要做些修改。最为重要的是，集群中分区
+的数量一定要在启动节点之前设好。
 
-Place the ring_creation_size item within the riak_core section in the
-`/etc/riak/app.config` file:
+在 `/etc/riak/app.config` 文件的 riak_core 区设置 ring_creation_size：
 
     {riak_core, [
        {ring_creation_size, 512},
        %% ...
        ]}
 
-If using LevelDB as the storage backend (which maintains its own I/O
-thread pool), the number of async threads in Riak's default pool can be
-decreased in the `/etc/riak/vm.args` file:
+如果使用 LevelDB 作为存储后台（管理自己的 IO 线程池），Riak 默认线程池中的
+异步线程数可以在 `/etc/riak/vm.args` 文件中减少：
 
 ```text
 +A 16
 ```
 
-Further information on Riak configuration is available in the [[Configuration files]] documentation.
+Riak 设置的更多信息，可以在 [[Configuration files]] 文档中查看。
 
-<div class="info"><div class="title">Basho Tip</div>Questions about Riak
-configuration can also be addressed to the Basho Client Services
-<a href="http://help.basho.com/">help desk</a>.</div>
+<div class="info">
+<div class="title">提示</div>
+关于 Riak 设置的疑问还可以发到 <a href="http://help.basho.com/">Riak 客户服务帮助网站</a>上。
+</div>
 
-## Load balancer configuration
-We recommend placing a load balancing solution, such as
-[HAProxy](http://haproxy.1wt.eu/) between the application nodes and Riak.
+## 负载平衡设置
 
-Below is an example HAProxy configuration that is based on known-good
-configuration values:
+我们建议在应用程序和 Riak 之间放置一个负载平衡工具，例如 [HAProxy](http://haproxy.1wt.eu/)。
+
+下面是一个 HAProxy 设置示例，设定值都经过测试：
 
 ```text
 listen riak 0.0.0.0:8087
@@ -230,120 +202,85 @@ listen riak 0.0.0.0:8087
     server riak-5 192.168.1.5:8087 check weight 1 maxconn 1024
 ```
 
-This configuration may have to be adjusted with respect to connection,
-server, and client timeouts. Where possible, use the kernel-splicing
-feature (on by default) to connect clients to Riak nodes for best
-performance.
+上述设置可能要根据连接、服务器和客户端超时等做调整。如果可能，请
+使用  kernel-splicing 功能（默认的）连接客户端和 Riak 节点，以便得到最佳性能。
 
-## Scaling Riak
-Riak can be scaled in two ways, vertically (improved hardware) and
-horizontally (more nodes). Both ways can provide performance and
-capacity benefits, but should be used in different circumstances. The
-[[riak-admin cluster command|riak-admin Command Line#cluster]] can assist in scaling both directions.
+## Riak 扩放
 
-When changing the cluster membership to scale vertically or
-horizontally, follow these steps:
+有两种方法可以扩放 Riak：纵向（改进硬件）和横向（添加更多节点）。这两种方法
+都可以提升性能和容量，但适用的情况不同。在使用这两种方法是，
+[[riak-admin cluster command|riak-admin Command Line#cluster]] 可以给你提供帮助。
 
-1.  Add, remove, or replace nodes using `riak-admin cluster [join|leave|replace]`.
-2.  Check the cluster transition plan using `riak-admin cluster plan`.
-    Ensure that the planned transition meets your expectations; that
-    is, the correct nodes should be joining or leaving, and ring
-    ownership should be transferred to the right nodes.
-3.  Run `riak-admin cluster commit` to confirm the changes or `riak-admin cluster clear`
-    to abort the changes.
-4.  Monitor the membership transition progress using `riak-admin member-status`
-    and `riak-admin ring-status`.
+如果要修改集群进行纵向或横向扩放，请遵循以下步骤：
 
-### Vertical Scaling
-Vertical scaling, or improving the capabilities of a node/server, gives
-greater capacity to the node but does not decrease the overall load on
-existing members of the cluster. That is, the ability for the improved
-node to handle existing load is increased, but the load itself is
-unchanged. Reasons to scale vertically include increasing IOPS,
-increasing CPU/RAM capacity, and increasing disk capacity.
+1.  分别使用 `riak-admin cluster [join|leave|replace]` 命令添加、删除或替换节点
+2.  使用 `riak-admin cluster plan` 命令查看集群转换计划。确保该计划符合你的期待，
+    即合并或删除正确的节点，环的所有权移交给了正确的节点
+3.  执行 `riak-admin cluster commit` 命令确认修改，或者执行 `riak-admin cluster clear` 命令终止修改
+4.  使用 `riak-admin member-status` 和 `riak-admin ring-status` 命令监视转换过程
 
-If the improved node can be initialized with the same IP address and
-data as the one it replaces, no changes to Riak are necessary. If the same
-resources are not available to the new node, use `riak-admin cluster replace <oldnode>
-<newnode>` after joining the new node.The node name(s) can be gathered
-from the output of member-status or from the `/etc/riak/vm.args`
-configuration file.
+### 纵向扩放
 
-### Horizontal Scaling
-Horizontal scaling, or increasing the number of nodes in the cluster,
-reduces the responsibilities of each member node by spreading the
-keyspace wider and providing additional endpoints for client
-connections. That is, the capacity of each individual node does not
-change, but its load is decreased. Reasons to scale horizontally include
-increasing I/O concurrency, reducing the load on existing nodes, and
-increasing disk capacity.
+纵向扩放，即增加节点/服务器的容量，把节点的容量增多了，但没有减轻集群中现有
+节点的总体负载。也就是说，扩容后的节点处理负载的能力提升了，但负载量没变。
+进行纵向扩放的情况有，提升 IPOS，提升 CPU/RAM 容量和硬盘容量。
 
-To scale horizontally, new nodes must be joined to the existing cluster
-using the [[riak-admin cluster join command|riak-admin Command Line#cluster]]. When growing
-the cluster by more than one node, all new nodes should be added at once
-rather than individually. That is, do not commit the plan until all new
-nodes are staged in the join state. This will reduce the total amount of
-data that will need to be transferred across the network (ownership
-handoff). Not doing so will likely result in the same data being moved
-multiple times.
+如果扩容的节点可以使用相同的 IP 地址和数据进行初始化，就无需修改 Riak。如果资源
+无法在新节点中使用，请在合并新节点后
+执行 `riak-admin cluster replace <oldnode> <newnode>` 命令。命令中的两个节点名
+可以从 member-status 命令的输出或者 `/etc/riak/vm.args` 文件中查看。
 
-### Reducing Horizontal Scale
-In the case where a Riak cluster is over-provisioned, or in response to
-seasonal usage decreases, the horizontal scale of a Riak
-cluster can shrink using the `riak-admin leave command` on the node to
-be removed. In the interest of caution and safety, we recommend removing
-one node at a time while monitoring the load, capacity and performance
-of the remaining nodes.
+### 横向扩放
 
+横向扩放，机增加集群中节点的数量，通过更大范围的键区间，为客户端连接提供
+更多的端点，减轻乐睿各节点的负担。也就是说，各节点的容量不变，但负载减少了。
+进行横向扩放的情况有，提升 IO 并发量，减少现有节点的负载，以及提升硬盘容量。
 
-## A Word of Caution
-Cluster membership changes should not be taken lightly or performed
-hastily. Redistributing the data among new members requires significant
-disk and network resources and time, and the coordination of ownership
-transitions takes additional time. As such, the rate of handoff is
-intentionally limited in the default Riak configuration to avoid
-impacting normal operations. This limit can be changed temporarily, in
-cases where greater handoff throughput or lower impact is desired, using
-the [[riak-admin transfer-limit command|riak-admin Command Line#transfer-limit]].
+进行横向扩放，新节点必须
+使用 [[riak-admin cluster join command|riak-admin Command Line#cluster]] 命令
+加入集群。如果添加的节点不止一个，应该一次性添加所有的节点，而不是一次添加一个。
+也就是说，在所有新节点的进行待加入状态之前，不要提交计划。这样做可以减少网络中
+传输的数据量（所有权移交）。如果不这么做，相同的数据可能会被多次移动。
 
-Additionally, nodes that become unavailable due to errors or maintenance
-should not leave the cluster. To perform maintenance on a node, mark it
-as down or stop Riak on the node, but do not have it leave the cluster.
+### 反向横向扩放
 
-If you encounter a failure, please read [[Failure and Recovery]] for more
-information.
+如果 Riak 集群未被充分使用，或者遇到了季节性用量减少，可以在要删除的节点上
+执行 `riak-admin leave` 命令进行反向扩放。安全起见，我们建议一次删除一个节点，
+同时要监控其他节点的负载、容量和性能。
 
+## 警告
 
-## Benchmarking
-Using a tool such as [Basho Bench](https://github.com/basho/basho_bench),
-you can generate load that simulates application operations by constructing
-and communicating approximately-compatible data payloads with the Riak
-cluster directly.
+集群成员的变动要小心谨慎。在新成员间重新分发数据需要一定的硬盘和网络资源，
+要花费一段时间；调整所有权转移的操作也要一定的时间。同样的，移交的频率也会
+受到 Riak 默认设置的限制，因为要避免影响正常操作。这个限制可以临时调整，如要
+更大的移交吞吐量，或者更低的影响，可以
+使用 [[riak-admin transfer-limit command|riak-admin Command Line#transfer-limit]]。
 
-Benchmarking is critical to determining appropriate cluster node
-resources, and is strongly recommended. More information is available
-on benchmarking Riak clusters with [[Basho Bench]].
+由于错误和维护而不可使用的节点不应该从节点中删除。要维护节点，可以把这个节点
+标记为下线，或者停止这个节点上的 Riak，但不要从集群中删除这个节点。
 
-In addition to simply measuring performance, it is also important to
-measure how performance degrades when the cluster is not in
-steady-state. While under a simulation of live load, the following
-states might be simulated:
+如果遇到问题，请阅读 [[Failure and Recovery]] 一文获取更多信息。
 
-1.  Stop one or more nodes normally and restart them after a few moments
-    (simulates rolling-upgrade).
-2.  Join two or more nodes to the cluster.
-3.  Leave nodes from the cluster (after step #2).
-4.  Hard-kill the Riak `beam.smp` process (i.e., `kill -9`) and then
-    restart it.
-5.  Restart a node.
-6.  Hard-stop and destroy a node's instance and build a new one from
-    backup.
-7.  Via networking (firewall, perhaps), partition one or more nodes from
-    the rest of the cluster, and then restore the original
-    configuration.
+## 评测
 
+使用像 [Basho Bench](https://github.com/basho/basho_bench) 这样的工具，可以
+生成负载，构建几乎兼容的有效数据负载，和 Riak 集群直接通信，来模拟应用程序的操作。
 
-## References
+测评是决定适当的集群节点资源的关键所在，强烈推荐一定要做。关于 Riak 集群测评的
+更多信息请阅读 [[Basho Bench]]。
+
+除了简单的性能测试之外，还要测试集群不在稳态时的性能削减。模拟实时负载时，
+可以模拟如下的状态：
+
+1.  正常的停止一个或多个节点，一段时间后在重启（模拟 rolling-upgrade）
+2.  在集群中添加两个或更多节点
+3.  删除集群中的一些节点（完成第 2 步后）
+4.  强制终止 Riak `beam.smp` 进程（例如使用 `kill -9`），然后再重启
+5.  重启一个节点
+6.  强制终止并销毁一个节点实例，然后从备份中创建一个新实例
+7.  通过网络（也可以是防火墙）从集群中分出一个或多个节点，然后恢复到原始设置
+
+## 参考资源
 
 * [[AWS Performance Tuning]]
 * [Why Your Riak Cluster Should Have At Least Five Nodes](http://basho.com/blog/technical/2012/04/27/Why-Your-Riak-Cluster-Should-Have-At-Least-Five-Nodes/)

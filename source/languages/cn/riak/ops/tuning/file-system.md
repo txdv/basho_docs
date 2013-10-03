@@ -8,25 +8,21 @@ audience: advanced
 keywords: [operator, os]
 ---
 
-The following article suggests I/O Scheduler configurations to use when deploying Riak.
+本文介绍了部署 Riak 时建议使用的 IO 调度方法设置。
 
-I/O or Disk Scheduling is a blanket term used to describe the method
-by which an operating system chooses how to order input and output operations to and
-from storage.
+IO 调度或硬盘调度是一个总括术语，用来说明操作系统如何排序读取和写入操作。
 
-There are many I/O Scheduling techniques. Some of the most common are:
+IO 调度方法有很多种。常用的有：
 
 * Anticipatory
-* CFQ, or Completely Fair Queuing, the default in Linux since 2006
+* 完全公平队列（CFQ），2006 年以后 Linux 使用的默认方法
 * Deadline
 * FIFO
 * NOOP
 
-CFQ, while a good general purpose scheduler, is not designed to provide the kind
-of throughput expected in production database deployments. For Riak, NOOP is
-considered the best choice when deploying on iSCSI over HBAs, or any hardware-based
-RAID. The Deadline scheduler is an ideal choice when using SSD based storage.
+CFQ 虽然是常规调度方法，但不能提供数据库在生产环境中所需的吞吐量。对 Riak 来说，
+如果使用 HBA 进行 iSCST 部署，或者使用基于 RAID 的硬件，最好的选择是 NOOP。
+如果使用 SSD 存储设备，最好使用 Deadline 方法。
 
-All system/workload combinations are different. Consult your operating system's
-documentation for specific information about the I/O Scheduling options available to you
-and the methods necessary for implementation.
+系统和工作量的配合有很多种，请查看所用操作系统的文档，查看可以使用的 IO 调度方法，
+以及必须要实现的方法。

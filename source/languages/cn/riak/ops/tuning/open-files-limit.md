@@ -8,13 +8,17 @@ audience: advanced
 keywords: [troubleshooting, os]
 ---
 
-Riak can consume a large number of open file handles during normal operation. In particular, the Bitcask backend may accumulate a number of data files before it has a chance to run a merge process. You can count the number of data files in the bitcask directory with following command:
+Riak 的常规操作会消耗很多打开文件句柄。一般来说，Bitcask 后台在有机会运行合并
+进程之前，会堆积很多数据文件。可以使用下面的命令统计 bitcask 目录下有多少数据文件：
 
 ```bash
 ls data/bitcask/*/* | wc -l
 ```
 
-Please note that the creation of numerous data files is normal. Each time Riak is started Bitcask creates a new data file per partition; every so often Bitcask will merge a collection of data files into a single file to avoid accumulating file handles. It’s possible to artificially inflate the number of file handles Bitcask uses by repeatedly writing data and restarting Riak. The shell command below illustrates this issue:
+请注意，创建数量众多的数据文件是正常行为。每次启动 Riak，Bitcask 都会为每个分区
+创建数据文件，一段时间后 Bitcask 会把一系列的数据文件合并成单个文件，避免消耗
+过多的文件句柄。我们可以不断写入数据再重启 Riak，人为增加 Bitcask 使用的文件
+句柄量。下面的 shell 命令可以完成这个操作：
 
 ```bash
 for i in {1..100}
@@ -28,113 +32,125 @@ for i in {1..100}
 done
 ```
 
-## Changing the limit
-Most operating systems can change the open-files limit using the `ulimit -n` command. Example:
+## 修改限制
+
+在大多数操作系统中可以使用 `ulimit -n` 命令修改打开文件限制。例如：
 
 ```bash
 ulimit -n 65536
 ```
 
-However, this only changes the limit for the **current shell session**. Changing the limit on a system-wide, permanent basis varies more between systems.
+不过，这个命令只会修改**当前 shell 会话**的限制。全局修改限制的方法，依操作系统而异。
 
 ## Linux
-On most Linux distributions, the total limit for open files is controlled by `sysctl`.
+
+大多数 Linux 发型版本中，打开文件的总限制是由 `sysctl` 控制的。
 
 ```bash
 sysctl fs.file-max
 fs.file-max = 50384
 ```
+如你所见，这个值经常要设的比 Riak 需求的高。如果系统上还运行了其他程序，修改
+这个设置的具体方法请参照  [[sysctl manpage|http://linux.die.net/man/8/sysctl]] 。
+不过一般需要修改的是针对每个用户的打开文件限制。这需要
+修改 `/etc/security/limits.conf` 文件，必须是超级用户才能修改。如果是使用安装包
+安装的 Riak 或 Riak Search ，请按照下面的方式修改，指定所需的硬限制和软限制：
 
-As seen above, it is generally set high enough for Riak. If you have other things running on the system, you might want to consult the [[sysctl manpage|http://linux.die.net/man/8/sysctl]] for how to change that setting. However, what most needs to be changed is the per-user open files limit. This requires editing /etc/security/limits.conf, which you’ll need superuser access to change. If you installed Riak or Riak Search from a binary package, add lines for the riak user like so, substituting your desired hard and soft limits:
-
-On Ubuntu, if you’re always relying on the init scripts to start Riak, you can create the file /etc/default/riak and specify a manual limit like so:
+在 Ubuntu 中，如果使用 init 脚本启动 Riak，可以创建 `/etc/default/riak` 文件，
+然后指定一个限制：
 
 ```bash
 ulimit -n 65536
 ```
 
-This file is automatically sourced from the init script, and the Riak process started by it will properly inherit this setting. As init scripts are always run as the root user, there’s no need to specifically set limits in /etc/security/limits.conf if you’re solely relying on init scripts.
+这个文件会自动引入 init 脚本，使用 init 脚本启动的 Riak 进程会正确的继承
+这个设置。init 脚本总是以 root 用户运行，所以如果你只使用 init 脚本就无需再
+在 `/etc/security/limits.conf` 文件中设置限制了。
 
-On CentOS/RedHat systems make sure to set a proper limit for the user you’re usually logging in with to do any kind of work on the machine, including managing Riak. On CentOS, sudo properly inherits the values from the executing user.
+在 CentOS/RedHat 中，请确保为进行常规操作（包括管理 Riak）的用户设置合适的限制。
+在 CentOS 中，sudo 会正确继承当前用户的设置。
 
-Reference: [[http://www.cyberciti.biz/faq/linux-increase-the-maximum-number-of-open-files/]]
+参考资源：[[http://www.cyberciti.biz/faq/linux-increase-the-maximum-number-of-open-files/]]
 
-### Enable PAM Based Limits for Debian & Ubuntu
-It can be helpful to enable PAM user limits so that non-root users, such as the riak user may specify a higher value for maximum open files. For example, follow these steps to enable PAM user limits and set the soft and hard values
-*for all users of the system* to allow for up to *65536* open files.
+### 在 Debian 和 Ubuntu 中启用基于 PAM 的限制
 
-  1. Edit `/etc/pam.d/common-session` and append the following line:
+我们可以设置基于 PAM 的限制，这样可以为非 root 用户，例如 riak，指定一个最大
+的打开文件数量。下面的步骤会为**系统中的所有用户**启用基于 PAM 的限制，
+并设置软限制和硬限制，最多可打开 *65536* 个文件。
 
-         session    required   pam_limits.so
+1. 编辑 `/etc/pam.d/common-session`，添加下面这行：
 
-  2. Save and close the file.
+       session    required   pam_limits.so
 
-  3. Edit `/etc/security/limits.conf` and append the following lines to the file:
+2. 保存并关闭该文件
 
-         *               soft     nofile          65536
-         *               hard     nofile          65536
+3. 编辑 `/etc/security/limits.conf`，添加下面这行：
 
-  4. Save and close the file.
+       *               soft     nofile          65536
+       *               hard     nofile          65536
 
-  5. (optional) If you will be accessing the Riak nodes via secure shell
-     (ssh), then you should also edit `/etc/ssh/sshd_config` and uncomment
-     the following line:
+4. 保存并关闭该文件
 
-         #UseLogin no
+5. （可选）如果想通过 ssh 访问 Riak 节点，还要修改 `/etc/ssh/sshd_config`，
+   去掉下面这行的注释：
 
-     and set its value to *yes* as shown here:
+       #UseLogin no
 
-         UseLogin yes
+   然后把值修改成 *yes*，如下所示：
 
-  6. Restart the machine so that the limits to take effect and verify that
-     the new limits are set with the following command:
+       UseLogin yes
 
-         ulimit -a
+6. 重启系统，以便设置生效，执行下面的命令确认新设置是否生效：
 
-
-### Enable PAM Based Limits for CentOS and Red Hat
-
-  1. Edit `/etc/security/limits.conf` and append the following lines to the file:
-
-         *               soft     nofile          65536
-         *               hard     nofile          65536
-
-  2. Save and close the file.
-
-  3. Restart the machine so that the limits to take effect and verify that
-     the new limits are set with the following command:
-
-         ulimit -a
+       ulimit -a
 
 
-<div class="note"><div class="title">Note</div> In the above examples, the
-open files limit is raised for all users of the system. If you prefer, the
-limit can be specified for the riak user only by substituting the two
-asterisks (*) in the examples with <code>riak</code>.</div>
+### 在 CentOS 和 Red Hat 中启用基于 PAM 的限制
+
+1. 编辑 `/etc/security/limits.conf`，添加下面这两行：
+
+       *               soft     nofile          65536
+       *               hard     nofile          65536
+
+2. 保存并关闭该文件
+
+3. 重启系统，以便设置生效，执行下面的命令确认新设置是否生效：
+       ulimit -a
+
+
+<div class="note">
+<div class="title">注意</div>
+在上面的示例中，为系统中所有用户提升了打开文件限制。如果只想修改 riak 用户的
+限制，可以把上面示例中的两个星号（*）改为 <code>riak</code>。
+</div>
 
 ## Solaris
-In Solaris 8, there is a default limit of 1024 file descriptors per process. In Solaris 9, the default limit was raised to 65536. To increase the per-process limit on Solaris, add the following line to `/etc/system`:
+
+在 Solaris 8 中，每个进程默认的限制是 1024 个文件描述符。在 Solaris 9 中，默认
+的限制增加到了 65536。要在 Solaris 中提升每个进程的限制，请把下面这行加入 `/etc/system`：
 
 ```bash
 set rlim_fd_max=65536
 ```
 
-Reference: [[http://blogs.oracle.com/elving/entry/too_many_open_files]]
+参考资源：[[http://blogs.oracle.com/elving/entry/too_many_open_files]]
 
 ## Mac OS X
-To check the current limits on your Mac OS X system, run:
+
+要查看 Mac OS X 当前的限制，请执行：
 
 ```bash
 launchctl limit maxfiles
 ```
 
-The last two columns are the soft and hard limits, respectively.
+输出结果的最后两栏分别是软限制和硬限制。
 
-To adjust the maximum open file limits in OS X 10.7 (Lion) or newer, edit `/etc/launchd.conf` and increase the limits for both values as appropriate.
+要想在 OS X 10.7（Lion）或新版中调整打开文件限制的最大值，请编辑 `/etc/launchd.conf`，
+把软限制和硬限制改为所需的值。
 
-For example, to set the soft limit to 16384 files, and the hard limit to 32768 files, perform the following steps:
+例如，要把软限制改为 16384，硬限制改为 32768，请按照下面的步骤操作：
 
-Verify current limits:
+查看当前的限制：
 
 ```bash
 launchctl limit
@@ -150,13 +166,14 @@ launchctl limit
     maxfiles    10240          10240
 ```
 
-Edit (or create) `/etc/launchd.conf` and increase the limits. Add lines that look like the following (using values appropriate to your environment):
+编辑（或新建） `/etc/launchd.conf`，提升相应的限制。添加如下所示的代码（指定适用你的环境的值）：
 
 ```bash
 limit maxfiles 16384 32768
 ```
 
-Save the file, and restart the system for the new limits to take effect. After restarting, verify the new limits with the launchctl limit command:
+保存文件，然后重启系统，以便新限制生效。重启后，执行 `launchctl limit` 命令验证
+是否生效：
 
 ```bash
 launchctl limit

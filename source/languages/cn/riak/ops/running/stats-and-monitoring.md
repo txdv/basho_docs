@@ -8,142 +8,185 @@ audience: intermediate
 keywords: [operator, troubleshooting]
 ---
 
-## Statistics from Riak
+## Riak 统计
 
-Riak provides data related to current operating status, which includes statistics in the form of counters and histograms. These statistics are made available through the HTTP API via the `[[/stats|HTTP Status]]` endpoint, or through the `[[riak-admin status|Inspecting a Node#riak-admin-status]]` command.
+Riak 为当前操作的状态提供了数据，包含数量统计和柱状图。这些统计数据可以通过 HTTP API 的
+ `[[/stats|HTTP Status]]` 端点获取，或者通过 `[[riak-admin status|Inspecting a Node#riak-admin-status]]` 命令获取。
 
-This page presents the most commonly monitored and gathered statistics, as well as numerous solutions for monitoring and gathering statistics that our customers and community report using successfully in Riak cluster environments. You can learn more about the specific Riak statistics provided in the [[Inspecting a Node]] documentation.
+本文介绍了经常被监视和手机的统计数据，以及客户和社区在 Riak 集群环境中成功使用的用来监视
+和收集统计数据的各种方法。Riak 各项统计信息的详细内容请阅读 [[Inspecting a Node]]。
 
-### Counters
-Riak provides counters for GETs, PUTs, read repairs, and other common operations.  By default, these counters count either the number of operations occurring within the last minute, or for the runtime duration of the node.
+### 数量统计
 
-#### Gets and Puts
-GET/PUT counters are provided for both nodes and vnodes. These counters are commonly graphed over time for trend analysis, capacity planning, and so forth.
+Riak 为 GET 请求，PUT 请求和读取修复等常规操作提供了数量统计。默认情况下，会统计前一分钟
+内的操作数量，或者节点整个运行周期内的操作数量。
 
-Metric             | Description   |
+#### GET 和 PUT 请求
+
+节点和虚拟节点（vnode）都能进行 GET/PUT 数量统计。这些统计数据经常用来做趋势分析和容量规划等。
+
+指标               | 说明           |
 -------------------| ------------- |
-`node_gets`        | Number of GETs coordinated by this node within the last minute, including GETs to non-local vnodes on this node |
-`node_gets_total`  | Number of GETs coordinated by this node since startup, including GETs to non-local vnodes                       |
-`node_puts`        | Number of PUTs coordinated by this node, including PUTs to non-local vnodes on this node within the last minute |
-`node_puts_total`  | Number of PUTs coordinated by this node since startup, including PUTs to non-local vnodes                       |
-`vnode_gets`       | Number of GET operations coordinated by vnodes on this node within the last minute                              |
-`vnode_gets_total` | Number of GETs coordinated by local vnodes since node startup                                                   |
-`vnode_puts_total` | Number of PUTS coordinated by local vnodes since node startup                                                   |
+`node_gets`        | 某节点前一分钟处理的 GET 请求数量，包括该节点上非本地虚拟节点处理的 GET 请求 |
+`node_gets_total`  | 自节点启动以来处理的 GET 请求数量，包括该节点上非本地虚拟节点处理的 GET 请求 |
+`node_puts`        | 某节点前一分钟处理的 PUT 请求数量，包括该节点上非本地虚拟节点处理的 PUT 请求 |
+`node_puts_total`  | 自节点启动以来处理的 PUT 请求数量，包括该节点上非本地虚拟节点处理的 PUT 请求 |
+`vnode_gets`       | 某节点中虚拟节点前一分钟处理的 GET 请求数量                               |
+`vnode_gets_total` | 自节点启动以来本地虚拟节点处理的 GET 请求数量                             |
+`vnode_puts_total` | 自节点启动以来本地虚拟节点处理的 PUT 请求数量                             |
 
-#### Read Repairs
-Read repair counters are commonly graphed and monitored for abnormally high totals, which can be indicative of an issue.
+#### 读取修复
 
-Metric               | Description |
----------------------|-------------|
-`read_repairs`       | Number of read repair operations this node has coordinated in the last minute         |
-`read_repairs_total` | Number of read repair operations this node has coordinated since the node was started |
+读取修复数量统计一般是为了监视和收集反常的峰值，能指示出问题所在。
 
-#### Coordinated Redirection
-Counters representing the number of coordinated node redirection operations are provided in total since node startup.
+指标                 | 说明                             |
+---------------------|---------------------------------|
+`read_repairs`       | 某节点前一分钟处理的读取修复操作数量 |
+`read_repairs_total` | 自节点启动以来节点处理的读取修复数量 |
 
-Metric               | Description |
----------------------|-------------|
-`coord_redirs_total` | Number of requests this node has redirected to other nodes for coordination since startup |
+#### 协调重定向
 
-### Statistics
-Riak provides statistics for a range of operations.  By default, Riak provides the mean, median, 95th percentile, 99th percentile, and 100th percentile over a 60 second window.
+节点协调重定向操作的数量统计自节点启动开始起得总量。
 
-#### Finite State Machine Time
-Riak exposes Finite State Machine (FSM) time counters (`node_get_fsm_time_*` & `node_put_fsm_time_*`) that measure the amount of time in microseconds required to traverse the GET or PUT FSM code, offering a picture of general node health.
+指标                 | 说明                                         |
+---------------------|---------------------------------------------|
+`coord_redirs_total` | 自节点启动以来处理的重定向到其他节点的操作数量    |
 
-#### GET FSM Object Size
-GET FSM Object Size (`node_get_fsm_objsize_*`) measures the size of objects flowing through this node's GET finite state machine (GET_FSM). The size of an object is obtained by summing the length of the object's bucket name, key, serialized vector clock, value, and the serialized metadata of each sibling.
+### 统计
 
-#### GET FSM Siblings
-GET FSM Sibling (`node_get_fsm_siblings_*`) provides a histogram (with 60 second window) of the number of siblings encountered by this node on the occasion of a GET request.
+Riak 为很多操作提供了统计数据。默认情况下，Riak会在一个 60 秒宽度的窗口中显示均值，中值，
+95 百分位值，99百分位值和 100 百分位值。
+
+#### 有限状态机时间
+
+Riak 提供了有限状态机（FSM）时间的数量统计（`node_get_fsm_time_*` 和 `node_put_fsm_time_*`），
+衡量了遍历 GET 或 PUT FSM 代码所需的时间，单位为毫秒。通过这一数据可以看出节点的一般健康状况。
+
+#### GET FSM 对象大小
+
+GET FSM 对象大小（`node_get_fsm_objsize_*`）衡量了流经该节点 GET FSM 的对象大小。
+对象的大小是该对象 bucket 名、键、序列化向量时钟、值和每个兄弟数据的序列化元数据长度之和。
+
+#### GET FSM 兄弟数据
+
+GET FSM 兄弟数据（`node_get_fsm_siblings_*`）会生成一个柱状图（在一个 60 秒的窗口内），
+显示该节点处理 GET 请求时处理的兄弟数据数量。
+
+## 图表显示的 Riak 指标
+
+指标                          | 说明                                                |
+------------------------------| -------------------------------------------------- |
+`node_get_fsm_objsize_mean`   | 某节点前一分钟处理的对象大小均值                       |
+`node_get_fsm_objsize_median` | 某节点前一分钟处理的对象大小中值                       |
+`node_get_fsm_objsize_95`     | 某节点前一分钟处理的对象大小 95 百分位值                |
+`node_get_fsm_objsize_100`    | 某节点前一分钟处理的对象大小 100 百分位值               |
+`node_get_fsm_time_mean`      | 客户端发起 GET 请求到收到响应时间间隔的均值              |
+`node_get_fsm_time_median`    | 客户端发起 GET 请求到收到响应时间间隔的中值              |
+`node_get_fsm_time_95`        | 客户端发起 GET 请求到收到响应时间间隔的 95 百分位值      |
+`node_get_fsm_time_100`       | 客户端发起 GET 请求到收到响应时间间隔的 100 百分位值     |
+`node_put_fsm_time_mean`      | 客户端发起 PUT 请求到收到响应时间间隔的均值              |
+`node_put_fsm_time_median`    | 客户端发起 PUT 请求到收到响应时间间隔的中值              |
+`node_put_fsm_time_95`        | 客户端发起 PUT 请求到收到响应时间间隔的 95 百分位值       |
+`node_put_fsm_time_100`       | 客户端发起 PUT 请求到收到响应时间间隔的 100 百分位值      |
+`node_get_fsm_siblings_mean`  | 某节点前一分钟所有 GET 操作处理的兄弟数据数量均值         |
+`node_get_fsm_siblings_median`| 某节点前一分钟所有 GET 操作处理的兄弟数据数量中值         |
+`node_get_fsm_siblings_95`    | 某节点前一分钟所有 GET 操作处理的兄弟数据数量 95 百分位值 |
+`node_get_fsm_siblings_100`   | 某节点前一分钟所有 GET 操作处理的兄弟数据数量 100 百分位值 |
+`memory_processes_used`       | Erlang 进程使用的内存总量                              |
+`read_repairs`                | 某节点前一分钟处理的读取修复操作数量                      |
+`read_repairs_total`          | 自节点启动以来处理的读取修复操作数量                      |
+`sys_process_count`           | Erlang 进程的数量                                      |
+`coord_redirs_total`          | 自节点启动以来处理的重定向到其他节点的操作数量             |
+`pbc_connect`                 | 某节点前一分钟新建立的 Protocol Buffer 连接数量          |
+`pbc_active`                  | 当前处理激活状态的 Protocol Buffer 连接数量              |
 
 
-## Riak Metrics To Graph
+## 图表显示的系统指标
 
-Metric                        | Description   |
-------------------------------| ------------- |
-`node_get_fsm_objsize_mean`   | Mean object size encountered by this node within the last minute                                      |
-`node_get_fsm_objsize_median` | Median object size encountered by this node within the last minute                                    |
-`node_get_fsm_objsize_95`     | 95th percentile object size encountered by this node within the last minute                           |
-`node_get_fsm_objsize_100`    | 100th percentile object size encountered by this node within the last minute                          |
-`node_get_fsm_time_mean`      | Mean time between reception of client GET request and subsequent response to client                   |
-`node_get_fsm_time_median`    | Median time between reception of client GET request and subsequent response to client                 |
-`node_get_fsm_time_95`        | 95th percentile time between reception of client GET request and subsequent response to client        |
-`node_get_fsm_time_100`       | 100th percentile time between reception of client GET request and subsequent response to client       |
-`node_put_fsm_time_mean`      | Mean time between reception of client PUT request and subsequent response to client                   |
-`node_put_fsm_time_median`    | Median time between reception of client PUT request and subsequent response to client                 |
-`node_put_fsm_time_95`        | 95th percentile time between reception of client PUT request and subsequent response to client        |
-`node_put_fsm_time_100`       | 100th percentile time between reception of client PUT request and subsequent response to client       |
-`node_get_fsm_siblings_mean`  | Mean number of siblings encountered during all GET operations by this node within the last minute     |
-`node_get_fsm_siblings_median`| Median number of siblings encountered during all GET operations by this node within the last minute   |
-`node_get_fsm_siblings_95`    | 95th percentile of siblings encountered during all GET operations by this node within the last minute |
-`node_get_fsm_siblings_100`   | 100th percentile of siblings encountered during all GET operations by this node within the last minute|
-`memory_processes_used`       | Total amount of memory used by Erlang processes                                                       |
-`read_repairs`                | Number of Read Repairs this node has coordinated within the last minute                               |
-`read_repairs_total`          | Number of Read Repairs this node has coordinated since startup                                        |
-`sys_process_count`           | Number of Erlang processes                                                                            |
-`coord_redirs_total`          | Number of requests this node has redirected to other nodes for coordination since startup             |
-`pbc_connect`                 | Number of new protocol buffer connections established during the last minute                                              |
-`pbc_active`                  | Number of currently active protocol buffer connections                                                          |
-
-
-## Systems Metrics To Graph
-
-Metric                 |
+指标                   |
 ---------------------- |
-Available Disk Space   |
-IOWait                 |
-Read Operations        |
-Write Operations       |
-Network Throughput     |
-Load Average           |
+可用的硬盘空间           |
+IO 等待时间             |
+读取操作                |
+写入操作                |
+网络吞吐量              |
+平均负载                |
 
 
-## Statistics and Monitoring Tools
-There are many open source, self-hosted, and service-based solutions for aggregating and analyzing statistics and log data for the purposes of monitoring, alerting, and trend analysis on a Riak cluster. Some solutions provide Riak-specific modules or plugins as noted.
+## 统计和监控工具
 
-The following are solutions which customers and community members have reported success with when used for monitoring the operational status of their Riak clusters. Community and open source projects are presented along with commercial and hosted services.
+统计数据和记录数据有很多开源、自托管和基于服务的解决方案，可以在 Riak 集群中进行监视、报警
+和趋势分析。有些解决方法提供了针对 Riak 的模块和插件。
 
-### Community and Open Source Tools
+下面列出的是客户和社区成员在监视 Riak 集群操作状态时证实可用的解决方案。商业和托管的服务
+也与社区开发和开源项目一并列出。
+
+### 社区和开源工具
 
 #### Riaknostic
-[Riaknostic](http://riaknostic.basho.com) is a growing suite of diagnostic checks that can be run against your Riak node to discover common problems and recommend how to resolve them. These checks are derived from the experience of the Basho Client Services Team as well as numerous public discussions on the mailing list, IRC room, and other online media.
 
-Riaknostic integrates into the `riak-admin` command via a `diag` subcommand, and is a great first step in the process of diagnosing and troubleshooting issues on Riak nodes.
+[Riaknostic](http://riaknostic.basho.com) 是一个持续开发的诊断恐惧，在节点中运行，
+能发现常规问题，并给出解决方法。这些检查项目来源于 Basho 客户服务团队的经验，以及邮件列表、
+IRC 和其他在线媒体上的公开讨论。
+
+
+Riaknostic 集成在 `riak-admin` 命令中，通过子命令 `diag` 调用。
+诊断和排错时最好先使用 Riaknostic。
 
 #### Riak Control
-[[Riak Control]] is Basho's REST-driven user-interface for managing Riak clusters. It is designed to give you quick insight into the health of your cluster and allow for easy management of nodes.
 
-While Riak Control does not currently offer specific monitoring and statistics aggregation or analysis functionality, it does offer features which provide immediate insight into overall cluster health, node status, and handoff operations.
+[[Riak Control]] 由 Basho 开发，是一个 REST 架构的 Riak 集群管理界面。其开发目的是，
+便于快速查看集群健康状况，以及简单的管理节点。
+
+Riak Control 目前没有提供监视和统计功能，只能快速查看集群健康状况、节点的状态，
+还能执行移交操作。
 
 #### collectd
-[collectd](http://collectd.org) gathers statistics about the system it is running on and stores them. The statistics are then typically graphed to find current performance bottlenecks, predict system load, and analyze trends.
+
+[collectd](http://collectd.org) 会收集并存储运行其上的系统的信息。然后这些统计信息会
+转换成图表，用来查看性能瓶颈，预测系统负载，以及分析趋势。
 
 #### Ganglia
-[Ganglia](http://ganglia.info) is a monitoring system specifically designed for large, high-performance groups of computers, such as clusters and grids. Customers and community members using Riak have reported success in using Ganglia to monitor Riak clusters.
 
-A [Riak Ganglia module](https://github.com/jnewland/gmond_python_modules/tree/master/riak/) for collecting statistics from the Riak HTTP `[[/stats|HTTP Status]]` endpoint is also available.
+[Ganglia](http://ganglia.info) 是一个监视系统，特别针对大型、高性能的电脑群组，例如
+集群和网格。客户和社区成员反馈成功使用 Ganglia 监视了 Riak 集群。
+
+有一个[针对 Riak 的模块](https://github.com/jnewland/gmond_python_modules/tree/master/riak/)，
+可以通过 Riak HTTP 的 `[[/stats|HTTP Status]]` 端点收集统计数据。
 
 #### Nagios
-[Nagios](http://www.nagios.org) is a monitoring and alerting solution that can provide information on the status of Riak cluster nodes, in addition to various types of alerting when particular events occur. Nagios also offers logging and reporting of events and can be used for identifying trends and capacity planning.
 
-A collection of [reusable Riak-specific scripts](https://github.com/basho/riak_nagios) are available to the community for use with Nagios.
+[Nagios](http://www.nagios.org) 是一个监控和报警系统，可以提供 Riak 集群中节点的
+状态信息，还能在某些特定事件发生时发出各种警报。Nagios 还有日志和事件报告功能，可以用来
+分析趋势和规划容量。
+
+有很多[针对 Riak 的脚本](https://github.com/basho/riak_nagios)可以结合 Nagios 使用。
 
 #### Riemann
-[Riemann](http://aphyr.github.com/riemann/) uses a powerful stream processing language to aggregate events from client agents running on Riak nodes, and can help track trends or report on events as they occur. Statistics can be gathered from your nodes and forwarded to a solution such as Graphite for producing related graphs.
 
-A [Riemann Tools](https://github.com/aphyr/riemann.git) project consisting of small programs for sending data to Riemann provides a module specifically designed to read Riak statistics.
+[Riemann](http://aphyr.github.com/riemann/) 使用一种强大的流处理语言收集运行
+在 Riak 节点上的客户端事件，可以用来跟踪趋势，以及在事件发生时给出报告。统计信息从节点
+获取，然后交由类似 Graphite 的工具生成图表。
+
+Riemann Tools](https://github.com/aphyr/riemann.git) 可以把数据发送给 Riemann，
+采用模块化设计，可以读取 Riak 的统计数据。
 
 #### OpenTSDB
-[OpenTSDB](http://opentsdb.net) is a distributed, scalable Time Series Database (TSDB) used to store, index, and serve metrics from various sources. It can collect data at a large scale and graph these metrics on the fly.
 
-A [Riak collector for OpenTSDB](https://github.com/stumbleupon/tcollector/blob/master/collectors/0/riak.py) is available as part of the [tcollector framework](https://github.com/stumbleupon/tcollector).
+[OpenTSDB](http://opentsdb.net) 是一个分布式可扩放的“时间序列数据库”（TSDB），能为不同
+的源存储、索引和服务指标。OpenTSDB 可以大规模的收集数据，然后飞速生成图表。
 
-### Commercial and Hosted Service Tools
-The following are some commercial tools which Basho customers have reported successfully using for statistics gathering and monitoring within their Riak clusters.
+[tcollector 框架](https://github.com/stumbleupon/tcollector) 中提供了一个
+[支持 OpenTSDB 的 Riak 收集器](https://github.com/stumbleupon/tcollector/blob/master/collectors/0/riak.py)。
+
+### 商业和托管的工具
+
+下面列出的是客户和社区成员在监视 Riak 集群状态、收集 Riak 集群数据时证实可用的商业工具。
 
 #### Circonus
-[Circonus](http://circonus.com) provides organization-wide monitoring, trend analysis, alerting, notifications, and dashboards. It can been used to provide trend analysis and help with troubleshooting and capacity planning in a Riak cluster environment.
+
+[Circonus](http://circonus.com) 提供了组织级别的监视、趋势分析、报警、提醒和管理面板
+功能。可用来在 Riak 集群环境中进行趋势分析，帮助排错，以及容量规划。
 
 <!--
 Need more information on this one...
@@ -152,16 +195,23 @@ Need more information on this one...
 -->
 
 #### Splunk
-[Splunk](http://www.splunk.com) is available as downloadable software or as a service, and provides tools for visualization of machine generated data such as log files. It can be connected to Riak's HTTP statistics `[[/stats|HTTP Status]]` endpoint.
 
-Splunk can be used to aggregate all Riak cluster node operational log files, including operating system and Riak-specific logs and Riak statistics data. These data are then available for real-time graphing, search, and other visualization ideal for troubleshooting complex issues and spotting trends.
+[Splunk](http://www.splunk.com) 可以下载，也可以作为服务使用。它提供的工具可以视觉化
+机器生成的数据，例如日志文件。它能连接到 Riak 的 HTTP 统计端点 `[[/stats|HTTP Status]]`。
 
-## Summary
-Riak exposes numerous forms of vital statistic information which can be aggregated, monitored, analyzed, graphed, and reported on in a variety of ways using numerous open source and commercial solutions.
 
-If you use a solution not listed here with Riak and would like to include it (or would otherwise like to update the information on this page), feel free to fork the docs, add it in the appropriate section, and send a pull request to the [Riak Docs project](https://github.com/basho/basho_docs).
+Splunk 可以收集 Riak 集群中所有节点的操作日志文件，包括操作系统和针对 Riak 的日志，以及
+ Riak 的统计数据。这些数据可以用来进行实时图表转换、搜索等其他视觉化操作，有助于问题排错和
+趋势分析。
 
-## References
+## 总结
+
+Riak 提供课很多重要的统计信息，可以使用各种开源和商业工具收集、监视、分析、转换成图表或报告。
+
+如果你使用的解决方案没有列出来，而且你想将其加入这篇文档，请 fork 本文档，在适当的小结内添加
+你的方法，然后给 [RiaK 文档项目](https://github.com/basho/basho_docs)发送一个合并请求。
+
+## 参考资源
 
 * [[Inspecting a Node]]
 * [Riaknostic](http://riaknostic.basho.com)
