@@ -8,139 +8,109 @@ audience: intermediate
 keywords: [operator]
 ---
 
-This page describes the process of adding and removing nodes to and from
-a Riak cluster. We'll look at how you join nodes together into a
-cluster, and what happens when you add or remove nodes.
+本文讲解如何在 Riak 集群中添加和删除节点。我们会介绍如何合并节点组成集群，以及添加
+或删除节点时会发生什么。
 
-Preconditions
--------------
+## 前提条件
 
-For most operations you need to access configuration files, whose
-location depends on your mode of installation and the operating system.
-Check the [[Configuration Files]] page for details on where to find them.
+对大多数操作来说都要访问设置文件，其位置根据安装的方式和所用操作系统而有所不同。
+具体的位置请参看 [[Configuration Files]] 。
 
-Creating the First Node
------------------------
+## 创建第一个节点
 
-After installing Riak on a system using either the binary packages or
-from source, there's some initial configuration steps you need to take
-that depend on your networking infrastructure and security measures.
+不管使用安装包安装或者从源码编译安装，安装 Riak 之后都要做一些初始化设置，具体设置的项目因
+网络和安全设置而异。
 
-Your node should not be running. If it is, stop it using the [[`riak stop` command|riak Command Line#stop]] or `/etc/init.d/riak stop`). Before you can start up the node
-again, a couple of changes need to made. If your new node was already
-running before making the configuration changes outlined below, it's
-best to delete your ring directory before starting it up again. Just
-delete the directory ring/ in your Riak data directory. In general, the
-steps outlined below should be taken before you bring up a new node.
+现在节点应该没有运行。如果已经运行，请使用 [[`riak stop` 命令|riak Command Line#stop]]
+将其停止。在启动之前，需要做一些修改。如果新创建的节点在修改下述设置之前已经运行了，最好先
+删除环文件夹，只需删除 Riak 数据文件夹中的 `ring/` 文件夹即可。一般来说，创建新节点时都要
+做下面的设置。
 
-Change the Node Name
---------------------
+## 修改节点名字
 
-The node name is an important setting for the Erlang VM, especially when
-you want to build a cluster of nodes, as the node name identifies both
-the Erlang application and the host name on the network. All nodes in
-the Riak cluster need these node names to communicate and coordinate
-with each other.
+节点的名字对 Erlang VM 来说很重要，特别是要搭建一个集群，节点的名字会标识 Erlang 应用
+程序，并且作为网络中的主机名。Riak 集群中的节点都要设定名字，这样才能和其他节点通讯和协调。
 
-The node name is configured in `vm.args`. Change the following line,
-which defaults to 127.0.0.1 (a.k.a. localhost):
+节点的名字在 `vm.args` 文件中设置。请修改下面这行代码，
+默认的名字是 127.0.0.1，也称作 localhost：
 
 ```erlang
 -name riak@127.0.0.1
 ```
 
-Change it to something that corresponds to either the IP address or a
-resolvable host name for this particular node, like so:
+将其修改为 IP 地址，或者可解析的主机名，如下所示：
 
 ```erlang
 -name riak@192.168.1.10
 ```
 
-Change the HTTP and Protocol Buffers binding address
-----------------------------------------------------
+## 修改 HTTP 和 Protocol Buffers 绑定地址
 
-By default, Riak's HTTP and Protocol Buffers services are bound to the
-local interface, i.e. 127.0.0.1, and are therefore unable to serve
-requests from the outside network. The relevant setting is configured in
-[[`app.config`|Configuration Files#app.config]],
-under the riak\_core section that reads:
+默认情况下，Riak 的 HTTP 和 Protocol Buffers 服务绑定到本地地址上，例如 127.0.0.1，因此
+无法服务于网外的请求。相应的设置在 [`app.config`|Configuration Files#app.config]] 文件
+中，`riak_core` 区之下：
 
 ```erlang
 {http, [ {"127.0.0.1", 8098 } ]},
 ```
 
-Either change it to use an IP address that corresponds to one of the
-server's network interfaces, or 0.0.0.0 to allow access from all
-interfaces and networks, e.g.:
+请将其修改为服务器某个网络接口对应的 IP 地址，或者修改为 0.0.0. 运行访问所有的接口和网络：
 
 ```erlang
 {http, [ {"0.0.0.0", 8098 } ]},
 ```
 
-The same configuration should be changed for the Protocol Buffers
-interface if you intend on using it. Do the same as above for the line
-in the `riak_kv` section that reads:
+如果要使用 Protocol Buffers，也要做类似设置。按照上面的方式修改 `riak_kv` 区的这行：
 
 ```erlang
 {pb_ip,   "127.0.0.1" },
 ```
 
-Start the Node
---------------
+## 启动节点
 
-Just like initial the configuration steps, this step has to be repeated
-for every node in your cluster. Before a node can join an existing
-cluster it needs to be started. Depending on your mode of installation,
-use either the init scripts installed by the Riak binary packages or
-simply the script `riak`:
+和初始化一样，这一步也要在集群中的每个节点中都执行。在加入集群之前，要先启动节点。根据所
+使用的安装方式，请使用 Riak 安装包创建的 init 脚本，或者直接调用 `riak` 命令：
 
 ```bash
 /etc/init.d/riak start
 ```
 
-or
+或者
 
 ```bash
 bin/riak start
 ```
 
-What Happens When You Start a Node?
------------------------------------
+## 启动节点时发生了什么？
 
-When you start a node it looks for a cluster description, known as the
-"ring file", in its data directory. If one does not exist it creates a
-new ring description based on the initially configured
-`ring_creation_size`, claiming all partitions for itself. The node is
-then ready to serve requests.
+启动节点时，会寻找数据文件夹中的集群描述，也就是“环文件”。如果该文件不存在，就会根据所设置
+的 `ring_creation_size 创建一个新环描述，并做好分区。然后，节点就可以接收请求了。
 
-Add a Node to an Existing Cluster
----------------------------------
+## 把节点添加到现有集群
 
-When the node is running, it can be added to an existing cluster. (Note
-that this step isn't necessary for the first node but only the ones you
-want to add after.) Pick a random node in your existing cluster and use the `riak-admin cluster join` command to stage
-a join request from the new node. The example shown below uses the IP
-192.168.2.2 as the so-called "seed node", the node that seeds the
-existing cluster data to the new node.
+节点启动后就可以加入集群了。（注意，这一步不需要在创建第一个节点时执行，只需在后续节点
+中执行。）在现有集群中随便选一个节点，在其中执行 `riak-admin cluster join` 命令，请求
+把新节点加入集群。下面的示例中使用了 IP 地址 192.168.2.2 上的节点，这个节点称为
+“种子节点”（seed node），把集群中的数据传入新节点。
 
 ```bash
 riak-admin cluster join riak@192.168.2.2
 ```
 
-This should result in a message similar to the following:
+上述命令会输出如下信息：
 
 ```
 Success: staged join request for 'riak@192.168.2.5' to 'riak@192.168.2.2'
 ```
 
-Repeat this process on each new node that will joined to form the cluster.
+要加入集群的所有节点都要执行上述操作。
 
-Joining Nodes to Form a Cluster
--------------------------------
+## 把节点合并组成集群
 
-The process of joining a cluster involves several steps, including staging the proposed cluster nodes, reviewing the cluster plan, and committing the changes.
+合并节点组成集群要好几步，包括暂存要合并的节点，审查集群计划和提交变动。
 
-After staging each of the cluster nodes with `riak-admin cluster join` commands, the next step in forming a cluster is to review the proposed plan of changes. This can be done with the `riak-admin cluster plan` command, which is shown in the example below.
+执行 `riak-admin cluster join` 命令暂存要合并的节点后，要审查提议的计划，这一步要
+执行 `riak-admin cluster plan` 命令，其输出如下：
 
 ```
 =============================== Staged Changes ================================
@@ -177,111 +147,81 @@ Transfers resulting from cluster changes: 51
   13 transfers from 'riak@192.168.2.2' to 'riak@192.168.2.6'
 ```
 
-If the plan is to your liking, submit the changes by typing `riak-admin cluster commit`.
+如果满意这个计划，就可以执行 `riak-admin cluster commit` 命令提交这次变动。
 
-The Node Join Process
----------------------
+## 合并节点的过程
 
-When a join request is sent from a new node, it will ask the seed node to send its
-cluster state. When the new node receives the cluster state, it discards
-its own, overwriting it completely with the state it just received. It
-then starts claiming partitions until the number of partitions in the
-cluster reaches an even distribution (or close thereto), taking into
-account the N value to guarantee an optimal physical distribution of
-partitions in the cluster.
+节点发出合并请求时，会要求种子节点报告集群的状态。收到集群状态时，节点会将其自身的状态销毁，
+换用刚收到的状态。然后节点开始声明分区，只到分区均匀分布，然后检查 N 值，让集群中的分区达到
+最优物理分布。
 
-While claiming partitions, the new node keeps updating the cluster state
-until an even distribution is reached. Claiming a partition means that
-the new node is now a primary replica for the particular partition.
+声明分区时，新节点会一直更新集群的状态，只到分区均匀分布为止。声明分区的意思是，对这个特定
+分区来说，这个新节点就是主要的副本。
 
-When the node has recalculated a new cluster state, it gossips the state
-to a random node in the cluster, thus making its own claims known to the
-other nodes.
+节点重新计算集群的状态后，会广播到集群中的一个随机节点，让其他节点知道新状态。
 
-After it ensured that all the vnodes it's responsible for are running
-(vnodes are mapped to Erlang processes), partition handoff will start,
-transferring data from existing nodes to the new one. The handoff is
-initiated by the existing nodes after they received the new cluster
-state, as the vnodes running on them realize that they're not a primary
-replica for a particular partition anymore, therefore transferring all
-their data to the new primary replica on the node that just joined.
+确认所有负责的 vnode 已经启动后（vnode 映射到 Erlang 进程上），开始进行分区移交，把现有
+节点上的数据传输到新节点上。移交操作是在现有节点收到集群的新状态后执行的，因为这时节点上
+的 vnode 才发现它们不再是特定分区的主要副本了，所以要把所有的数据传输到新加入的节点这个主要
+副本中。
 
-This process happens asynchronously as the gossip is updated across the
-cluster over the next couple of minutes. Remember that after claiming
-its partitions the new node only gossips the new cluster state to a
-random node in the cluster, which then in turn gossips the state to the
-other nodes, so it can take up to a minute until the handoff starts.
+上述过程会在广播集群状态的几分钟内异步执行。还记得吗，声明分区后新节点会对集群内一个随机的
+节点广播状态，然后再广播到其他节点，这个过程要花费几分钟，完成后才能进行移交。
 
-During the handoff, the new cluster state is already known throughout
-the cluster, so there are periods where handoff is still active, but the
-new node is already expected to serve requests. Basho is working on
-improving this situation, but in general the application interacting
-with Riak is expected to deal with situations where not all replicas may
-have the data yet. See our page on [[Eventual Consistency]]
-for more details on these scenarios.
+移交时，集群的新状态已经传遍了整个集群，所以会存在这样的时间段，移交还在进行，但节点已经开始
+接受请求了。Basho 正在努力改善这个问题，但一般来说，和 Riak 交互的应用程序期望处理并不是
+所有副本中都有数据的情况。关于这种情况更详细的说明请阅读“[[最终一致性|Eventual Consistency]]”。
 
-<div class ="info">Ryan Zezeski wrote a [[great
-introduction|https://github.com/rzezeski/try-try-try/tree/master/2011/riak-core-the-vnode]]
-of what happens during a vnode's lifecycle, including an overview of the
-different states of handoff.</div>
+<div class ="info">
+Ryan Zezeski 写了一篇[[很不错的文章|https://github.com/rzezeski/try-try-try/tree/master/2011/riak-core-the-vnode]]，
+讲解了 vnode 声明中期内所发生的事情，还说明了移交操作的不同状态。
+</div>
 
+## 从集群中删除节点
 
-Removing a Node From a Cluster
-------------------------------
+从集群中删除节点有两种方法。一种方法假定节点已经退役，例如，因为容量增加而不需要这个节点了，
+或者被新节点取代了。另一种方法和失效有关，不是损坏就是无法复原了，所以必须在其他节点上
+将其从集群中删除。
 
-A node can be removed from the cluster in two ways. One assumes that a
-node is decommissioned, for example because its added capacity is not
-needed anymore or because it's explicitly replaced with a new one. The
-second is relevant for failure scenarios, where a node has crashed and
-is irrecoverable, so it must be removed from the cluster from another
-node.
+删除正在运行的节点使用 `riak-admin cluster leave` 命令。这个命令要在想删除的节点中执行。
 
-The command to remove a running node is `riak-admin cluster leave`. This command
-must be executed on the node that's supposed to be removed from the
-cluster.
-
-Similarly to joining a node, after executing `riak-admin cluster leave`, the cluster plan must be reviewed with `riak-admin cluster plan`, and the changes committed with `riak-admin cluster commit`.
+跟合并节点类似，执行完 `riak-admin cluster leave` 命令后，还要
+审查 `riak-admin cluster plan` 命令的计划，然后使用 `riak-admin cluster commit` 命令
+提交变动。
 
 <div class="info">
-<div class="title">Riak 1.2 Cluster Administration</div>
+<div class="title">Riak 1.2 集群管理</div>
 
-Learn more about the new [[cluster command|riak-admin Command Line#cluster]] introduced in Riak version 1.2.
+请认真学习一下 Riak 1.2 中新加入的 [[cluster 命令|riak-admin Command Line#cluster]]。
 
 </div>
 
-The other command is `riak-admin cluster leave <node>`, where `<node>` is an
-Erlang node name as specified in the node's vm.args file, e.g.
+还可以使用 `riak-admin cluster leave <node>` 命令，其中 `<node>` 是 Erlang 的节点名字，
+即在 `vm.args` 文件中设定地名字，例如：
 
 ```bash
 riak-admin cluster leave riak@192.168.2.1
 ```
 
-This command can be run from any other node in the cluster.
+这个命令可以在集群中其他任何一个中执行。
 
-Under the hood, both commands basically do the same thing. Running
-`riak-admin cluster leave <node>` just selects the current node for you automatically.
+这两个命令背后执行的操作是一样的。`riak-admin cluster leave <node>` 命令会自动为你选择
+当前节点。
 
-As with `riak-admin cluster leave`, the plan to have a node leave the cluster must be first reviewed with `riak-admin cluster plan`, and committed with `riak-admin cluster commit` before any changes will actually take place.
+和 `riak-admin cluster leave` 命令一样，也要审查 `riak-admin cluster plan` 给出的计划，
+并使用 `riak-admin cluster commit` 命令提交变动，然后变动才会生效。
 
-What Happens When You Remove a Node?
-------------------------------------
+## 删除节点时发生了什么？
 
-Removing a node is basically the process of joining a node in reverse.
-Instead of claiming partitions, the node to be removed determines a new
-cluster state, taking out all the partitions it currently owns,
-re-distributing them evenly across the remaining nodes.
+删除节点基本上与合并节点的操作是相反的。不过删除节点时不用声明分区，而是生成一个新集群状态，
+找出该节点拥有的所有分区，在剩下的节点中重新均匀的分发。
 
-The new state is sent to all nodes in the cluster, not just a random
-one, so every node in the cluster immediately knows that the node left.
-Then it sets the cluster state on the leaving node, causing hand-off to
-start, which again is initialized by vnodes realizing they're not the
-primary replicas anymore, transferring the data to the new owners.
+新状态会广播到集群中所有的节点，而不再是一个随机节点，所以集群立即就知道有节点删除了。
+然后在删除的节点中设置集群状态，开始移交，这个操作还是由不再作为主要副本的 vnode 发起，
+把数据传输到新拥有者那里。
 
-When all data is handed off, the Erlang VM process eventually exits.
+移交完所有数据后，Erlang VM 进程就会彻底退出。
 
-In case you're using `riak-admin remove` on a different node, this whole
-process will occur on that particular node instead. The last step,
-forcing the old node to hand-off data, will obviously fail in a scenario
-where the node to be removed is not available anymore, but the cluster,
-given enough replicas, will balance itself out even without the failed
-node.
+如果你在其他节点中执行 `riak-admin remove` 命令，上述操作就会在该节点中进行。最后一步，
+移交旧节点的数据可定是会失败的，因为删除的节点已经不存在了。不过集群还是会给出足够的副本，
+即便没有被删除的节点了，还是能自我平衡。

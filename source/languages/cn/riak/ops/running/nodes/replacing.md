@@ -8,75 +8,74 @@ audience: advanced
 keywords: [operator]
 ---
 
-At some point, for various reasons, you might need to replace a node in your Riak cluster (which is different from [[recovering a failed node|Recovering a failed node]]). Here is the recommended way to go about replacing a node.
+有时基于各种原因，可能要替换 Riak 集群中的节点
+（这和[[恢复失效的节点|Recovering a failed node]]可不一样）。
+替换节点时推荐按照下面的步骤操作。
 
-  1. Back up your data directory on the node in question. In this example scenario,
-    we'll call the node **riak4**:
+1. 备份要替换的节点数据文件夹。本例中我们称这个节点为 **riak4**
 
-    ```bash
-    sudo tar -czf riak_backup.tar.gz /var/lib/riak /etc/riak
-    ```
+```bash
+sudo tar -czf riak_backup.tar.gz /var/lib/riak /etc/riak
+```
 
-  2. Download and install Riak on the new node you wish to bring into the cluster and
-    have replace the **riak4** node. We'll call this node **riak7** for the purpose of this example.
+2. 在想引入集群替换 **riak4** 的节点上下载并安装 Riak，我们把这个新节点叫做 **riak7**
 
-  3. Start the new **riak7** node with `[[riak start|Command Line Tools#start]]`:
+3. 执行 `[[riak start|Command Line Tools#start]]` 命令启动 **riak7**
 
-    ```bash
-    riak start
-    ```
+```bash
+riak start
+```
 
-  4. Plan the join of the new **riak7** node to an existing node already participating in
-    he cluster; for example **riak0** with the
-    `[[riak-admin cluster join|riak-admin Command Line#cluster]]` command executed
-    on the the new **riak7** node:
+4. 把 **riak7** 和集群中某个现有节点合并，例如在 **riak7** 中
+执行 `[[riak-admin cluster join|riak-admin Command Line#cluster]]` 命令，
+和 **riak0** 合并
 
-    ```bash
-    riak-admin cluster join riak0
-    ```
+```bash
+riak-admin cluster join riak0
+```
 
-  5. Plan the replacement of the existing **riak4** node with the new **riak7** node using
-    the `[[riak-admin cluster replace|riak-admin Command Line#cluster]]` command:
+5. 执行 `[[riak-admin cluster replace|riak-admin Command Line#cluster]]` 命令
+把 **riak4** 替换成 **riak7**
 
-    ```bash
-    riak-admin cluster replace riak4 riak7
-    ```
+```bash
+riak-admin cluster replace riak4 riak7
+```
 
-    <div class=info>
-    <div class=title>Single Nodes</div>
-    If a node is started singly using default settings (as, for example,
-    you might do when you are building your first test environment), you
-    will need to remove the ring files from the data directory after you edit
-    <code>etc/vm.args</code>. <code>riak-admin cluster replace</code> will not work as the node
-    has not been joined to a cluster.
-    </div>
+<div class=info>
+<div class=title>单个节点</div>
+如果只有一个节点，要先修改 <code>etc/vm.args</code> 文件，再删除数据文件夹中的环文件。
+<code>riak-admin cluster replace</code> 命令没有任何作用，因为节点没有加入集群。
+</div>
 
-  6. Examine the proposed cluster changes with the
-    `[[riak-admin cluster plan|riak-admin Command Line#cluster]]` command executed
-    on the the new **riak7** node:
+6. 在 **riak7** 中执行 `[[riak-admin cluster plan|riak-admin Command Line#cluster]]` 命令，
+审查替换计划：
 
-    ```bash
-    riak-admin cluster plan
-    ```
+```bash
+riak-admin cluster plan
+```
 
-  7. If the changes are correct, you can commit them with the
-    `[[riak-admin cluster commit|riak-admin Command Line#cluster]]` command:
+7. 如果计划符合要求，执行 `[[riak-admin cluster commit|riak-admin Command Line#cluster]]` 命令
+提交变动：
 
-    ```bash
-    riak-admin cluster commit
-    ```
+```bash
+riak-admin cluster commit
+```
 
-If you need to clear the proposed plan and start over, use `[[riak-admin cluster clear|riak-admin Command Line#cluster]]`:
+如果要放弃计划重新开始，请执行 `[[riak-admin cluster clear|riak-admin Command Line#cluster]]` 命令：
 
 ```bash
 riak-admin cluster clear
 ```
 
-Once you have successfully replaced the node, it should begin leaving the cluster. You can check on ring readiness after replacing the node with the `[[riak-admin ringready|riak-admin Command Line#ringready]]` and `[[riak-admin member-status|riak-admin Command Line#member-status]]` commands.
+成功替换后，旧节点就从集群中删除了。替换节点后可以
+使用 `[[riak-admin ringready|riak-admin Command Line#ringready]]`
+ 和 `[[riak-admin member-status|riak-admin Command Line#member-status]]` 命令
+ 查看环的准备状态。
 
 <div class="info">
-<div class="title">Ring Settling</div>
-You'll need to make sure that no other ring changes occur between the time when you start the new node and the ring settles with the new IP info.
+<div class="title">安置环</div>
+你要确保在启动新节点和使用新 IP 地址安置好环之间的这段时间内，不会修改环。
 
-The ring is considered settled when the new node reports <strong>true</strong> using the <code>riak-admin ringready</code> command.
+如果 <code>riak-admin ringready</code> 命令的输出为 <strong>true</strong>，就证明环
+已经安置好了。
 </div>
