@@ -8,9 +8,9 @@ audience: beginner
 keywords: [command-line, riak]
 ---
 
-# Command Line Tools - `riak`
+# 命令行工具 - `riak`
 
-This is the primary script for controlling the Riak node process.
+`riak` 是控制 Riak 节点进程的主要脚本。
 
 
 ```bash
@@ -20,93 +20,70 @@ Usage: riak { start | stop | restart | reboot | ping | console | attach | chkcon
 
 ## start
 
-Starts the Riak node in the background. If the node is already started, you will
-get the message "Node is already running!" If the node is not already running,
-no output will be given.
-
+启动节点，在后台运行。如果节点已经运行，会看到“Node is already running!”消息。
+如果节点尚未运行，不会看到任何输出。
 
 ```bash
 riak start
 ```
 
-
 ## stop
 
-Stops the running Riak node. Prints "ok" when successful, "Node 'riak@127.0.0.1'
-not responding to pings." when the node is already stopped or not responding.
-
+停止运行节点。如果操作成功会显示“ok”，如果节点之前已经停止了，或者没有响应，
+则会显示“Node 'riak@127.0.0.1' not responding to pings.”。
 
 ```bash
 riak stop
 ```
 
-
 ## restart
 
-Stops and then starts the running Riak node without exiting the Erlang VM.
-Prints "ok" when successful, "Node 'riak@127.0.0.1' not responding to pings."
-when the node is already stopped or not responding.
-
-
+在不退出 Erlang VM 的前提下，停止然后再次启动运行着的节点。如果操作成功会显示“ok”，如果
+节点之前已经停止了，或者没有响应，则会显示“Node 'riak@127.0.0.1' not responding to pings.”。
 
 ```bash
 riak restart
 ```
 
-
 ## reboot
 
-Stops and then starts the running Riak node, exiting the Erlang VM. Prints "ok"
-when successful, "Node 'riak@127.0.0.1' not responding to pings." when the node
-is already stopped or not responding.
-
+退出 Erlang VM，停止然后再启动运行着的节点。如果操作成功会显示“ok”，如果节点之前
+已经停止了，或者没有响应，则会显示“Node 'riak@127.0.0.1' not responding to pings.”。
 
 ```bash
 riak reboot
 ```
 
-
 ## ping
 
-Checks that the Riak node is running. Prints "pong" when successful, "Node
-'riak@127.0.0.1' not responding to pings." when the node is stopped or not
-responding.
-
+检查 Riak 节点是否正在运行。如果操作成功会显示“pong”，如果节点之前已经停止，或者无响应，
+则会显示“Node 'riak@127.0.0.1' not responding to pings.”。
 
 ```bash
 riak ping
 ```
 
-
 ## console
 
-Starts the Riak node in the foreground, giving access to the Erlang shell and
-runtime messages. Prints "Node is already running - use 'riak attach' instead"
-when the node is running in the background.
-
+启动 Riak 节点，在后台运行，可以访问 Erlang shell 和运行时信息。如果节点已经在后台运行，
+会显示“Node is already running - use 'riak attach' instead”。
 
 ```bash
 riak console
 ```
 
-
 ## attach
 
-Attaches to the console of a Riak node running in the background, giving access
-to the Erlang shell and runtime messages. Prints "Node is not running!" when the
-node cannot be reached.
-
-
+附加到后台运行的 Riak 节点的控制台上，可以访问 Erlang shell 和运行时信息。如果无法访问节点，
+会显示“Node is not running!”。
 
 ```bash
 riak attach
 ```
 
-
 ## chkconfig
 
-Confirms whether the app.config is valid.
-
+确认 app.config 是否可用。
 
 ```bash
 riak chkconfig

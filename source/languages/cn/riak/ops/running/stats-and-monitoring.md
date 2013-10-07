@@ -76,10 +76,10 @@ GET FSM 兄弟数据（`node_get_fsm_siblings_*`）会生成一个柱状图（�
 
 指标                          | 说明                                                |
 ------------------------------| -------------------------------------------------- |
-`node_get_fsm_objsize_mean`   | 某节点前一分钟处理的对象大小均值                       |
-`node_get_fsm_objsize_median` | 某节点前一分钟处理的对象大小中值                       |
-`node_get_fsm_objsize_95`     | 某节点前一分钟处理的对象大小 95 百分位值                |
-`node_get_fsm_objsize_100`    | 某节点前一分钟处理的对象大小 100 百分位值               |
+`node_get_fsm_objsize_mean`   | 某节点前一分钟流经 GET\_FSM 的对象大小均值             |
+`node_get_fsm_objsize_median` | 某节点前一分钟流经 GET\_FSM 的对象大小中值             |
+`node_get_fsm_objsize_95`     | 某节点前一分钟流经 GET\_FSM 的对象大小 95 百分位值      |
+`node_get_fsm_objsize_100`    | 某节点前一分钟流经 GET\_FSM 的对象大小 100 百分位值     |
 `node_get_fsm_time_mean`      | 客户端发起 GET 请求到收到响应时间间隔的均值              |
 `node_get_fsm_time_median`    | 客户端发起 GET 请求到收到响应时间间隔的中值              |
 `node_get_fsm_time_95`        | 客户端发起 GET 请求到收到响应时间间隔的 95 百分位值      |
@@ -125,7 +125,7 @@ IO 等待时间             |
 
 #### Riaknostic
 
-[Riaknostic](http://riaknostic.basho.com) 是一个持续开发的诊断恐惧，在节点中运行，
+[Riaknostic](http://riaknostic.basho.com) 是一个持续开发的诊断工具，在节点中运行，
 能发现常规问题，并给出解决方法。这些检查项目来源于 Basho 客户服务团队的经验，以及邮件列表、
 IRC 和其他在线媒体上的公开讨论。
 

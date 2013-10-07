@@ -8,38 +8,28 @@ audience: advanced
 keywords: [troubleshooting]
 ---
 
-Restarting a node after a failure may result in a slower than normal
-startup time. The longer startup time associated with recovery may also lead
-to other problems. To avoid problems when recovering a failed node the
-following technique should be followed.
+节点失效后重启会花费比常规启动更长的时间。启动时间过长还会导致其他问题。为了避免在
+恢复节点时出现问题，应该按照下面介绍的技术进行操作。
 
-## General Recovery Notes
+## 一般性恢复
 
-When a Riak node is to be recovered, general rules of recovery apply
-depending on what failed in particular. Check for RAID and file system
-consistency, faulty memory, fully functional network connections, etc.
+要恢复一个节点，根据具体的失效情况，可以使用一些基本的原则，检查 RAID 和文件系统的一致性，
+错误记忆，完整的网络连接等。
 
-In general, when a failed node comes back up, make sure it has the
-same node name as before it crashed.  Changing the node name makes the
-cluster assume this is an entirely new node, leaving the old one still
-as part of the ring, until you remove it manually using `riak-admin
-remove riak@node-name.host`.
+一般而言，要让失效的节点重新上线，必须保证使用和失效前一样的节点名。如果名字不一样，集群会
+认为这是一个全新的节点，失效的节点还是环的一部分，
+除非手动执行 `riak-admin remove riak@node-name.host` 命令将其删除。
 
-When the node is recovering, hinted handoff will kick in and update
-the data on the recovered node with updates from the rest of the
-cluster. Your cluster may temporarily return "not found" for objects
-that are currently being handed off (see our page on
-[[Eventual Consistency]] for more details on these scenarios, in
-particular how the system behaves while the failed node is not part of
-the cluster).
 
-There may be additional steps for recovery that depend on your storage
-backend.
+恢复节点时，会进行提示移交操作，同时还会从集群的其他节点中获取更新的数据。集群可能会对正在
+移交的数据返回“not found”响应（详细信心请阅读“[[最终一致性|Eventual Consistency]]”一文，
+介绍当失效节点还没加入集群时，系统应该如何响应）。
+
+根据存储后台的不同，可能还要做其他操作。
 
 ## Bitcask
 
-A failed node that's using Bitcask as storage backend can be started
-normally using `riak start` or the Riak init.d scripts and should
-recover on its own.
+使用 Bitcask 后台的失效节点可以使用 `riak start` 或者 Riak 的 init.d 脚本启动，而且
+可以进行自我修复。
 
-More information can be found on [[Failure and Recovery]].
+详细内容请阅读 [[Failure and Recovery]] 一文。

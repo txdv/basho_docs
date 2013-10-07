@@ -8,379 +8,246 @@ audience: intermediate
 keywords: [operator, status, riaknostic]
 ---
 
-When inspection of a Riak node to gather metrics on performance or
-potential issues is desired, a number of tools are available to help,
-and are either included with Riak itself or made available through the
-Riak community.
+检查 Riak 节点收集性能指标或为了发现潜在问题时，有很多工具可以使用，其中有些是 Riak 内建的，
+有些是 Riak 社区开发的。
 
-This guide provides starting points and details on some of the available
-tools for inspecting a Riak node.
+本文简单介绍了如何使用这些工具检查 Riak 节点。
 
-riak-admin status
------------------
+## riak-admin status
 
-`riak-admin status` is a subcommand of the `riak-admin` command that is
-included with every installation of Riak. The `status` subcommand
-provides data related to current operating status for a node. The output
-of `riak-admin status` is categorized and detailed below.
 
-Please note, for some counters such as node_get_fsm_objsize a minimum of
-5 transactions is required for statistics to be generated.
+`riak-admin status` 是 `riak-admin` 命令的子命令，每个 Riak 都有。`status` 命令可以
+显示节点当前运行状态相关的数据。`riak-admin status` 命令的输出结果分类介绍如下。
 
-### One-minute
+注意，某些计数器至少需要 5 个事务（transaction）才能收集到统计数据。
 
-One-minute Counters are data points delineating the number of times a
-particular activity has occurred within the last minute on this node.
+### 一分钟
 
-Sample one minute counters:
+一分钟计数器是一系列数据收集点，描绘出过去一分钟某节点上特定操作执行的次数。
 
--   **node\_gets** Number of GETs coordinated by this node, including
-    GETs to non-local vnodes on this node within the last minute
--   **node\_gets\_total** Number of GET operations coordinated by vnodes
-    on this node since node was started
--   **node\_puts** Number of PUTs coordinated by this node, including
-    PUTs to non-local vnodes on this node within the last minute
--   **node\_puts\_total** Number of PUT operations coordinated by vnodes
-    on this node since node was started
--   **vnode gets** Number of GET operations coordinated by vnodes on
-    this node within the last minute
--   **vnode\_gets\_total** Number of GET operations coordinated by
-    vnodes on this node since node was started
--   **vnode\_puts** Number of PUT operations coordinated by vnodes on
-    this node within the last minute
--   **vnode\_puts\_total** Number of PUT operations coordinated by
-    vnodes on this node since node was started
--   **riak_kv_vnodes_running**: Number of key/value virtual node queues
-    running in the last minute
--   **riak_kv_vnodeq_mean**: Mean number of key/value virtual node queues
-    running in the last minute
--   **riak_kv_vnodeq_median**: Median number of key/value virtual node queues
-    running in the last minute
--   **riak_kv_vnodeq_max**: Maximum number of key/value virtual node queues
-    running in the last minute
--   **riak_kv_vnodeq_min**: Minimum number of key/value virtual node queues
-    running in the last minute
--   **read\_repairs** Number of read repair operations this this node
-    has coordinated in the last minute
--   **read\_repairs\_total**: Number of read repair operations this this
-    node has coordinated since node was started
+例如：
+
+-   **node\_gets** 某节点前一分钟处理的 GET 请求数量，包括该节点上非本地虚拟节点处理的 GET 请求
+-   **node\_gets\_total** 自节点启动以来处理的 GET 请求数量，包括该节点上非本地虚拟节点处理的 GET 请求
+-   **node\_puts** 某节点前一分钟处理的 PUT 请求数量，包括该节点上非本地虚拟节点处理的 PUT 请求
+-   **node\_puts\_total** 自节点启动以来处理的 PUT 请求数量，包括该节点上非本地虚拟节点处理的 PUT 请求
+-   **vnode\_gets** 某节点中虚拟节点前一分钟处理的 GET 请求数量
+-   **vnode\_gets\_total** 自节点启动以来本地虚拟节点处理的 GET 请求数量
+-   **vnode\_puts** 某节点中虚拟节点前一分钟处理的 PUT 请求数量
+-   **vnode\_puts\_total** 自节点启动以来本地虚拟节点处理的 PUT 请求数量
+-   **riak_kv_vnodes_running**: 前一分钟某虚拟节点排队的键值对数量
+-   **riak_kv_vnodeq_mean**: 前一分钟某虚拟节点排队的键值对数量均值
+-   **riak_kv_vnodeq_median**: 前一分钟某虚拟节点排队的键值对数量中值
+-   **riak_kv_vnodeq_max**: 前一分钟某虚拟节点排队的键值对数量最大值
+-   **riak_kv_vnodeq_min**: 前一分钟某虚拟节点排队的键值对数量最小值
+-   **read\_repairs** 某节点前一分钟处理的读取修复操作数量
+-   **read\_repairs\_total**: 自节点启动以来节点处理的读取修复数量
 
 ### FSM\_Time
 
-FSM\_Time Counters represent the amount of time in microseconds required
-to traverse the GET or PUT Finite State Machine code, offering a picture
-of general node health. From your application's perspective, FSM\_Time
-effectively represents experienced latency. Mean, Median, and 95th-,
-99th-, and 100th-percentile (Max) counters are displayed. These are
-one-minute stats.
+FSM\_Time 计数器表明遍历 GET 或 PUT FSM 代码所需的时间，单位为毫秒。由此可以看出节点的
+一般健康状况。对应用程序来说，FSM\_Time 很好地说明了迟延时间。FSM\_Time 计数器可以显示
+均值、中值、95 百分位值、100 百分位值（最大值）。这些也属于“一分钟”状态。
 
-Sample finite state machine time counters:
+例如：
 
--   **node\_get\_fsm\_time\_mean**: Mean time between reception of
-    client GET request and subsequent response to client
--   **node\_get\_fsm\_time\_median**: Median time between reception of
-    client GET request and subsequent response to client
--   **node\_get\_fsm\_time\_95**: 95th percentile time between reception
-    of client GET request and subsequent response to client
--   **node\_get\_fsm\_time\_99** 99th percentile time between reception
-    of client GET request and subsequent response to client
--   **node\_get\_fsm\_time\_100** 100th percentile time between
-    reception of client GET request and subsequent response to client
--   **node\_put\_fsm\_time\_mean**: Mean time between reception of
-    client PUT request and subsequent response to client
--   **node\_put\_fsm\_time\_median**: Median time between reception of
-    client PUT request and subsequent response to client
--   **node\_put\_fsm\_time\_95**: 95th percentile time between reception
-    of client PUT request and subsequent response to client
--   **node\_put\_fsm\_time\_99**: 99th percentile time between reception
-    of client PUT request and subsequent response to client
--   **node\_put\_fsm\_time\_100**: 100th percentile time between
-    reception of client PUT request and subsequent response to client
+-   **node\_get\_fsm\_time\_mean**: 客户端发起 GET 请求到收到响应时间间隔的均值
+-   **node\_get\_fsm\_time\_median**: 客户端发起 GET 请求到收到响应时间间隔的中值
+-   **node\_get\_fsm\_time\_95**: 客户端发起 GET 请求到收到响应时间间隔的 95 百分位值
+-   **node\_get\_fsm\_time\_99** 客户端发起 GET 请求到收到响应时间间隔的 99 百分位值
+-   **node\_get\_fsm\_time\_100** 客户端发起 GET 请求到收到响应时间间隔的 100 百分位值
+-   **node\_put\_fsm\_time\_mean**: 客户端发起 PUT 请求到收到响应时间间隔的均值
+-   **node\_put\_fsm\_time\_median**: 客户端发起 PUT 请求到收到响应时间间隔的中值
+-   **node\_put\_fsm\_time\_95**: 客户端发起 PUT 请求到收到响应时间间隔的 95 百分位值
+-   **node\_put\_fsm\_time\_99**: 客户端发起 PUT 请求到收到响应时间间隔的 99 百分位值
+-   **node\_put\_fsm\_time\_100**: 客户端发起 PUT 请求到收到响应时间间隔的 100 百分位值
 
 ### GET\_FSM\_Siblings
 
-GET\_FSM\_Sibling Stats offer a count of the number of siblings
-encountered by this node on the occasion of a GET request. These are
-one-minute stats.
+GET\_FSM\_Sibling 表明在 GET 请求中节点中兄弟数据的数量。这也是“一分钟”状态。
 
-Sample finite state machine sibling counters:
+例如：
 
--   **node\_get\_fsm\_siblings\_mean**: Mean number of siblings
-    encountered during all GET operations by this node within the last
-    minute
--   **node\_get\_fsm\_siblings\_median**: Median number of siblings
-    encountered during all GET operations by this node within the last
-    minute
--   **node\_get\_fsm\_siblings\_95**: 95th percentile of siblings
-    encountered during all GET operations by this node within the last
-    minute
--   **node\_get\_fsm\_siblings\_99**: 99th percentile of siblings
-    encountered during all GET operations by this node within the last
-    minute
--   **node\_get\_fsm\_siblings\_100**: 100th percentile of siblings
-    encountered during all GET operations by this node within the last
+-   **node\_get\_fsm\_siblings\_mean**: 某节点前一分钟所有 GET 操作处理的兄弟数据数量均值
+-   **node\_get\_fsm\_siblings\_median**: 某节点前一分钟所有 GET 操作处理的兄弟数据数量中值
+-   **node\_get\_fsm\_siblings\_95**: 某节点前一分钟所有 GET 操作处理的兄弟数据数量 95 百分位值
+-   **node\_get\_fsm\_siblings\_99**: 某节点前一分钟所有 GET 操作处理的兄弟数据数量 99 百分位值
+-   **node\_get\_fsm\_siblings\_100**: 某节点前一分钟所有 GET 操作处理的兄弟数据数量 100 百分位值
     minute
 
 ### GET\_FSM\_Objsize
 
-GET\_FSM\_Objsize is a window on the sizes of objects flowing through
-this node's GET\_FSM. The size of an object is obtained by summing the
-length of the bucket name, key, the serialized vector clock, the value,
-and the serialized metadata of each sibling. GET\_FSM\_Objsize and
-GET\_FSM\_Siblings are inextricably linked. These are one-minute stats.
+GET\_FSM\_Objsize 是流经某节点 GET\_FSM 的对象大小。对象的大小是该对象 bucket 名、键、
+序列化向量时钟、值和每个兄弟数据的序列化元数据长度之和。
+GET\_FSM\_Objsize 和 GET\_FSM\_Siblings 之间的联系很紧密。这些也是“一分钟”状态。
 
-Sample finite state machine object size counters:
+例如：
 
--   **node\_get\_fsm\_objsize\_mean**: Mean object size encountered by
-    this node within the last minute
--   **node\_get\_fsm\_objsize\_median**: Median object size encountered
-    by this node within the last minute
--   **node\_get\_fsm\_objsize\_95**: 95th percentile object size
-    encountered by this node within the last minute
--   **node\_get\_fsm\_objsize\_99**: 99th percentile object size
-    encountered by this node within the last minute
--   **node\_get\_fsm\_objsize\_100** 100th percentile object size
-    encountered by this node within the last minute
+-   **node\_get\_fsm\_objsize\_mean**: 某节点前一分钟流经 GET\_FSM 的对象大小均值
+-   **node\_get\_fsm\_objsize\_median**: M某节点前一分钟流经 GET\_FSM 的对象大小中值
+-   **node\_get\_fsm\_objsize\_95**: 某节点前一分钟流经 GET\_FSM 的对象大小 95 百分位值
+-   **node\_get\_fsm\_objsize\_99**: 某节点前一分钟流经 GET\_FSM 的对象大小 99 百分位值
+-   **node\_get\_fsm\_objsize\_100** 某节点前一分钟流经 GET\_FSM 的对象大小 100 百分位值
 
-### Totals
+### 总数
 
-Total Counters are data points that represent the total number of times
-a particular activity has occurred since this node was started.
+一分钟计数器是一系列数据收集点，描绘自节点启动以来特定操作执行的次数。
 
-Sample total counters:
+例如：
 
--   **vnode\_gets\_total**: Number of GETs coordinated by local vnodes
-    since node startup
--   **vnode\_puts\_total**: Number of PUTS coordinated by local vnodes
-    since node startup
--   **riak_kv_vnodeq_total**: Total number of key/value virtual node queues
-    running since node startup
--   **node\_gets\_total**: Number of GETs coordinated by this node since
-    startup, including GETs to non-local vnodes
--   **node\_puts\_total**: Number of PUTs coordinated by this node since
-    startup, including PUTs to non-local vnodes
--   **read\_repairs\_total**: Number of Read Repairs this node has
-    coordinated since node startup
--   **coord\_redirs\_total**: Number of requests this node has redirected
-    to other nodes for coordination since node startup
+-   **vnode\_gets\_total**: 自节点启动以来本地虚拟节点处理的 GET 请求数量
+-   **vnode\_puts\_total**: 自节点启动以来本地虚拟节点处理的 PUT 请求数量
+-   **riak_kv_vnodeq_total**: 自虚拟节点启动以来排队的键值对数量
+-   **node\_gets\_total**: 自节点启动以来处理的 GET 请求数量，包括该节点上非本地虚拟节点处理的 GET 请求
+-   **node\_puts\_total**: 自节点启动以来处理的 PUT 请求数量，包括该节点上非本地虚拟节点处理的 PUT 请求
+-   **read\_repairs\_total**: 自节点启动以来节点处理的读取修复数量
+-   **coord\_redirs\_total**: 自节点启动以来处理的重定向到其他节点的操作数量
 
-### CPU and Memory
+### CPU 和内存
 
-CPU statistics are taken directly from Erlang’s cpu\_sup module.
-Documentation for which can be found at [ErlDocs:
-cpu\_sup](http://erldocs.com/R14B04/os_mon/cpu_sup.html).
+CPU 的统计数据直接从 Erlang 的 cpu\_sup 模块获取，详细说明请
+阅读 [Erlang 文档](http://erldocs.com/R14B04/os_mon/cpu_sup.html)
 
--   **cpu\_nprocs**: Number of operating system processes
--   **cpu\_avg1**: The average number of active processes for the last 1
-    minute (equivalent to top(1) command’s load average when divided by
-    256()
--   **cpu\_avg5**: The average number of active processes for the last 5
-    minutes (equivalent to top(1) command’s load average when divided by
-    256()
--   **cpu\_avg15**: The average number of active processes for the last
-    15 minutes (equivalent to top(1) command’s load average when divided
-    by 256()
+-   **cpu\_nprocs**: 操作系统的进程数量
+-   **cpu\_avg1**: 前一分钟运行的进程数均值（等价于 top(1) 命令的平均负载除以 256）
+-   **cpu\_avg5**: 前五分钟运行的进程数均值（等价于 top(1) 命令的平均负载除以 256）
+-   **cpu\_avg15**: 前十五分钟运行的进程数均值（等价于 top(1) 命令的平均负载除以 256）
 
-Memory statistics are taken directly from the Erlang virtual machine.
-Documentation for which can be found at [ErlDocs:
-Memory](http://erldocs.com/R14B04/erts/erlang.html?i=0&search=erlang:memory#memory/0).
+内存使用统计数据直接从 Erlang 的虚拟机获取，详细说明请
+阅读 [Erlang 文档](http://erldocs.com/R14B04/erts/erlang.html?i=0&search=erlang:memory#memory/0)。
 
--   **memory\_total**: Total allocated memory (sum of processes and
-    system)
--   **memory\_processes**: Total amount of memory allocated for Erlang
-    processes
--   **memory\_processes\_used**: Total amount of memory used by Erlang
-    processes
--   **memory\_system**: Total allocated memory that is not directly
-    related to an Erlang process
--   **memory\_atom**: Total amount of memory currently allocated for
-    atom storage
--   **memory\_atom\_used**: Total amount of memory currently used for
-    atom storage
--   **memory\_binary**: Total amount of memory used for binaries
--   **memory\_code**: Total amount of memory allocated for Erlang code
--   **memory\_ets**: Total memory allocated for Erlang Term Storage
--   **mem\_total**: Total available system memory
--   **mem\_allocated**: Total memory allocated for this node
+-   **memory\_total**: 分配的内存总量（进程和系统之和）
+-   **memory\_processes**: 为 Erlang 进程分配的内存总量
+-   **memory\_processes\_used**: Erlang 进程使用的内存总量
+-   **memory\_system**: 不是直接为 Erlang 进程分配的内存总量
+-   **memory\_atom**: 为 Atom 存储分配的内存总量
+-   **memory\_atom\_used**: Atom 存储使用的内存总量
+-   **memory\_binary**: 二进制文件使用的内存总量
+-   **memory\_code**: 为 Erlang 代码分配的内存总量
+-   **memory\_ets**: 为 Erlang Term Storage 分配的内存总量
+-   **mem\_total**: 系统中可用的内存总量
+-   **mem\_allocated**: 为某节点分配的内存总量
 
-### Miscellaneous Information
+### 其他信息
 
-Miscellaneous Information stats are data points that provide details
-particular to this node.
+Riak 也会提供一些关于节点的其他信息。
 
-Sample miscellaneous information statistics:
+例如：
 
--   **nodename** The name this node uses to identify itself
--   **ring\_num\_partitions** The configured number of partitions in the
-    ring
--   **ring\_ownership**: List of all nodes in the ring and their
-    associated partition ownership
--   **ring\_members**: List of nodes which are members of the ring
--   **rings_reconciled**: Number of recent ring reconciliation operations
--   **rings_reconciled_total**: Total number of ring reconciliation operations
-    since node was started
--   **converge_delay_min**: Minimum time in milliseconds describing time taken
-    for the ring to converge after ring changes
--   **converge_delay_max**: Maximum time in milliseconds describing time taken
-    for the ring to converge after ring changes
--   **converge_delay_mean**: Mean time in milliseconds describing time taken
-    for the ring to converge after ring changes
--   **converge_delay_last**: Last observed histogram value in milliseconds 
-    describing time taken for the ring to converge after ring changes
--   **connected\_nodes** A list of the nodes that this node is aware of
-    at this time
--   **gossip_received**: Total number of gossip messages received since
-    node was started
--   **ignored\_gossip\_total**: Total number of ignored gossip messages
-    since node was started
--   **handoff\_timeouts**: Number of handoff timeouts encountered by
-    this node
--   **rejected_handoffs**: Number of recent ownership handoff operations
-    rejected by the node
--   **rebalance_delay_min**: Minimum time in milliseconds taken to calculate
-    partition rebalance during a cluster membership change
--   **rebalance_delay_max**: Maximum time in milliseconds taken to calculate
-    partition rebalance during a cluster membership change
--   **rebalance_delay_mean**: Mean time in milliseconds taken to calculate
-    partition rebalance during a cluster membership change
--   **rebalance_delay_last**: Last observed histogram in milliseconds
-    describing time take to calculate partition rebalance during a cluster
-    membership change
--   **coord\_redirs\_total**: Number of requests this node has
-    redirected to other nodes for coordination since startup
--   **precommit\_fail**: Number of pre commit hook failures
--   **postcommit\_fail**: Number of post commit hook failures
--   **sys\_driver\_version**: String representing the Erlang driver
-    version in use by the runtime system
--   **sys\_global\_heaps\_size**: Current size of the shared global heap
--   **sys\_heap\_type**: String representing the heap type in use (one
-    of private, shared, hybrid)
--   **sys\_logical\_processors**: Number of logical processors available
-    on the system
+-   **nodename** 用来标记自身的节点名字
+-   **ring\_num\_partitions** 设定的环中分区的数量
+-   **ring\_ownership**: 列出环中所有节点，以及所拥有的分区
+-   **ring\_members**: 列出环中包含的节点
+-   **rings_reconciled**: 最近进行的环核对操作次数
+-   **rings_reconciled_total**: 自节点启动以来进行的环核对操作次数
+-   **converge_delay_min**: 修改环后再次汇集所需的时间最小值，单位为毫秒
+-   **converge_delay_max**: 修改环后再次汇集所需的时间最大值，单位为毫秒
+-   **converge_delay_mean**: 修改环后再次汇集所需的时间均值，单位为毫秒
+-   **converge_delay_last**: 上一次监控到的修改环后再次汇集所需的时间，单位为毫秒
+-   **connected\_nodes** 某节点目前连接的节点列表
+-   **gossip_received**: 自节点启动以来收到的广播信息总数
+-   **ignored\_gossip\_total**: 自节点启动以来忽略的广播信息总数
+-   **handoff\_timeouts**: 某节点移交操作超时的次数
+-   **rejected_handoffs**: 某节点最近拒绝的所有权移交操作次数
+-   **rebalance_delay_min**: 集群成员变动后重新计算分区分布所用的最少时间，单位为毫秒
+-   **rebalance_delay_max**: 集群成员变动后重新计算分区分布所用的最多时间，单位为毫秒
+-   **rebalance_delay_mean**: 集群成员变动后重新计算分区分布所用的平均时间，单位为毫秒
+-   **rebalance_delay_last**: 上一次监控到的集群成员变动后重新计算分区分布所用时间，单位为毫秒
+-   **coord\_redirs\_total**: 自节点启动以来处理的重定向到其他节点的操作数量
+-   **precommit\_fail**: pre commit 钩子执行失败的次数
+-   **postcommit\_fail**: post commit 钩子执行失败的次数
+-   **sys\_driver\_version**: 运行时所在系统使用的 Erlang 驱动版本，以字符串的形式显示
+-   **sys\_global\_heaps\_size**: 当前共享的全局堆（global heap）
+-   **sys\_heap\_type**: 所用堆的类型，以字符串形式显示（结果为 private，shared，hybrid 之一）
+-   **sys\_logical\_processors**: 系统上可用的逻辑处理器数量
 
 {{#1.2.0+}}
-### Pipeline Metrics
+### Pipeline 指标
 
-The following metrics from from riak_pipe are generated during MapReduce operations.
+下列 riak_pipe 的指标在 MapReduce 操作执行时产生。
 
-- **pipeline_active**: The number of pipelines active in the last 60 seconds
-- **pipeline_create_count**: The total number of pipelines created since the node was started
-- **pipeline_create_error_count**: The total number of pipeline creation errors since the node was started
-- **pipeline_create_error_one**: The number of pipelines created in the last 60 seconds
-- **pipeline_create_one**: The number of pipeline creation errors in the last 60 seconds
+- **pipeline_active**: 前 60 秒运行的 pipeline 数量
+- **pipeline_create_count**: 自节点启动以来创建的 pipeline 总量
+- **pipeline_create_error_count**: 自节点启动以来，创建 pipeline 时发生的错误次数
+- **pipeline_create_error_one**: 前 60 秒创建 pipeline 时发生的错误次数
+- **pipeline_create_one**: 前 60 秒创建的 pipeline 数量
 {{/1.2.0+}}
 
-### Application and Subsystem Versions
+### 应用程序和子系统的版本
 
-The specific version of each Erlang application and subsystem which
-makes up a Riak node is present in `riak-admin status` output.
+构成 Riak 节点的 Erlang 应用程序和子系统所用的版本也可以通过 `riak-admin status` 命令查看。
 
--   **sys\_driver\_version**: String representing the Erlang driver
-    version in use by the runtime system
--   **sys\_otp\_release**: Erlang OTP release version in use on the node
--   **sys\_system\_version**: Detailed Erlang version information
--   **ssl\_version**: Version of secure sockets layer (SSL) application
-    in use
--   **public\_key\_version**: Version of public key application in use
--   **runtime\_tools\_version**: Version of runtime tools application in
-    use
--   **basho\_stats\_version**: Version of Basho stats application in use
--   **riak\_search\_version**: Version of Riak Search application in use
--   **riak\_kv\_version**: Version of Riak KV application in use
--   **bitcask\_version**: Version of Bitcask backend application in use
--   **luke\_version**: Version of Luke application in use {{<1.3.0}}
--   **erlang\_js\_version**: Version of Erlang JS application in use
--   **mochiweb\_version**: Version of MochiWeb application in use
--   **inets\_version**: Version of Inets application in use
--   **riak\_pipe\_version**: Version of Riak Pipe application in use
--   **merge\_index\_version**: Version of Merge Index application in use
--   **cluster\_info\_version**: Version of Cluster Information
-    application in use
--   **basho\_metrics\_version**: Version of Basho Metrics application in
-    use
--   **riak\_control\_version**: Version of Riak Control application in
-    use
--   **riak\_core\_version**: Version of Riak Core application in use
--   **lager\_version**: Version of Lager application in use
--   **riak\_sysmon\_version**: Version of Riak System Monitor
-    application in use
--   **webmachine\_version**: Version of Webmachine application in use
--   **crypto\_version**: Version of Cryptography application in use
--   **os\_mon\_version**: Version of Operating System Monitor
-    application in use
--   **sasl\_version**: Version of SASL application in use
--   **stdlib\_version**: Version of Standard Library application in use
--   **kernel\_version**: Version of Kernel application in use
+-   **sys\_driver\_version**: 运行时所在系统使用的 Erlang 驱动版本，以字符串的形式显示
+-   **sys\_otp\_release**: 某节点使用的 Erlang OTP 发行版本
+-   **sys\_system\_version**: Erlang 版本的详细信息
+-   **ssl\_version**: 所用的 SSL 版本
+-   **public\_key\_version**: 所用公匙程序的版本
+-   **runtime\_tools\_version**: 所用运行时工具的版本
+-   **basho\_stats\_version**: 所有 Basho 状态程序的版本
+-   **riak\_search\_version**: 所有 Riak 搜索程序的版本
+-   **riak\_kv\_version**: 所用 Riak KV 程序的版本
+-   **bitcask\_version**: 所用 Bitcask 后台的版本
+-   **luke\_version**: 所用 Luke 程序的版本{{<1.3.0}}
+-   **erlang\_js\_version**: 所用 Erlang JS 程序的版本
+-   **mochiweb\_version**: 所用 MochiWeb 程序的版本
+-   **inets\_version**: 所用 Inets 程序的版本
+-   **riak\_pipe\_version**: 所用 Riak Pipe 程序的版本
+-   **merge\_index\_version**: 所用 Merge Index 程序的版本
+-   **cluster\_info\_version**: 所用 Cluster Information 程序的版本
+-   **basho\_metrics\_version**: 所用 Basho Metrics 程序的版本
+-   **riak\_control\_version**: 所用 Riak Control 程序的版本
+-   **riak\_core\_version**: 所用 Riak Core 程序的版本
+-   **lager\_version**: 所用 Large 程序的版本
+-   **riak\_sysmon\_version**: 所用 Riak System Monitor 程序的版本
+-   **webmachine\_version**: 所用 Webmachine 程序的版本
+-   **crypto\_version**: 所用 Cryptography 程序的版本
+-   **os\_mon\_version**: 所用 Operating System Monitor 程序的版本
+-   **sasl\_version**: 所用 SASL 程序的版本
+-   **stdlib\_version**: 所用 Standard Library 程序的版本
+-   **kernel\_version**: 所用的内核版本
 
 {{#1.2.0+}}
-### Riak Search Statistics
+### Riak 搜索统计
 
-The following statistics related to Riak Search message queues are available.
+下列的统计信息和 Riak 搜索消息队列有关。
 
-- **riak_search_vnodeq_max**: Maximum number of unprocessed messages all
-  virtual node (vnode) message queues in the Riak Search subsystem have
-  received on this node in the last minute
-- **riak_search_vnodeq_mean**: Mean number of unprocessed messages all
-  vnode message queues in the Riak Search subsystem have received on this
-  node in the last minute
-- **riak_search_vnodeq_median**: Median number of unprocessed messages all
-  vnode message queues in the Riak Search subsystem have received on this
-  node in the last minute
-- **riak_search_vnodeq_min**: Minimum number of unprocessed messages all
-  vnode message queues in the Riak Search subsystem have received on this
-  node in the last minute
-- **riak_search_vnodeq_total**: Total number of unprocessed messages all
-  vnode message queues in the Riak Search subsystem have received on this
-  node since it was started
-- **riak_search_vnodes_running**: Total number of vnodes currently running
-  in the Riak Search subsystem
+- **riak_search_vnodeq_max**: 前一分钟 Riak 搜索系统收到的所有虚拟节点消息队列中未处理的消息数量最大值
+- **riak_search_vnodeq_mean**: 前一分钟 Riak 搜索系统收到的所有虚拟节点消息队列中未处理的消息数量均值
+- **riak_search_vnodeq_median**: 前一分钟 Riak 搜索系统收到的所有虚拟节点消息队列中未处理的消息数量均值
+- **riak_search_vnodeq_min**: 前一分钟 Riak 搜索系统收到的所有虚拟节点消息队列中未处理的消息数量最小值
+- **riak_search_vnodeq_total**: 自节点启动以来 Riak 搜索系统收到的所有虚拟节点消息队列中未处理的消息数量最大值
+- **riak_search_vnodes_running**: 目前在 Riak 搜索系统中运行的虚拟节点数量
 
-Note that under ideal operation and with the exception of
-`riak_search_vnodes_running` these statistics should contain low values
-(e.g., 0-10). Presence of higher values could be indicative of an issue.
+注意，在理想状态下，除了 `riak_search_vnodes_running`，其他信息的值可能很小（例如 0-10）。
+如果值很大可能就是出问题了。
 {{/1.2.0+}}
 
-Riaknostic
-----------
+## Riaknostic
 
-[Riaknostic](http://riaknostic.basho.com/) is a small suite of
-diagnostic checks that can be run against a Riak node to discover common
-problems, and recommend how to resolve them. These checks are derived
-from the experience of the Basho Client Services Team as well as
-numerous public discussions on the mailing list, `#riak` IRC channel,
-and other online media.
+[Riaknostic](http://riaknostic.basho.com) 是一个小型的诊断工具，在节点中运行，
+能发现常规问题，并给出解决方法。这些检查项目来源于 Basho 客户服务团队的经验，以及邮件列表、
+IRC 和其他在线媒体上的公开讨论。
 
 {{#1.3.0-}}
-Riaknostic is an open source project developed by Basho Technologies and
-Riak community members. The code is available in the [Riaknostic
-Github repository](https://github.com/basho/riaknostic).
+Riaknostic 是一个开源项目，由 Basho Technologies 和社区成员开发。其代码
+可到 [GitHub 仓库](https://github.com/basho/riaknostic)获取。
 
-Getting started with Riaknostic is easy, and instructions for
-installation and use are provided on the Riaknostic website. Once
-downloaded and installed, Riaknostic adds a `diag` subcommand to the
-`riak-admin` command.
+Riaknostic 使用起来很简单，安装和使用说明可以到 Riaknostic 的网站查看。下载安装后，
+Riaknostic 向 `riak-admin` 添加了 `diag` 子命令。
 
-Executing `riak-admin diag` will provide
-information on any node problems as detected by Riaknostic, and also
-recommendations for resolution of the problems. Riaknostic can be
-extremely handy for diagnosing a range of configuration issues and is strongly
-recommended as a first step when inspecting a problematic node or cluster
-issue.
+`riak-admin diag` 会输出节点的所有问题及推荐的解决方法。Riaknostic 特别适合用来诊查
+设置相关的问题，节点或集群遇到问题时强烈建议先使用它来检查问题。
 {{/1.3.0-}}
 
 {{#1.3.0+}}
-As of Riak version 1.3, Riaknostic is installed by default.
+从 Riak 1.3 开始，Riaknostic 是默认安装的。
 
-Riaknostic is included with Riak and exposed through the `riak-admin diag` command. It is an open source project developed by Basho Technologies and
-Riak community members. The code is available in the
-[Riaknostic Github repository](https://github.com/basho/riaknostic).
+Riaknostic 包含在 Riak 中，可以使用 `riak-admin diag` 命令运行。Riaknostic 是一个开源项目，由 Basho Technologies 和社区成员开发。其代码
+可到 [GitHub 仓库](https://github.com/basho/riaknostic)获取。
 {{/1.3.0+}}
 
+## 相关资源
 
-Related Resources
------------------
-
--   [Configuration and Management: Command Line Tools:
-    riak-admin](http://docs.basho.com/riak/1.2.0/references/riak-admin Command Line/)
+-   [设置和管理：命令行工具：riak-admin](http://docs.basho.com/riak/1.2.0/references/riak-admin Command Line/)
 -   [Riaknostic](http://riaknostic.basho.com/)
 -   [[HTTP API status|HTTP Status]]

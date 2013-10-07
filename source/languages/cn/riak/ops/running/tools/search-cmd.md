@@ -8,119 +8,95 @@ audience: beginner
 keywords: [command-line, search]
 ---
 
-# Command Line Tools - `search-cmd`
+# 命令行工具 - `search-cmd`
 
-This script is used to interact with the Search functionality included with
-Riak.  Make sure you've first
-[[enabled  Search|Configuration Files#riak_search]]. The `INDEX` argument is
-optional for all commands and defaults to `search`.
+这个命令用来和 Riak 的搜索功能交互。确保已经
+[[启用了搜索功能|Configuration Files#riak_search]]。在所有命令中，`INDEX` 选项都是
+可选的，默认值为 `search`。
 
-
-    search-cmd set-schema [INDEX] SCHEMAFILE : Set schema for an index.
-    search-cmd show-schema [INDEX]           : Display the schema for an index.
-    search-cmd clear-schema-cache            : Empty the schema cache on all nodes.
-    search-cmd search [INDEX] QUERY          : Perform a search.
-    search-cmd search-doc [INDEX] QUERY      : Perform a document search.
-    search-cmd explain [INDEX] QUERY         : Ouputs the query plan.
-    search-cmd index [INDEX] PATH            : Index files in a path.
-    search-cmd delete [INDEX] PATH           : De-index files in a path.
-    search-cmd solr [INDEX] PATH             : Run the Solr file.
-    search-cmd install BUCKET                : Install kv/search integration hook
-    search-cmd uninstall BUCKET              : Uninstall kv/search integration hook
-    search-cmd test PATH                     : Run a test package
-
+    search-cmd set-schema [INDEX] SCHEMAFILE : 设定索引的模式（schema）
+    search-cmd show-schema [INDEX]           : 显示索引的模式
+    search-cmd clear-schema-cache            : 清空所有节点的模式缓存
+    search-cmd search [INDEX] QUERY          : 进行一次搜索操作
+    search-cmd search-doc [INDEX] QUERY      : 进行一次文件搜索操作
+    search-cmd explain [INDEX] QUERY         : 显示查询计划
+    search-cmd index [INDEX] PATH            : 索引某路径中的文件
+    search-cmd delete [INDEX] PATH           : 删除某路径中文件的索引
+    search-cmd solr [INDEX] PATH             : 运行 Solr 文件
+    search-cmd install BUCKET                : 安装 kv/search 集成钩子
+    search-cmd uninstall BUCKET              : 写在 kv/search 集成钩子
+    search-cmd test PATH                     : 运行测试包
 
 ## set-schema
 
     set-schema [INDEX] SCHEMAFILE
 
-Set the [[schema|Advanced Search Schema]] for a given index.  If you don't
-explicitly set the schema for an index it will use the default schema.
-
+设置指定索引的[[模式|Advanced Search Schema]]。如果不设定就是用默认的模式。
 
 ## show-schema
 
     show-schema [INDEX]
 
-Show the [[schema|Advanced Search Schema]] for a given index.
-
+显示指定索引使用的[[模式|Advanced Search Schema]]。
 
 ## clear-schema-cache
 
     clear-schema-cache
 
-Search stores its schemas in Riak just like any other object.  However, to
-avoid the costliness of getting an object each time the schema information is
-needed it caches the schema object locally on each node.  If you've modified
-your schema you'll want to clear this cache in order to make sure the latest
-version is read from Riak.
-
+搜索会把模式存储在 Riak 中，就像保存其他对象一样。为了避免每次需要时都从 Riak 中读取对象，
+所用模式在每个节点中都有个缓存。如果修改了所用的模式，就需要清除这个缓存，确保从 Riak 读取
+的是修改后的模式。
 
 ## search
 
     search [INDEX] QUERY
 
-Execute the given query on the index returning the document id, properties, and
-score.  The [[query syntax|Using Search]] is the same as Lucene.
-
+在索引上执行指定的查询，返回文件 ID、属性和得分。[[查询的句法|Using Search]]和 Lucene 一样。
 
 ## search-doc
 
     search-doc [INDEX] QUERY
 
-Much like `search` but also returns all the fields too.
+和 `search` 命令很像，不过还会返回所有字段（field）。
 
 ## explain
 
     explain [INDEX] QUERY
 
-Outputs the query plan for the specified index query.
-
+显示针对指定索引的查询计划。
 
 ## index
 
     index [INDEX] PATH
 
-Index the document at the given path.  See the 
-[[indexing section|Search Indexing Reference#Indexing-from-the-Command-Line]] for 
-more details.
-
+索引指定路径中的文件。详细信息请阅读[[这份文档|Search Indexing Reference#Indexing-from-the-Command-Line]]。
 
 ## delete
 
     delete [INDEX] PATH
 
-Used to delete a document from the index.  See the 
-[[indexing section|Search Indexing Reference#Deleting-from-the-Command-Line]] 
-for more details.
-
+从索引中删除文件。详细信息请阅读[[这份文档|Search Indexing Reference#Deleting-from-the-Command-Line]]。
 
 ## solr
 
     solr [INDEX] PATH
 
-Index solr documents.  See the 
-[[indexing section|Search Indexing Reference#Indexing-using-the-Solr-Interface]]
-for more details.
-
+索引 Solr 文件。详细信息请阅读[[这份文档|Search Indexing Reference#Indexing-using-the-Solr-Interface]]。
 
 ## install
 
     install BUCKET
 
-Install the Search precommit hook on the given bucket.  This allows one to
-[[index incoming objects|Search Indexing Reference]].
-
+在指定的 bucket 中安装搜索 precommit 钩子。这样就可以[[索引存入的对象|Search Indexing Reference]]了。
 
 ## uninstall
 
     uninstall BUCKET
 
-Uninstall the Search precommit hook on the given bucket.
-
+写在指定 bucket 中的 搜索 precommit 钩子。
 
 ## test
 
     test PATH
 
-Run the Search test script at the given path.
+运行指定路径中的搜索测试脚本。

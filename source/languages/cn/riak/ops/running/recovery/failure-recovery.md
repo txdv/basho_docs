@@ -8,136 +8,91 @@ audience: advanced
 keywords: [operator, troubleshooting]
 ---
 
-Riak's design protects against or reduces the severity of many types of
-failures, but software bugs do happen and hardware does break.
-Occasionally, Riak itself will fail.
+Riak 的设计可以保护或者减轻很多失效形式的严重性，不过软件总是存在问题，硬件也会损毁。
+某些情况下，Riak 本身会无法使用。
 
-## Forensics
-When a failure occurs, collect as much information as possible. Check
-monitoring systems, backup log and configuration files if they are
-available, including system logs like `dmesg` and syslog. Make sure that
-the other nodes in the Riak cluster are still operating normally and are
-not affected by a wider problem like a virtualization or network outage.
-Try to determine the cause of the problem from the data you have collected.
+## 查证
 
-## Data Loss
-Many failures do not incur data loss, or have minimal loss that can be
-repaired automatically, without intervention. Outage of a single node
-does not necessarily cause data loss, as other replicas of every key are
-available elsewhere in the cluster. Once the node is detected as down,
-other nodes in the cluster will take over its responsibilities
-temporarily, and transmit the updated data to it when it eventually
-returns to service (also called hinted handoff).
+遇到失效时，尽量多的收集信息。查看监控系统，备份日志和设置文件，包括系统日志，
+例如 `dmesg` 和 syslog。确保集群中的其他节点仍可以正常工作，没有受到更大问题
+（例如虚拟资源或网络资源耗尽）的困扰。试着从所收集的数据中查找问题的原因。
 
-The more severe data loss scenarios usually relate to hardware failure.
-In the cases where data is lost, several options are available for
-restoring the data.
+## 数据丢失
 
-1.  Restore from backup. A daily backup of Riak nodes can be helpful.
-    The data in this backup may be stale depending on the time  at which
-    the node failed, but can be used  to partially-restore data from
-    lost storage volumes. If running in a RAID configuration, rebuilding
-    the array may also be possible.
-2.  Restore from multi-cluster replication. If replication is enabled
-    between two or more clusters, the missing data will gradually be
-    restored via streaming replication and full-synchronization. A
-    full-synchronization can also be triggered manually via the
-    `riak-repl` command.
-3.  Restore using intra-cluster repair. Riak versions 1.2 and greater
-    include a repair feature which will restore lost partitions with
-    data from other replicas. This currently has to be invoked manually
-    using the Riak console and should be performed with guidance from a
-    Basho CSE.
+很多失效都不会导致数据丢失，或者丢失的很少，无需干预即可自动修复。某个节点资源耗尽并不会
+丢失数据，因为集群中的其他节点上存有副本。只要节点下线了，集群中其他节点就会临时担起责任，
+等节点重新上线后，再把数据转移回来（提示移交）。
 
-Once data has been restored, normal operations should continue. If
-multiple nodes completely lose their data, consultation and assistance
-from Basho is strongly recommended.
+很多数据丢失都和硬件损坏有关。根绝数据丢失地方的不同，有很多种方法可以用来恢复数据。
 
-## Data Corruption
-Data at rest on disk can become corrupted by hardware failure or other
-events. Generally, the Riak storage backends are designed to handle
-cases of corruption in individual files or entries within files, and can
-repair them automatically or simply ignore the corrupted parts.
-Otherwise, data corruption can be recovered from similarly to data loss.
+1.  从备份恢复。每日做一次 Riak 节点备份是很有用的。根据节点失效的时间，
+    备份中的数据可能已经过期，不过仍然可以用来部分恢复 EBS 卷丢失的数据。
+    如果使用 RAID，还可以重建阵列。
+2.  从多个集群中的副本恢复。如果在两个或多个集群中存在副本，丢失的数据就可以
+    通过副本流和整体同步恢复。整体同步还可以使用 riak-repl 命令手动触发。
+3.  使用集群内部的修复功能恢复。Riak 1.2 以上的版本提供了“修复”功能，可以从副本
+    恢复丢失的分区。目前，这种方式必须在 Riak 终端里手动调用，而且应该
+    在 Basho CSE 的指导下操作。
 
-## Out-of-Memory
-Sometimes Riak will exit when it runs out of available RAM. While this
-does not necessarily cause data loss, it may indicate that the cluster
-needs to be scaled out. While the Riak node is out, if free capacity is
-low on the rest of the cluster, other nodes may also be at risk, so
-monitor carefully.
+数据恢复后就可以进行常规操作了。如果多个节点完全丢失了数据，强烈建议你咨询 Basho。
 
-Replacing the node with one that has greater RAM capacity may temporarily
-alleviate the problem, but out of memory (OOM) tends to be an indication
-that the cluster is under-provisioned.
+## 数据损坏
 
-## High Latency / Request Timeout
-High latencies and timeouts can be caused by slow disk, network, or an
-overloaded node. Check `iostat` and `vmstat` or your monitoring system to
-determine the state of resource usage. If I/O utilization is high but
-throughput is low, this may indicate that the node is responsible for
-too much data and growing the cluster may be necessary. Additional RAM
-may also improve latency because more of the active dataset will be
-cached by the operating system.
+硬盘中的数据可能会由于硬件损坏或其他事件而损坏。一般来说，Riak 存储后台可以处理单独的文件损坏，
+或者文件中的记录损坏，会自动修复，或者干脆直接忽略损坏部分。否则，损坏的数据可以使用和数据丢失
+一样的方法恢复。
 
-Sometimes extreme latency spikes can be caused by sibling-explosion.
-This condition occurs  when the client application does not resolve
-conflicts properly or in a timely fashion. In that scenario, the size of
-the value on disk grows in proportion to the number of siblings, causing
-longer disk service times and slower network responses.
+## 内存耗尽
 
-Sibling-explosion can be detected by examining the
-`node_get_fsm_siblings` and `node_get_fsm_objsize` statistics from the
-`riak-admin status` command. To recover from sibling explosion, the
-application should be throttled and the resolution policy might need to
-be invoked manually on offending keys.
+有时，当 Riak 用完 RAM 时会退出运行。这种情况虽然不会导致数据丢失，但这说明集群要扩放了。
+这个节点下线后，如果可用容量仍然很少，其他节点就会有危险，所以要认真监控。
 
-A Basho CSE can assist in manually finding large values (ones
-potentially with siblings) in the storage backend.
+用具有更大 RAM 的节点替换这个节点可以临时解决问题，但内存耗尽（OOM）表明集群资源供应不充足。
 
-MapReduce requests typically involve multiple I/O operations and are
-thus the most likely to timeout. From the client application, reducing
-the number of inputs, supplying a longer request timeout, and reducing
-the usage of secondary indexes and key-listing can all improve the
-success of MapReduce requests. Heavily-loaded clusters may experience
-more MapReduce timeouts simply because many other requests are being
-serviced as well. Adding nodes to the cluster can reduce MapReduce
-failure in the long-term by spreading load and increasing available CPU
-and IOPS.
+## 高迟延/请求超时
 
-## Cluster Recovery From Backups
-The general procedure for recovering a cluster from catastrophic failure
-involves installation of Riak on the new nodes to establish a cluster with
-the same number of nodes, restoration of the original configuration, and
-restoration of previous data.
+高迟延和请求超时可能是由反应慢得硬盘、网络或者超负载的节点导致的。请通过 `iostat` 和 `vmstat`，
+或者监控系统查看资源的使用情况。如果 IO 利用率很高，但是吞吐量很低，说明可能是节点负责的数据
+太多了，需要扩容集群。是否更大容量的 RAM 可能会减少迟延，因为操作系统可以缓存更多的活跃数据。
 
-Specifically, you should follow this basic process, ensuring that Riak
-is **not started** on any node during steps 1-7:
+有时兄弟数据激增会导致超高的迟延。这种情况的出现，是由于客户端程序没有正确或及时地解决冲突。
+此时，硬盘中的数据量会随着兄弟数据的增长而增长，导致更长的硬盘服务时间，更慢的网络响应。
 
-1. Establish replacement cluster configured with the same number of nodes.
-2. Restore the Riak configuration to each of the nodes.
-3. Ensure that Riak is not running on any of the nodes.
-4. Remove any previous Riak data (e.g., from `/var/lib/riak`) to ensure that
-   the node is not started with no data present.
-5. Restore the backup data to each node's data root (e.g, `/var/lib/riak`)
-6. If you are restoring in an environment where the new nodes will have new
-   network addresses (such as with AWS for example) or you will otherwise
-   need to give the nodes new names, you need to execute `riak-admin reip`
-   to change the network name for every node in the cluster from each node.
-7. After renaming the nodes with `riak-admin reip` if necessary, you should
-   check the `vm.args` configuration file to ensure that each node has the
-   updated name.
-8. Start the first node and check that its name is correct; one way to do
-   this is to start the node, then attach to the node with `riak attach`.
-   You should see the node name as part of the prompt as in the example
-   below. Once you've verified the correct node name, exit the console
-   with CTRL-D.
-9. Execute `riak-admin member-status` on the node and verify that it
-   returns expected output.
-10. Start each of the remaining nodes, verifying the details in the same
-    manner as the first node.
+兄弟数据激增可以通过 `riak-admin status` 命令
+输出的 `node_get_fsm_siblings` 和 `node_get_fsm_objsize` 统计数据发现。要解决兄弟数据
+激增，应用程序应该节流，还要手动干预一下有冲突的键。
 
-<div class="info"><div class="title">Tip</div> If you are a licensed
-  Riak EDS or CS customer and require assistance or further advice with a
-  cluster recovery, please file a ticket with the
-  <a href="https://help.basho.com">Basho Helpdesk</a>.</div>
+Basho CSE 可以帮你找到存储后台种的大型数据（可能含有兄弟数据）。
+
+
+MapReduce 请求涉及到多个 IO 操作，因此很容易导致超时。在客户端程序中，减少输入量，提供更长
+的请求超时，较少二级索引的使用量，以及使用键列表，都可以提高 MapReduce 请求的成功几率。负载
+严重的集群可能会经受更多的 MapReduce 超时，因为集群还要处理其他请求。添加节点可以
+减少 MapReduce 请求失败的概率，从长远来看，要均分负载，还要增加可用的 CPU 和 IOPS。
+
+## 从备份恢复集群
+
+要从灾难性的失效中恢复一个集群需要很多步骤，包括在新节点上安装 Riak，组成一个相同节点数量
+的集群，恢复原始设置，以及恢复之前的数据。
+
+详细的说，应该按照下面的基本步骤操作，确保进行第 1-7 步时，**不要启动**任何节点.
+
+1. 搭建一个新集群，节点的数量和之前一样
+2. 在每个节点上恢复 Riak 设置
+3. 确保每个节点上的 Riak 都没有运行
+4. 删除 Riak 节点上的所有数据（例如，从 `/var/lib/riak` 中删除），确保一个干净的环境
+5. 把备份的数据恢复到每个节点的数据文件夹中（例如，`/var/lib/riak`）
+6. 如果新节点需要设置新 IP 地址（例如在 AWS 上），或者想给节点起一个新名字，
+   需要执行 `riak-admin reip` 命令，修改集群中每一个节点的网络名字
+7. 重新命名后，如果需要，请查看 `vm.args` 文件中的设置，确保每个节点都用上了新名字
+8. 启动第一个节点，检查其名字是否正确。其中一种方法是，启动节点，
+   然后执行 `riak attach` 命令。你应该能看到终端输出了节点名。
+   确认名字正确后按 CTRL-D 键退出控制台。
+9. 执行 `riak-admin member-status` 命令，确保输出的结果符合预期
+10. 重命名其他节点，按照第一个节点的方式做验证操作。
+
+<div class="info">
+<div class="title">提示</div>
+如果你是授权的 Riak EDS 或 CS 客户，恢复集群时需要帮助或者更进一步的建议，
+请访问 <a href="https://help.basho.com">Basho Helpdesk</a>，发布一个新帖子。
+</div>

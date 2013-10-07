@@ -9,18 +9,12 @@ audience: beginner
 keywords: [command-line]
 ---
 
-This is a description of the Riak command-line tools and their subcommands.
-These tools are located in the `bin` directory of an embedded node, and the path
-when installed from a package (usually `/usr/sbin` or `/usr/local/sbin`).
-
-This is a description of the Riak command-line tools and their subcommands.
-These tools are located in the `bin` directory of an embedded node, and the path
-when installed from a package (usually `/usr/sbin` or `/usr/local/sbin`).
+本文列出了 Riak 命令行工具及其子命令。这些工具位于嵌入节点的 `bin` 目录中，
+以及使用安装包安装时指定的路径（`/usr/sbin` or `/usr/local/sbin`）。
 
 ## riak
 
-`[[riak|riak Command Line]]` is the primary script for controlling the
-Riak node process. The following subcommands are available:
+`[[riak|riak Command Line]]` 是控制 Riak 节点进程的主要脚本。包含以下子命令：
 
 * [[start|riak Command Line#start]]
 * [[stop|riak Command Line#stop]]
@@ -33,10 +27,8 @@ Riak node process. The following subcommands are available:
 
 ## riak-admin
 
-`[[riak-admin|riak-admin Command Line]]` performs operations not related
-to node-liveness, including node membership, backup, and basic status reporting.
-The node must be running for most of these commands to work. The following
-subcommands are supported:
+`[[riak-admin|riak-admin Command Line]]` 用来处理和节点运行状态无关的操作，包括节点的
+成员，备份和基本状态。大多数命令都要求节点处于运行状态。包含下列子命令：
 
 * [[cluster|riak-admin Command Line#cluster]]
   * [[cluster join|riak-admin Command Line#cluster join]]
@@ -65,9 +57,7 @@ subcommands are supported:
 
 ## search-cmd
 
-`[[search-cmd|search Command Line]]` is used to interact with the
-Search functionality included with Riak. The following subcommands are
-supported:
+`[[search-cmd|search Command Line]]` 用了和 Riak 提供的搜索功能交互。包含下列子命令：
 
 * [[set-schema|search Command Line#set-schema]]
 * [[show-schema|search Command Line#show-schema]]

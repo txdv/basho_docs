@@ -10,10 +10,9 @@ keywords: [command-line, riak-admin]
 
 # riak-admin
 
-This script performs operations unrelated to node-liveness, including node
-membership, backup, and basic status reporting.  The node must be running for
-most of these commands to work.
-
+`riak-admin` 用来处理和节点运行状态无关的操作，包括节点的
+成员，备份和基本状态。大多数命令都要求节点处于运行状态。
+对大多数子命令来说，节点必须处于运行状态。
 
 ```
 Usage: riak-admin { cluster | join | leave | backup | restore | test |
@@ -25,141 +24,142 @@ Usage: riak-admin { cluster | join | leave | backup | restore | test |
 
 ## cluster
 
-As of version 1.2, Riak provides a multi-phased approach to cluster administration that allows changes to be staged and reviewed before being committed.
+从 Riak 1.2 开始，Riak 为集群提供了分步管理方式，先把变动暂存，然后审查，最后再提交。
 
-This approach to cluster administration allows multiple changes to be grouped together, such as adding multiple nodes at once, or adding some nodes while removing others.
+使用这种方式可以把多个变动放在一起，例如一次添加多个节点，或者添加一些节点删除一些节点。
 
-Details about how a set of staged changes will impact the cluster, listing the future ring ownership as well as the number of transfers necessary to implement the planned changes are provided by the new interface.
+这种新方式可以提供一系列暂存的变动如何影响集群的详细信息，可以列出未来的环所有权，以及要实现
+这些变动需要进行的转移次数。
 
-The following commands stage changes to cluster membership. These commands
-do not take effect immediately. After staging a set of changes, the staged
-plan must be committed using the staging commands to take effect:
+下面的命令把变动暂存在集群的成员中。这些命令不会立即产生效果。变动暂存后必须提交才能生效。
 
 ## cluster join
-Join this node to the cluster containing &lt;node&gt;.
+
+把 &lt;node&gt; 和集群中的节点合并。
 
 ```bash
 riak-admin cluster join <node>
 ```
 
 ## cluster leave
-Instruct this node to hand off its data partitions, leave the cluster and shutdown.
+
+把节点中的数据分区移交出去，从集群中删除并停止运行。
 
 ```bash
 riak-admin cluster leave
 ```
 
-Instruct &lt;node&gt; to hand off its data partitions, leave the cluster and shutdown.
+把 &lt;node&gt; 中的数据分区移交出去，从集群中删除并停止运行。
 
 ```bash
 riak-admin cluster leave <node>
 ```
+
 ## cluster force-remove
-Remove &lt;node&gt; from the cluster without first handing off data partitions. This command is designed for crashed, unrecoverable nodes, and should be used with caution.
+
+不移交数据分区，直接把 &lt;node&gt; 从集群中删除。这个命令适用于损坏无法恢复的节点，
+使用时要小心。
 
 ```bash
 riak-admin cluster force-remove <node>
 ```
+
 ## cluster replace
-Instruct &lt;node1&gt; to transfer all data partitions to &lt;node2&gt;, then leave the cluster and shutdown.
+
+把 &lt;node1&gt; 中的所有数据分区转移到  &lt;node2&gt;，然后把  &lt;node1&gt; 从
+集群中删除并停止运行。
 
 ```bash
 riak-admin cluster replace <node1> <node2>
 ```
 
 ## cluster force-replace
-Reassign all partitions owned by &lt;node1&gt; to &lt;node2&gt; without first handing off data, and then remove &lt;node1&gt; from the cluster.
+
+不移交数据，直接把 &lt;node1&gt; 的所有分区转移到 &lt;node2&gt;，
+然后把 &lt;node1&gt; 从集群中删除。
 
 ```bash
 riak-admin cluster force-replace <node1> <node2>
 ```
 
+### 暂存命令
 
-### Staging Commands
-
-The following commands are used to work with staged changes:
+下列命令用来暂存变动。
 
 #### cluster plan
-Display the currently staged cluster changes.
+
+显示目前暂存的变动。
 
 ```bash
 riak-admin cluster plan
 ```
 
 #### cluster clear
-Clear the currently staged cluster changes.
+
+清除目前暂存的集群变动。
 
 ```bash
 riak-admin cluster clear
 ```
 
 #### cluster commit
-Commit the currently staged cluster changes. Staged cluster changes must be reviewed with `riak-admin cluster plan` prior to being committed.
+
+提交目前暂存的集群变动。在提交之前，必须先执行 `riak-admin cluster plan` 命令审查变动。
 
 ```bash
 riak-admin cluster commit
 ```
 
-
 ## join
 
-<div class="note"><div class="title">Deprecation Notice</title></div>
-  <p>As of Riak version 1.2, the <tt>riak-admin join</tt> command has been deprecated in favor of the [[riak-admin cluster join|riak-admin Command Line#cluster-join]] command. The command can still be used by providing a <tt>-f</tt> option, however.</p>
+<div class="note">
+<div class="title">弃用说明</title></div>
+<p>从 Riak 1.2 开始，<tt>riak-admin join</tt> 弃用，换成了 [[riak-admin cluster join|riak-admin Command Line#cluster-join]] 命令。不过，如果指定 <tt>-f</tt> 选项还可以继续使用 <tt>riak-admin join</tt> 命令。</p>
 </div>
 
-Joins the running node to another running node so that they participate in the
-same cluster.
+合并两个运行中的节点，组成集群。
 
-* &lt;node&gt; is the other node to connect to.
-
+* &lt;node&gt; 是要连接的另一个节点。
 
 ```bash
 riak-admin join -f <node>
 ```
 
-
 ## leave
 
-<div class="note"><div class="title">Deprecation Notice</title></div>
-  <p>As of Riak version 1.2, the <tt>riak-admin leave</tt> command has been deprecated in favor of the new [[riak-admin cluster leave|riak-admin Command Line#cluster-leave]] command. The command can still be used by providing a <tt>-f</tt> option, however.</p>
+<div class="note">
+<div class="title">弃用说明</title></div>
+<p>从 Riak 1.2 开始，<tt>riak-admin leave</tt> 弃用，换成了 [[riak-admin cluster leave|riak-admin Command Line#cluster-leave]] 命令。不过，如果指定 <tt>-f</tt> 选项还可以继续使用 <tt>riak-admin leave</tt> 命令。</p>
 </div>
 
-
-Causes the node to leave the cluster in which it participates. After this is run, the node in question will hand-off all its replicas to other nodes in the cluster before it completely exits.
-
+从所在集群中删除节点。执行这个命令后，要删除的节点中所有的副本都会移交到集群中的其他节点，
+然后才被完全删除。
 
 ```bash
 riak-admin leave -f
 ```
 
-
 ## backup
 
-Backs up the data from the node or entire cluster into a file.
+把节点或整个集群中数据备份到一个文件中。
 
-* &lt;node&gt; is the node from which to perform the backup.
-* &lt;cookie&gt; is the Erlang cookie/shared secret used to connect to the node.
-This is "riak" in the [[default configuration|Configuration Files#\-setcookie]].
-* &lt;filename&gt; is the file where the backup will be stored. _This should be
-the full path to the file._
-* [node|all] specifies whether the data on this node or the entire cluster will
-be backed up, respectively.
 
+* &lt;node&gt; 是在其上执行备份操作的节点名字
+* &lt;cookie&gt; 是用来连接到节点的 Erlang cookie 或共享密匙。[[默认设置|Configuration Files#\-setcookie]]为“riak”
+* &lt;filename&gt; 是存储备份数据的文件。应该指定文件的完整路径
+* [node|all] 指定要备份所在节点还是整个集群的数据
 
 ```bash
 riak-admin backup <node> <cookie> <filename> [node|all]
 ```
 
-
 ## restore
 
-Restores data to the node or cluster from a previous backup.
+从备份中恢复节点或集群。
 
-* &lt;node&gt; is the node which will perform the restore.
-* &lt;cookie&gt; is the Erlang cookie/shared secret used to connect to the node.
-By default this is set to "riak" in the [[vm.args|Configuration Files#vm.args]] configuration file.
-* &lt;filename&gt; is the file where the backup is stored. _This should be the
-full path to the file._
+* &lt;node&gt; 是在其上执行恢复操作的节点名字
+* &lt;cookie&gt; 是用来连接到节点的 Erlang cookie 或共享密匙。[[vm.args|Configuration Files#vm.args]] 文件中的默认值是 “riak”
+* &lt;filename&gt; 是存储备份数据的文件。应该指定文件的完整路径
 
 ```bash
 riak-admin restore <node> <cookie> <filename>
@@ -167,7 +167,7 @@ riak-admin restore <node> <cookie> <filename>
 
 ## test
 
-Runs a test of a few standard Riak operations against the running node.
+在节点中运行一系列 Riak 标准操作进行测试。
 
 ```
 riak-admin test
@@ -175,10 +175,9 @@ riak-admin test
 
 ## reip
 
-_This will likely be removed in future versions. Instead use `riak-admin cluster replace`._
+_这个命令未来极有可能会删除。请使用 `riak-admin cluster replace`。_
 
-Renames a node. The current ring state will be backed up in the process. **The
-node must NOT be running for this to work.**
+这个命令的最用是重命名节点。在这个过程中会备份环的状态。**要想操作成功，节点一定不能处于运行状态。**
 
 ```bash
 riak-admin reip <old nodename> <new nodename>
@@ -186,9 +185,8 @@ riak-admin reip <old nodename> <new nodename>
 
 ## js-reload
 
-Forces the embedded Javascript virtual machines to be restarted. This is useful
-when deploying new custom built-in [[MapReduce|Using MapReduce]] functions. (_This needs to be
-run on all nodes in the cluster_.)
+强制内嵌的 JavaScript 虚拟机重启。这个命令在部署新的自定义 [[MapReduce|Using MapReduce]] 功能是很有用。
+（_这个命令要在集群中所有节点上运行。_）
 
 ```bash
 riak-admin js-reload
@@ -196,7 +194,7 @@ riak-admin js-reload
 
 ## services
 
-Lists available services on the node (e.g. **riak_kv**)
+列出节点上可用的服务。（例如 **riak_kv**）
 
 ```bash
 riak-admin services
@@ -204,9 +202,8 @@ riak-admin services
 
 ## wait-for-service
 
-Waits on a specific watchable service to be available (typically _riak_kv_).
-This is useful when (re-)starting a node while the cluster is under load. Use
-"services" to see what services are available on a running node.
+等待所关注的服务可用（一般是 _riak_kv_）。这个命令在集群负载未满时启动或重启节点时很有用。
+执行 `services` 命令可以查看节点上可用的服务。
 
 ```
 riak-admin wait-for-service <service> <nodename>
@@ -214,9 +211,8 @@ riak-admin wait-for-service <service> <nodename>
 
 ## ringready
 
-Checks whether all nodes in the cluster agree on the ring state. Prints "FALSE"
-if the nodes do not agree. This is useful after changing cluster membership to
-make sure that ring state has settled.
+检查集群中所有节点是否都使用了同一个环状态。如果不相同，会显示“FALSE”。在集群成员
+变动后，检查环状态是否安置时很有用。
 
 ```bash
 riak-admin ringready
@@ -224,9 +220,7 @@ riak-admin ringready
 
 ## transfers
 
-Identifies nodes that are awaiting transfer of one or more partitions. This
-usually occurs when partition ownership has changed (after adding or removing a
-node) or after node recovery.
+识别等待转移一个或多个分区的节点。这种情况一般发生在改变分区所有权（添加或删除节点）或还原节点后。
 
 ```bash
 riak-admin transfers
@@ -234,7 +228,7 @@ riak-admin transfers
 
 ## transfer-limit
 
-Change the handoff_concurrency limit.
+修改 handoff_concurrency 限制值。
 
 ```bash
 riak-admin transfer-limit <node> <limit>
@@ -243,11 +237,14 @@ riak-admin transfer-limit <node> <limit>
 ## force-remove
 
 <div class="note">
-<div class="title">Deprecation Notice</title></div>
-As of Riak version 1.2, the <tt>riak-admin force-remove</tt> command has been deprecated in favor of the new [[riak-admin cluster force-remove|riak-admin Command Line#cluster-force-remove]] command. The command can still be used by providing a <code>-f</code> option, however.
+<div class="title">弃用说明</div>
+<p>从 Riak 1.2 开始，<tt>riak-admin force-remove</tt> 弃用，换成了 [[riak-admin cluster force-remove|riak-admin Command Line#cluster-force-remove]] 命令。不过，如果指定 <code>-f</code> 选项，还可以继续使用 <tt>riak-admin force-remove</tt> 命令。</p>
 </div>
 
-Immediately removes a node from the cluster without ensuring handoff of its replicas. This is a dangerous command, and is designed to only be used in cases were the normal, safe leave behavior cannot be used -- e.g. when the node you are removing had a major hardware failure and is unrecoverable. Using this command will result in a loss of all replicas living on the removed node which will then need to be recovered through other means such as [[read repair|Replication#Read-Repair]]. It's recommended that you use the [[riak-admin leave|riak-admin Command Line#leave]] command whenever possible.
+不移交副本，直接从集群中删除节点。这个命令很危险，适用于常规、安全的删除方法无法使用的情况，
+例如要删除的节点出现了硬件问题，无法恢复。使用这个命令会导致要删除的节点上所有数据都丢失，
+必须使用其他方法，例如[[读取修复|Replication#Read-Repair]]，进行复原。只要可以，就建议
+使用 [[riak-admin leave|riak-admin Command Line#leave]] 命令。
 
 ```bash
 riak-admin force-remove -f <node>
@@ -255,8 +252,7 @@ riak-admin force-remove -f <node>
 
 ## down
 
-Marks a node as down so that ring transitions can be performed before the node is brought back online.
-
+把节点标记为下线状态，这样在重新上线之前可以进行环转换操作。
 
 ```bash
 riak-admin down <node>
@@ -264,44 +260,43 @@ riak-admin down <node>
 
 ## cluster-info
 
-Output system information from a Riak cluster. This command will collect
-information from all nodes or a subset of nodes and output the data to a single
-text file.
+显示 Riak 集群的信息。这个命令会收集集群中所有节点或部分节点的信息，
+然后把结果输出到一个文本文件中。
 
-The following information is collected:
+这个命令会输出以下信息：
 
- * Current time and date
- * VM statistics
- * erlang:memory() summary
- * Top 50 process memory hogs
- * Registered process names
- * Registered process name via regs()
- * Non-zero mailbox sizes
- * Ports
- * Applications
- * Timer status
- * ETS summary
- * Nodes summary
- * net_kernel summary
- * inet_db summary
- * Alarm summary
- * Global summary
- * erlang:system_info() summary
- * Loaded modules
- * Riak Core config files
- * Riak Core vnode modules
- * Riak Core ring
- * Riak Core latest ring file
- * Riak Core active partitions
- * Riak KV status
- * Riak KV ringready
- * Riak KV transfers
+ * 当前时间和日期
+ * VM 统计数据
+ * erlang:memory() 概况
+ * 前 50 个占用内存最多的进程
+ * 注册的进程名字
+ * 使用 regs() 注册的进程名字
+ * 收件箱大小
+ * 端口
+ * 程序
+ * 计时器状态
+ * ETS 概况
+ * 节点概况
+ * net_kernel 概况
+ * inet_db 概况
+ * 警报概况
+ * 全局概况
+ * erlang:system_info() 概况
+ * 加载的模块
+ * Riak Core 设置文件
+ * Riak Core 虚拟节点模块
+ * Riak Core 环
+ * Riak Core 最新的环文件
+ * Riak Core 激活的分区
+ * Riak KV 状态
+ * Riak KV 环准备状态
+ * Riak KV 转移
 
 ```bash
 riak-admin cluster_info <output file> [<node list>]
 ```
 
-Examples:
+示例：
 
 ```bash
 # Output information from all nodes to /tmp/cluster_info.txt
@@ -321,7 +316,7 @@ riak@192.168.1.11
 
 ## member-status
 
-Prints the current status of all cluster members.
+输出集群全部成员的当前状态。
 
 ```bash
 riak-admin member-status
@@ -329,8 +324,7 @@ riak-admin member-status
 
 ## ring-status
 
-Outputs the current claimant, its status, ringready, pending ownership handoffs
-and a list of unreachable nodes.
+输出当前集群的状态，环准备状态，待进行的所有权移交，以及无法访问的节点列表。
 
 ```bash
 riak-admin ring-status
@@ -338,7 +332,7 @@ riak-admin ring-status
 
 ## vnode-status
 
-Outputs the status of all vnodes the are running on the local node.
+输出本地节点上所有虚拟节点的状态。
 
 ```bash
 riak-admin vnode-status
@@ -347,40 +341,37 @@ riak-admin vnode-status
 {{#1.3.0+}}
 ## aae-status
 
-This command provides insight into operation of Riak's Active Anti Entropy
-(AAE) feature.
+这个命令会详细说明 Riak Active Anti Entropy（AAE）功能的操作。
 
 ```
 riak-admin aae-status
 ```
 
-The output contains information on AAE key/value partition exchanges,
-entropy tree building, and key repairs which were triggered by AAE.
+这个命令会输出关于 AAE 键值对分区交换、构建熵树和由 AEE 导致的键修复等信息。
 
-* **Exchanges**
- * The *Last* column lists when the most recent exchange between a partition and one of its sibling replicas was performed.
- * The *All* column shows how long it has been since a partition exchanged with all of its sibling replicas.
+* **交换**
+ * *Last* 列显示最近一次分区和兄弟副本交换的时间
+ * *All* 显示分区和所有兄弟副本交换持续了多长时间
 
-* **Entropy Trees**
- * The *Built* column shows when the hash trees for a given partition were created.
+* **熵树**
+ * *Built* 列显示指定分区的哈希树是什么时候创建的
 
-* **Keys Repaired**
- * The *Last* column shows the number of keys repaired during the most
-   recent key exchange.
- * The *Mean* column shows the mean number of keys repaired during all
-   key exchanges since the last node restart.
- * The *Max* column shows the maximum number of keys repaired during all
-   key exchanges since the last node restart.
+* **键修复**
+ * *Last* 列显示最近一次键交换时修复的键数量
+ * *Mean* 列显示自上一次节点启动以来，所有键交换时修复的键数量均值
+ * *Max* 列显示自上一次节点启动以来，所有键交换时修复的键数量最大值
 
-<div class="info">All AAE status information is in-memory and is reset across a node restart. Only tree build times are persistent (since trees themselves are persistent).</div>
+<div class="info">
+所有 AAE 状态信息都储存在内存中，节点重启后会重设。只有构建树的时间会永久保存（因为树本身就会永久保存）。
+</div>
 
-More details on the `aae-status` command are available in the
-[Riak version 1.3 release notes](https://github.com/basho/riak/blob/1.3/RELEASE-NOTES.md#active-anti-entropy).
+`aae-status` 命令更详细的说明可以
+阅读 [Riak 1.3 的发布说明](https://github.com/basho/riak/blob/1.3/RELEASE-NOTES.md#active-anti-entropy)。
 {{/1.3.0+}}
 
 ## diag
 
-Run diagnostic checks against &lt;node&gt;. {{#<1.3.0}}[riaknostic](http://riaknostic.basho.com/) must be installed in order to run.{{/<1.3.0}}
+诊断 &lt;node&gt;。{{#<1.3.0}}必须先安装 [riaknostic](http://riaknostic.basho.com/) 才能执行这个命令。{{/<1.3.0}}
 
 ```bash
 riak-admin diag <check>
@@ -388,11 +379,9 @@ riak-admin diag <check>
 
 ## status
 
-Prints status information, including performance statistics, system health
-information, and version numbers. The statistics-aggregator must be enabled in
-the [[configuration|Configuration Files#riak_kv_stat]] for this to work. Further
-information about the output is available [[here|Inspecting a Node]].
-
+显示状态信息，包括性能统计、系统健康信息和版本数字。
+必须在[[设置|Configuration Files#riak_kv_stat]]中启用才能使用这个命令。关于这个命令
+的输出，请阅读[[这篇文章|Inspecting a Node]]。
 
 ```bash
 riak-admin status
@@ -401,36 +390,30 @@ riak-admin status
 {{#1.3.1+}}
 ## reformat-indexes
 
-This command reformats integer indexes in Secondary Index data for versions
-of Riak prior to 1.3.1 so that range queries over the indexes will return
-correct results.
+这个命令会在 Riak 1.3.1 之前版本中重建二级索引的整数索引，这样范围查询才能返回正确地结果。
 
 ```
 riak-admin reformat-indexes [<concurrency>] [<batch size>] --downgrade
 ```
 
-The `concurrency` option defaults to *2* and controls how many partitions are
-concurrently reformatted.
+`concurrency` 选项的默认值是 *2*，设定并发重建索引的分区数量。
 
-The `batch size` option controls the number of simultaneous key operations
-and defaults to *100*.
+`batch size` 选项设定同时进行的键操作数量，默认值为 *100*。
 
-The command can be executed while the node is serving requests, and default
-values are recommended for most cases. You should only change the default
-values after testing impact on cluster performance.
+这个命令可以在节点接受请求时执行，大多数情况下，选项的值都建议使用默认值。只有测试对集群性能
+的影响时才应该修改默认值。
 
-Information is written to `console.log` upon completion of the process.
+命令完成后会把结果写到 `console.log` 中。
 
-A `--downgrade` switch can be specified when downgrading a node to a version
-of Riak prior to version 1.3.1.
+`--downgrade` 用来把节点所用 Riak 的版本降级 到 1.3.1 之前的版本。
 
-Additional details are available in the
-[Riak 1.3.1 release notes](https://github.com/basho/riak/blob/1.3/RELEASE-NOTES.md).
+更多信息请阅读 [Riak 1.3.1 的发布说明](https://github.com/basho/riak/blob/1.3/RELEASE-NOTES.md)。
 {{/1.3.1+}}
 
 ## top
 
-Top provides information about what the Erlang processes inside of Riak are doing. Top reports process reductions (an indicator of CPU utilization), memory used and message queue sizes
+这个命令可以显示 Riak 中 Erlang 进程正在做什么，包括进程还原（CPU 利用率的指标之一），
+内存用量和消息队列的大小。
 
 ```bash
 riak-admin top
