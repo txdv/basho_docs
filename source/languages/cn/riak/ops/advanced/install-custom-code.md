@@ -8,40 +8,37 @@ audience: advanced
 keywords: [operators, code, erlang, javascript]
 ---
 
-Riak supports the use of Erlang named functions in compiled modules for
-[[pre/post-commit hooks|Advanced Commit Hooks]], and MapReduce operations. This
-doc contains installation steps with simple examples for each use case.
+Riak 允许在编译好的模块中使用 Erlang 函数做 [[pre/post-commit 钩子|Advanced Commit Hooks]]，
+还可以使用 Erlang 函数进行 MapReduce 操作。这篇文档会介绍这两种情况的安装步骤。
 
-Your developers can compile [[custom erlang code|Advanced Commit Hooks]], which
-they can send to you as a *beam* file. You should note that in Erlang, a file
-name must have the same name the module. So if you are given a file named
-`validate_json.beam`, do not rename it.
+开发者可以编译[[自己编写的 Erlang 代码|Advanced Commit Hooks]]，然后以 *beam* 格式分发。
+请注意，在 Erlang 中文件的名字必须和模块名一样。所以，如果为文件起好了名字 `validate_json.beam`，
+就不要轻易修改。
 
-*Note: The [[Configure|Installing Custom Code#Configure]] step (`add_paths`) also applies to installing JavaScript files.*
+*注意：[[设置|Installing Custom Code#Configure]]这一步也可用于安装 JavaScript 文件。*
 
-### Compiling
+### 编译
 
-If you have been given Erlang code and are expected to compile it for
-your developers, keep the following notes in mind.
+如果有一些 Erlang 代码想编译，请谨记下面的说明。
 
-<div class="info"><div class="title">Note on the Erlang Compiler</div> You
-must use the Erlang compiler (<tt>erlc</tt>) associated with the Riak
-installation or the version of Erlang used when compiling Riak from source.
-For packaged Riak installations, you can consult Table 1 below for the
-default location of Riak's <tt>erlc</tt> for each supported platform.
-If you compiled from source, use the <tt>erlc</tt> from the Erlang version
-you used to compile Riak.</div>
+<div class="info">
+<div class="title">Note on the Erlang Compiler</div>
+必须使用 Riak 附带的 Erlang 编译器（<tt>erlc</tt>）。如果是从源码安装的 Riak，则必须使用
+和编译 Riak 源码时使用的 Erlang 编译器相同的版本。如果使用安装包安装，可以查看下面的表格 1，
+找到所支持平台上 Riak <tt>erlc</tt> 存储的位置。如果从源码安装，请使用编译 Riak 时使用的
+ Erlang 编译器。
+</div>
 
 <table style="width: 100%; border-spacing: 0px;">
 <tbody>
 <tr align="left" valign="top">
-<td style="padding: 15px; margin: 15px; border-width: 1px 0 1px 0; border-style: solid;"><strong>CentOS &amp; RHEL Linux</strong></td>
+<td style="padding: 15px; margin: 15px; border-width: 1px 0 1px 0; border-style: solid;"><strong>CentOS 和 RHEL Linux</strong></td>
 <td style="padding: 15px; margin: 15px; border-width: 1px 0 1px 0; border-style: solid;">
 <p><tt>/usr/lib64/riak/erts-5.9.1/bin/erlc</tt></p>
 </td>
 </tr>
 <tr align="left" valign="top">
-<td style="padding: 15px; margin: 15px; border-width: 1px 0 1px 0; border-style: solid;"><strong>Debian &amp; Ubuntu Linux</strong></td>
+<td style="padding: 15px; margin: 15px; border-width: 1px 0 1px 0; border-style: solid;"><strong>Debian 和 Ubuntu Linux</strong></td>
 <td style="padding: 15px; margin: 15px; border-width: 1px 0 1px 0; border-style: solid;">
 <p><tt>/usr/lib/riak/erts-5.9.1/bin/erlc</tt></p>
 </td>
@@ -67,40 +64,33 @@ you used to compile Riak.</div>
 </tbody>
 </table>
 
-Table 1: Erlang compiler executable location for packaged Riak installations
-         on supported platforms
+表格 1：在所支持的系统中使用安装包安装 Riak 后 Erlang 编译器存放的位置
 
-Compiling the module is a straightforward process.
+模块的编译很简单。
 
 ```text
 erlc validate_json.erl
 ```
 
-Next, you'll need to define a path from which compiled modules can be stored
-and loaded. For our example, we'll use a temporary directory `/tmp/beams`,
-but you should choose a directory for production functions based on your
-own requirements such that they will be available where and when needed.
+接着，需要制定一个位置，用来保存编译的模块。例如，我们使用临时文件夹 `/tmp/beams`，不过
+要选择一个文件夹存放生产环境中用到的函数，这样在需要使用时才能找到。
 
-<div class="info">Ensure that the directory chosen above can be read by
-the <tt>riak</tt> user.</div>
+<div class="info">确保所选的文件夹 <tt>riak</tt> 用户有读权限。</div>
 
-Successful compilation will result in a new `.beam` file,
-`validate_json.beam`.
+编译成功后会生成一个 `.beam` 文件，本例中是 `validate_json.beam`。
 
-### Configure
+<a name="Configure"></a>
+### 设置
 
-Take the `validate_json.beam` and copy this file to the `/tmp/beams` directory.
+把 `validate_json.beam` 复制到 `/tmp/beams` 文件夹中。
 
 ```text
 cp validate_json.beam /tmp/beams/
 ```
 
-After copying the compiled module into `/tmp/beams/`, you must update
-`app.config` and configure Riak to allow loading of compiled modules from
-the directory where they're stored (again in our example case, `/tmp/beams`).
+复制完成后，必须修改 `app.config`，运行 Riak 从这个文件夹加载编译的模块。
 
-Edit `app.config` and insert an `add_paths` setting into the `riak_kv`
-section as shown:
+编辑 `app.config`，在 `riak_kv` 区加入 `add_paths` 设置，如下所示：
 
 ```erlang
 {riak_kv, [
@@ -109,13 +99,10 @@ section as shown:
   %% ...
 ```
 
-After updating `app.config`, Riak must be restarted. In production cases, you
-should ensure that if you are adding configuration changes to multiple nodes,
-that you do so in a rolling fashion, taking time to ensure that the Riak key
-value store has fully initialized and become available for use.
+更新 `app.config` 后，必须重启 Riak。在生产环境中，如果要修改多个节点的设置，必须滚动
+进行，花点时间确保 Riak 的键值对存储完全初始化可以使用了。
 
-This is done with the `riak-admin wait-for-service` command as detailed
-in the [[Commands documentation|riak-admin Command Line#wait-for-service]].
+这个操作可以使用 `riak-admin wait-for-service` 命令完成，
+详情参照 [[Commands documentation|riak-admin Command Line#wait-for-service]]。
 
-<div class="note">It is important that you ensure riak_kv is
-active before restarting the next node.</div>
+<div class="note">在重启下一个节点之前一定要确保 riak_kv 正在运行。</div>

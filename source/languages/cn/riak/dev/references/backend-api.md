@@ -7,19 +7,15 @@ toc: true
 keywords: [api, backends]
 ---
 
-Riak's storage API uniformly applies to all of the
-[[supported backends|Choosing a Backend]]. This page presents the details of
-the storage backend API in the form of
-[Erlang type specifications](http://www.erlang.org/doc/reference_manual/typespec.html)
-(specs).
+Riak 存储 API 可用于全部[[支持的后台|Choosing a Backend]]。本页
+[以 Erlang 类型规格表](http://www.erlang.org/doc/reference_manual/typespec.html)
+的形式列出了存储后台 API 的详细信息。
 
-Specs are used by [dialyzer](http://www.erlang.org/doc/man/dialyzer.html),
-an Erlang static analysis tool. It is recommended to copy these specs into any
-custom backend modules and use them as a guide for development to
-avoid errors and ensure full compatibility with Riak.
+规格表用于 [dialyzer](http://www.erlang.org/doc/man/dialyzer.html)，Erlang 的静态
+分析工具。建议把这份规格表复制到任何一个自定义的后台模块中，作为开发时的参考，避免出现错误，
+也能确保完全能和 Riak 兼容。
 
-Also included below is the function export list that can be pasted directly
-into a custom storage backend module.
+下面还列出了函数导出列表，可以直接粘贴到自定义存储后台模块中。
 
 ```erlang
 %% Riak Storage Backend API

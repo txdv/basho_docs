@@ -8,46 +8,37 @@ audience: advanced
 keywords: [operator, proxy]
 ---
 
-The recommended best practice mode of production Riak operation suggests
-placing Riak behind a load balancing or proxy solution, either hardware or
-software based, and never exposing Riak directly to public network interfaces.
+生产环境中推荐使用的最佳实践是把 Riak 放在负载平衡系统或代理之后，这个系统可以是硬件也可以
+是软件，总之不要直接把 Riak 暴漏给公开的网络接口。
 
-Riak users have reported success in using Riak with a variety of load
-balancing and proxy solutions. Common solutions include proprietary hardware
-based load balancers, cloud based load balancing options, such as Amazon's
-Elastic Load Balancer, and open source software based projects like HAProxy
-and Nginx.
+Riak 用户反馈，在很多负载平衡和代理系统中成功使用了 Riak。常见的方法有，使用专有的硬件负载
+平衡系统，基于云存储的负载平衡（例如 Amazon 的 Elastic），以及开源的软件，
+例如 HAProxy 和 Nginx。
 
-This guide briefly explores the commonly used open source software based
-solutions HAProxy and Nginx, and provides some configuration and operational
-tips gathered from community users and operations oriented engineers at Basho.
+本文简单介绍了常用的开源软件 HAProxy 和 Nginx，以及从社区用户和 Basho 的工程师那里收集
+的设置和操作上的小贴士。
 
-While it is by no means an exhaustive overview of the topic, this guide should
-provide a starting point for choosing and implementing your own solution.
+本文不会深入讨论，知识做个入门说明，介绍如何选择适合自己的解决方案。
 
 ## HAProxy
 
-[HAProxy](http://haproxy.1wt.eu/) is a fast and reliable open source solution
-for load balancing and proxying of HTTP and TCP based application traffic.
+[HAProxy](http://haproxy.1wt.eu/) 是个快速且可靠的开源软件，可以警醒负载平衡及
+代理 HTTP 和 TCP 流量。
 
-Users have reported success in using HAProxy in combination with Riak in a
-number of configurations and scenarios. Much of the information and example
-configuration for this section is drawn from experiences of users in the
-Riak community in addition to suggestions from Basho engineering.
+很多用户都说，他们成功的在 Riak 中使用了 HAProxy。这里介绍的示例设置来社区用户的经验，
+外加 Basho 工程师的建议。
 
-### Example Configuration
+### 设置示例
 
-The following is an example starting point configuration for HAProxy to act
-as a load balancer to a 4 node Riak cluster for access by clients using
-the protocol buffers and HTTP interfaces.
+下面的例子说明了如何在一个有 4 个节点的集群中使用 HAProxy 做负载平衡，以便客户端
+从 Protocol Buffers 和 HTTP 接口访问 Riak。
 
-<div class="info">The operating system's open files limits need to be
-  greater than 256000 for the example configuration that follows. Consult
-  the [[Open Files Limit]] documentation for details on
-  configuring the value for different operating systems.</div>
+<div class="info">
+这个例子要求系统的打开文件限制大于 256000。
+请阅读 [[Open Files Limit]] 了解如何在各种系统上修改这个限制值。
+</div>
 
 ```
-
 global
         log 127.0.0.1     local0
         log 127.0.0.1     local1 notice
@@ -106,61 +97,48 @@ frontend riak_protocol_buffer
        default_backend    riak_protocol_buffer_backend
 ```
 
-Note that the above example is considered a starting point and is a work
-in progress based upon [this example](https://gist.github.com/1507077). You
-should carefully examine the configuration and change it according to your
-specific environment.
+注意，上面的示例只是一个初始设置，基于[这个例子](https://gist.github.com/1507077)。
+你应该仔细的检查设置，根据自己的环境适当修改。
 
-### Maintaining Nodes Behind HAProxy
+### 使用 HAProxy 维护节点
 
-When using HAProxy with Riak, you can instruct HAProxy to ping each node in
-the cluster and automatically remove nodes which do not respond.
+在 Riak 中使用 HAProxy 后，可以通过 HAProxy 向集群中的每个节点发送 Ping 请求，如果
+没有得到响应就自动把对应的节点删除。
 
-You can also specify a round robin configuration in HAProxy and have your
-application handle connection failures by retrying after a timeout, thereby
-reaching a functioning node upon retrying the connection attempt.
+还可以在 HAProxy 中做个循环设置，应用程序连接失败后等待一段时间再尝试连接，这样就能通过不断
+重试连接到一个可用的节点。
 
-HAPproxy also has a standby system you can use to remove a node from rotation
-while allowing existing requests to finish. You can remove nodes from
-HAProxy directly from the command line by interacting with the HAProxy stats
-socket with a utility such as
-[socat](http://www.dest-unreach.org/socat/):
+HAPproxy 还有一个静止系统，在请求完成后从循环中删除节点。当然，还可以在 HAProxy 的命令行
+中检查状态 socket，使用工具直接删除节点，例如 [socat](http://www.dest-unreach.org/socat/)：
 
     echo "disable server <backend>/<riak_node>" | socat stdio /etc/haproxy/haproxysock
 
-At this point, you can perform maintenance on the node, down the node, and
-so on. When you've finished working with the node and it is again available
-for requests, you can re-enable the node:
+此时，可以维护节点，下线节点等。等这些操作完成后，节点就可以重新上线，接受请求：
 
     echo "enable server <backend>/<riak_node>" | socat stdio /etc/haproxy/haproxysock
 
+请阅读下面的文档，查看如何在你所用的环境中设置 HAProxy：
 
-Consult the following HAProxy documentation resources for more information on
-configuring HAProxy in your environment:
-
-* [HAProxy Documentation](http://code.google.com/p/haproxy-docs/w/list)
-* [HAProxy Architecture](http://haproxy.1wt.eu/download/1.2/doc/architecture.txt)
+* [HAProxy 文档](http://code.google.com/p/haproxy-docs/w/list)
+* [HAProxy 架构](http://haproxy.1wt.eu/download/1.2/doc/architecture.txt)
 
 ## Nginx
 
-Some users have reported success in using the [Nginx](http://nginx.org/) HTTP
-server to proxy requests for Riak clusters. An example that provides access
-to a Riak cluster *through GET requests only* is provided here for reference.
+有些用户报告说，成功的在 Riak 集群中使用了 [Nginx](http://nginx.org/) 这个 HTTP 服务器
+代理请求。下面的例子只介绍了如何通过 GET 请求访问 Riak 集群。
 
-### Example Configuration
+### 设置示例
 
-The following is an example starting point configuration for Nginx to act
-as a front end proxy to a 5 node Riak cluster.
+下面是个初始设置，可以把 Nginx 作为有 5 个节点集群的前端代理。
 
-This example forwards all GET requests to Riak nodes while rejecting all other
-HTTP operations.
+这个例子转发了所有发到 Riak 节点上的 GET 请求，并拒绝其他类型的请求。
 
-<div class="note"><div class="title">Nginx version notes</div> This example
-configuration was verified on <strong>Nginx version 1.2.3</strong>. Please be
-aware that early versions of Nginx did not support any HTTP 1.1 semantics for
-upstream communication to backends. You should carefully examine this
-configuration and make changes appropriate to your specific environment
-before attempting to use it.</div>
+<div class="note">
+<div class="title">注意 Nginx 的版本</div>
+这里例子证实在 <strong>Nginx 1.2.3</strong> 上可用。注意，较早的版本
+不支持 HTTP 1.1 和后端进行的上游通讯。因此在使用之前要仔细检查这些设置，并根据所用环境
+做适当修改。
+</div>
 
 ```
 upstream riak_hosts {
@@ -216,22 +194,19 @@ server {
 }
 ```
 
-<div class="note"><div class="title">Note</div>
-Even when filtering and limiting requests to GETs only as done in the example,
-you should strongly consider additional access controls beyond what Nginx can
-provide directly, such as specific firewall rules to limit inbound connections
-to trusted sources.</div>
+<div class="note">
+<div class="title">注意</div>
+虽然这个例子中过滤并限制只能处理 GET 请求，你应该使用 Nginx 之外的系统做其他的访问限制，
+例如使用防火墙限制入站连接只接受可信源。
+</div>
 
-### Querying Secondary Indexes Over HTTP
+### 通过 HTTP 执行二级索引查询
 
-When accessing Riak over HTTP and issuing Secondary Index queries, you
-can encounter an issue due to the default Nginx handling of HTTP header
-names containing underscore (`_`) characters.
+通过 HTTP 访问 Riak 及发起二级索引查询时，可能会遇到一个问题，这个问题的原因在于 Nginx 对
+包含下划线的报头的处理方式。
 
-By default, Nginx will issue errors for such queries, but you can instruct
-Nginx to handle such header names when doing Secondary Index queries over
-HTTP by adding the following directive to the appropriate `server` section
-of `nginx.conf`:
+默认情况下，Nginx 会对这种查询报错，不过可以在通过 HTTP 执行二级索引查询时让 Nginx 处理
+这种报头名，把下面的设置加入 `nginx.conf` 文件的 `server` 区即可：
 
 ```
 underscores_in_headers on;

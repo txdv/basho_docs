@@ -12,80 +12,60 @@ next: "[[LevelDB]]"
 interest: false
 ---
 
-## Overview
+## 概览
 
-[Bitcask](https://github.com/basho/bitcask) is an Erlang application that
-provides an API for storing and retrieving key/value data into a log-structured
-hash table that provides very fast access. The
-[design](http://downloads.basho.com/papers/bitcask-intro.pdf) owes a lot to the
-principles found in log-structured file systems and draws inspiration from a
-number of designs that involve log file merging.
+[Bitcask](https://github.com/basho/bitcask) 是一个 Erlang 程序，提供了 API 把键值对
+存储在日志结构的哈希表中，速度非常快。其设计借鉴了很多日志结构文件系统的原则，也受到了日志
+文件合并的启发。
 
-### Strengths:
+### 优点
 
-  * Low latency per item read or written
+  * 各条目读写时迟延很低
 
-    This is due to the write-once, append-only nature of the Bitcask database
-    files.
+    因为 Bitcask 数据库文件“只写入一次，而后附加”的特性
 
-  * High throughput, especially when writing an incoming stream of random items
+  * 高吞吐量，特别是把随机的条目写入输入流中时
 
-    Because the data being written doesn't need to be ordered on disk and
-    because the log structured design allows for minimal disk head movement
-    during writes these operations generally saturate the I/O and disk
-    bandwidth.
+    因为要写入的数据不需要在硬盘上排序，还因为日志结构的设计在写入时只需要最少得磁头移动，
+    磁头移动往往会用尽硬盘的 IO 和带宽
 
-  * Ability to handle datasets larger than RAM w/o degradation
+  * 无需降级即可处理比 RAM 更大的数据集
 
-    Because access to data in Bitcask is direct lookup from an in-memory hash
-    table finding data on disk is very effecient, even when data sets are very
-    large.
+    因为在 Bitcask 中获取数据时是直接查看内存中的哈希表来查找硬盘上的数据的，这种方式效率
+    很高，即使数据集很大也不怕
 
-  * Single Seek to Retrieve Any Value
+  * 读取任何数据只需单次寻道
 
-    Bitcask's in-memory hash-table of keys point directly to locations on disk
-    where the data lives. Bitcask never uses more than one disk seek to read a
-    value and sometimes, due to file-system caching done by the operating
-    system, even that isn't necessary.
+    Bitcask 在内存中保存的键哈希表直接指明了数据在硬盘上的位置，因此读取数据时磁盘寻道
+    从来不会超过一次，某些情况下，因为操作系统的文件系统有缓存，甚至一次都不用
 
-  * Predictable Lookup _and_ Insert Performance
+  * 可预测的查询和插入性能
 
-    As you might expect from the description above, read operations have a
-    fixed, predictable behavior. What you might not expect is that this is
-    also true for writes. Write operations are at most a seek to the end of
-    the current file open writing and an append to that file.
+    从上面的说明可以看出，读取操作的方式是固定可预测的。你可能没发现，这种特性对写入操作
+    同样有效。写入操作只要找到当前打开文件的末尾，把数据附加其后即可
 
-  * Fast, bounded Crash Recovery
+  * 快速、有限制的恢复
 
-    Due to the append-only write once nature of Bitcask files, recovery is easy
-    and fast. The only items that might be lost are partially written records
-    at the tail of the file last opened for writes. Recovery need only review
-    the last record or two written and verify CRC data to ensure that the data
-    is consistent.
+    因为“只写入一次，而后附加”的特性，恢复的过程异常简单而且快速。唯一会丢失的数据是上次
+    打开文件写入末尾的记录。恢复时只要检查最后一到两个记录仪，确认 CRC 数据保证数据的一致性
 
-  * Easy Backup
+  * 备份简单
 
-    In most systems backup can be very complicated but here again Bitcask
-    simplifies this process due to it's append-only write once disk format.
-    Any utility that archives or copies files in disk-block order will properly
-    backup or copy a Bitcask database.
+    在大多数系统中备份都很复杂，得益于“只写入一次，而后附加”，Bitcask 简化了这个过程。
+    任何能按照硬盘上的顺序存储或复制文件的工具都可以备份或复制 Bitcask 数据库
 
-### Weaknesses:
+### 缺点
 
-  * Keys Must Fit In Memory
+  * 键必须能装入内存
 
-    Bitcask keeps all keys in memory at all times, this means that your system
-    must have enough memory to contain your entire keyspace with room for other
-    operational components and operating system resident filesystem buffer
-    space.
+    Bitcask 总是把所有的键都保存在内存中，因此系统必须有足够大的内存才能放得下全部的键，
+    而且还要有余量处理其他操作和常驻内存的文件系统缓冲。
 
-## Installing Bitcask
+## 安装 Bitcask
 
-Riak ships with Bitcask included within the distribution. In fact it is the
-default storage engine and no separate installation is required.
+Riak 中就包含了 Bitcask。其实 Bitcask 是默认的存储引擎，无需再安装。
 
-The default configuration values found in the `app.config` for Bitcask are as
-follows:
+`app.config` 中针对 Bitcask 的默认设置如下：
 
 ```erlang
  %% Bitcask Config
@@ -94,19 +74,16 @@ follows:
            ]},
 ```
 
-## Configuring Bitcask
+## 设置 Bitcask
 
-Modify the default behavior by adding these settings into the `bitcask` section
-in your [[app.config|Configuration Files]].
+要想修改 Bitcask 的默认行为，请把下面的设置加入 [[app.config|Configuration Files]] 文件
+的 `bitcask` 区。
 
-### Open Timeout
+### 打开超时
 
-  The `open_timeout` setting specifies the maximum time Bitcask will block on
-  startup while attempting to create or open the data directory. The value is
-  in seconds and the default is `4`. You generally need not change this value.
-  If for some reason the timeout is exceeded on open you'll see a log message
-  of the form: `"Failed to start bitcask backend: ...`. Only then should you
-  consider a longer timeout.
+`open_timeout` 设置指定在尝试创建或打开数据文件夹时 Bitcask 允许使用的最长时间，单位
+为秒，默认值是 `4`。一般来说无需修改这个值。如果由于某些原因导致超时了，会在日志中看到
+消息：`"Failed to start bitcask backend: ...`。这时才需要设置一个较长的超时值。
 
 ```erlang
 {bitcask, [
@@ -116,29 +93,22 @@ in your [[app.config|Configuration Files]].
 ]}
 ```
 
-### Sync Strategy
+### 同步策略
 
-  The `sync_strategy` setting changes the durability of writes by specifying
-  when to synchronize data to disk. The default setting protects against data
-  loss in the event of application failure (process death) but leaves open a
-  small window wherein data could be lost in the event of complete system
-  failure (e.g. hardware, O/S, power).
+`sync_strategy` 设置何时把数据同步到硬盘来控制写入的持久性。默认的设置可以避免因应用程序
+出错导致数据丢失，但却有可能因为系统出错（例如 硬件问题，OS 问题，或者停电）导致其中的数据丢失。
 
-  The default mode, `none`, writes data into operating system buffers which
-  which will be written to the disks when those buffers are flushed by the
-  operating system. If the system fails (power loss, crash, etc.) before
-  before those buffers are flushed to stable storage that data is lost.
+默认的设置是 `none`，即在操作系统刷新缓存时，会把其中的数据写入硬盘。如果在刷新之前系统出
+问题了（停电，损毁等），数据就会丢失。
 
-  This is prevented by the setting `o_sync` which forces the operating system
-  to flush to stable storage at every write. The effect of flushing each
-  write is better durability, however write throughput will suffer as each
-  write will have to wait for the write to complete.
+设置为 `o_sync` 就可以强制每次写入缓冲后都摆数据存入硬盘。这样可以得到更好地持久性，不过写
+操作的吞吐量会增加，因为每次写入都要等待完全写入硬盘。
 
-  ___Available Sync Strategies___
+___可用的同步策略___
 
-  * `none` - (default) Lets the operating system manage syncing writes.
-  * `o_sync` - Uses the O_SYNC flag which forces syncs on every write.
-  * `{seconds, N}` - Riak will force Bitcask to sync every `N` seconds.
+* `none` - （默认值）交由操作系统管理同步写操作
+* `o_sync` - 使用 O_SYNC 旗标，强制每次写操作都要同步
+* `{seconds, N}` - Riak 会强制 Bitcask 每 `N` 秒同步一次
 
 ```erlang
 {bitcask, [
@@ -332,12 +302,11 @@ they are set higher, Bitcask will trigger merges where no files meet the
 thresholds, and thus never resolve the conditions that triggered
 merging.</p></div>
 
-#### Fold Keys Threshold
+#### 折叠键阈值
 
-Fold keys thresholds will reuse the keydir if another fold was started less
-than `max_fold_age` ago and there were less than `max_fold_puts` updates.
-Otherwise it will wait until all current fold keys complete and then start.
-Set either option to -1 to disable.
+如果另一个折叠在 `max_fold_age` 之前开始，而且有不超过 `max_fold_puts` 个更新，那么
+折叠键会重用键目录。否则就会等到所有当前的折叠键完成后再开始。把前面这两个设置设为 -1 则
+完全禁止折叠键。
 
 ```erlang
 {bitcask, [
@@ -348,14 +317,12 @@ Set either option to -1 to disable.
 ]}
 ```
 
-#### Automatic Expiration
+#### 自动过期
 
-By default, Bitcask keeps all of your data around. If your data has
-limited time-value, or if for space reasons you need to purge data, you can
-set the `expiry_secs` option. If you needed to purge data automatically
-after 1 day, set the value to `86400`.
+默认情况下，Bitcask 会保存所有数据。如果数据具有时效性，或者空间有限需要清除数据，那么就
+可以设定 `expiry_secs` 选项。如果要在一天后自动清除数据，请将其设为 `86400`。
 
-Default is: `-1` which disables automatic expiration
+默认值：`-1`，即禁用自动过期
 
 ```erlang
 {bitcask, [
@@ -365,21 +332,18 @@ Default is: `-1` which disables automatic expiration
 ]}
 ```
 
-<div class="note"><p>Space occupied by stale data <i>may not be reclaimed
-immediately</i>, but the data will become immediately inaccessible to client
-requests. Writing to a key will set a new modification timestamp on the value
-and prevent it from being expired.</p></div>
+<div class="note">
+<p>被过期数据占用的空间可能不会立马就能使用，但这些数据立即就无法请求。向键写入新的数据会
+修改时间戳，因此不会过期。</p>
+</div>
 
 {{#1.2.1+}}
 
-By default, Bitcask will trigger a merge whenever a data file contains
-an expired key. This may result in excessive merging under some usage
-patterns. To prevent this you can set the `expiry_grace_time` option.
-Bitcask will defer triggering a merge solely for key expiry by the
-configured number of seconds. Setting this to `3600` effectively limits
-each cask to merging for expiry once per hour.
+默认情况下，只要数据文件包含过期的键就会触发合并操作。某些情况下，会导致过多的合并。
+为了避免发生这样的事，可以设置 `expiry_grace_time` 选项。如果只是由于键过期，Bitcask 会
+延迟触发合并所设置的秒数。设置为 `3600` 可以有效限制每个桶每小时只进行一次合并。
 
-Default is: `0`
+默认值：`0`
 
 ```erlang
 {bitcask, [
@@ -391,121 +355,92 @@ Default is: `0`
 
 {{/1.2.1+}}
 
-## Tuning Bitcask
+## 调整 Bitcask
 
-Bitcask has many very desirable qualities and has been shown in production
-to be stable, reliable, low-latency and high throughput storage engine for Riak
-data.
+Bitcask 有很多令人满意的功能，在生产环境中已经证实其很稳定、很可靠，迟延小，吞吐量大。
 
-### Tips & Tricks:
+### 提示和技巧
 
-  * __Bitcask depends on filesystem caches__
+  * __Bitcask 依赖于文件系统的缓存__
 
-    Some data storage layers implement their own page/block buffer cache
-    in-memory, but Bitcask does not. Instead, it depends on the
-    filesystem's cache. Adjusting the caching characteristics of your
-    filesystem can impact performance.
+    某些数据存储层把页缓冲和块缓冲放在内存中，但 Bitcask 不是这样。Bitcask 依赖于文件系统
+    的缓存。调整文件系统的缓存可以影响 Bitcask 的性能。
 
-  * __Be aware of file handle limits__
+  * __注意文件句柄限制__
 
-    Review the [[open files limitations|Open-Files-Limit]] information.
+    请阅读“[[打开文件限制|Open-Files-Limit]]”一文了解详情。
 
-  * __Avoid the overhead of updating file metadata (such as last access time) on every read or write operation__
+  * __避免每次读写操作更新文件元数据的开销（例如上次访问时间）__
 
-    You can get a big speed boost by adding the `noatime` mounting option to
-    `/etc/fstab`. This will disable the recording of the "last accessed time"
-    for all files, which results in less disk head seeks. If you need last
-    access times but you'd like some of the benefits of this optimization
-    you can try `relatime`.
+    如果把 `noatime` 挂载选项加入 `/etc/fstab` 可以提速不少。设置后，所有文件都不会记录
+    “上次访问时间”，因此减少了磁头寻道时间。如果需要记录上次访问时间，但又想从这种优化措施
+    中受益，可以试一下 `relatime`。
 
     ```
     /dev/sda5    /data           ext3    noatime  1 1
     /dev/sdb1    /data/inno-log  ext3    noatime  1 2
     ```
 
-  * __Small number of frequently changed keys__
+  * __不要频繁修改键__
 
-    When keys are changed frequently, fragmentation rapidly increases. To
-    counteract this, one should lower the fragmentation trigger and threshold.
+    如果频繁修改键，分段数量会显著增多。为了避免这种情况，应该把片段触发和阈值设的小一点。
 
-  * __Limited disk space__
+  * __限制空间用量__
 
-    When disk space is limited, keeping the space occupied by dead keys limited
-    is of paramount importance. Lower the dead bytes threshold and trigger to
-    counteract wasted space.
+    如果限制了空间用量，控制死亡键占用的空间就显得尤为重要了。为了避免浪费空间，可以把死亡
+    键字节阈值和触发阈值设的小一点。
 
-  * __Purging stale entries after a fixed period__
+  * __定期清除过期数据__
 
-    To automatically purge stale values, set the `expiry_secs` value to the
-    desired cutoff time. Keys that are not modified for a period equal to or
-    greater than `expiry_secs` will become inaccessible.
+    如果要自动清除过期数据，请设置一个所需的 `expiry_secs` 值。
+    等于或超过 `expiry_secs` 时间没有修改的键就无法访问了。
 
-  * __High number of partitions per-node__
+  * __各节点的分区数多一些__
 
-    Because the cluster has many partitions running, this means Bitcask will
-    have many [[files open|Open-Files-Limit]]. To reduce the number of open
-    files, you might increase `max_file_size` so that larger files will be
-    written. You might also decrease the fragmentation and dead-bytes settings
-    and increase the `small_file_threshold` so that merging will keep the
-    number of open files small in number.
+    集群中分区越多，Bitcask 能[[打开的文件|Open-Files-Limit]]就越多。如果要减少打开文件
+    数，可以增加 `max_file_size`，写入更大的文件。还可以减少分段和死亡键设置，并
+    增加 `small_file_threshold`，这样合并操作会把打开文件数保持在一个很低的水平上。
 
-  * __High daytime traffic, low nighttime traffic__
+  * __白天流量多，晚上流量少__
 
-    In order to cope with a high volume of writes without performance
-    degradation during the day, one might want to prevent merging except in
-    non-peak periods. Setting the `merge_window` to hours of the day when
-    traffic is low will help.
+    为了复制大量写入卷而不降低性能，应该避免在高峰期进行合并操作。尽量把 `merge_window` 的
+    值设在一天中流量很低的时段。
 
-  * __Multi-cluster replication (Riak Enterprise)__
+  * __多集群副本（Riak Enterprise）__
 
-    If you are using Riak Enterprise with the replication feature enabled,
-    your clusters might experience higher production of fragmentation and dead
-    bytes caused by replays. Additionally, because the full-sync feature
-    operates across entire partitions, it will be made more efficient by
-    accessing data as sequentially as possible (across fewer files). Lowering
-    both the fragmentation and dead-bytes settings will improve performance.
+    如果 Riak Enterprise 激活了副本功能，集群可能会由于“重演”（replay）产生大量分段和
+    死亡字节。而且，因为完整同步会操作全部分区，尽量连续的访问数据（在较少的文件之间）可以
+    提高效率。减少分段和死亡字节设置可以提高性能。
 
 ## FAQ
 
-  * [[Why does it seem that Bitcask merging is only triggered when a Riak node is restarted?|Developing on Riak FAQs#why-does-it-seem-that-bitc]]
-  * [[If the size of key index exceeds the amount of memory, how does Bitcask handle it?|Operating Riak FAQs#if-the-size-of-key-index-e]]
-  * [[Bitcask Capacity Planning]] Guide
+  * [[为什么好像只有 Riak 节点重启时 Bitcask 才会进行合并？|Developing on Riak FAQs#why-does-it-seem-that-bitc]]
+  * [[如果键索引超出了内存大小，Bitcask 会怎么办？|Operating Riak FAQs#if-the-size-of-key-index-e]]
+  * [[Bitcask 容量规划|Bitcask Capacity Planning]]
 
-## Bitcask Implementation Details
+## Bitcask 的实现细节
 
-Riak will create a Bitcask database directory for each vnode in a cluster. In
-each of those directories there will be at most one database file open for
-writing at any given time. The file being written to will grow until it
-exceeds a size threshold at which time it is closed and a new ﬁle is created
-for additional writes. Once a ﬁle is closed, either purposefully or due to
-server exit, it is considered immutable and will never be opened for writing
-again.
+Riak 会为使用 Bitcask 数据库的虚拟节点创建一个文件夹。在每个文件夹中，一次最多只有一个
+数据库文件打开接受数据写入。写入的这个文件会一直保持打开只到其大小超过了某个值，然后会被
+关闭，系统再创建一个新文件接受写入操作。只要文件被关闭了，不管是有意的还是因为服务器出问题了，
+这个文件就无法再被修改，无法再次打开接受写入操作了。
 
-The file currently open for writes is only written by appending,
-which means that sequential writes do not require disk seeking dramatically
-speeding up disk I/O. Note that this can be spoiled when you still have
-`atime` enabled on your filesystem because the disk head will have to move to
-update both the data blocks and the file and directory meta data blocks. The
-primary speed-up from a log-based database is its ability to minimize disk head
-seeks. Deleting a value from Bitcask is a two step process. First we append
-a "tombstone" record to the file open for writes which indicates that a value
-was marked for deletion at that time. At the same time we remove references to
-that key in the in-memory `keydir` information.
+当前打开接受写入操作的文件只能把数据附加到文件末尾，也就是说，连续的写入不会明显增加
+硬盘的 IO 使用量。注意，如果文件系统启用了 `atime`，可能会破坏写入操作，因为硬盘磁头要在
+来回移动更新数据块和文件及文件夹的元数据块。基于日志的数据块其主要优势是可以最小化硬盘磁头的
+寻道时间。从 Bitcask 中删除数据分两步。首先，我们在打开的文件末尾加入一个“墓碑”记录，把值
+标记为删除。同时，我们从内存中的 `keydir` 中删除这个键的引用。
 
-Later, during a merge, non-active data files are scanned and only those values
-without tombstones are merged into the active data file. This effectively
-removes the obsolete data and reclaims disk space associated with it. This data
-management strategy may use up a lot of space over time, since we just write
-out new values without touching the old ones. A process for compaction that we
-refer to as ”merging” solves this. The merge process iterates over all
-non-active (i.e. immutable) ﬁles in a Bitcask and produces as output a set of
-data files containing only the ”live” or latest versions of each present key.
+合并时，只会扫描不活动的数据文件，而且只有那些不是“墓碑”的值才会合并到活动的数据文件中。
+这样可以很高效的删除过期数据，并将其占用的空间释放出来。这种数据管理方式久而久之便会用掉
+很多空间，因为只写入新数据，而不动旧数据。一个我们称之为“合并”的压缩过程可以避免这个问题。
+合并操作会遍历 Bitcask 中所有不活动的文件，生成的文件中只包含新鲜数据，即每个键对应最新
+版本的值。
 
-### Bitcask Database Files
+### Bitcask 数据库文件
 
-Below there are two directory listings showing what you would expect to find on
-disk when using Bitcask. In this example we use a 64 partition ring which
-results in 64 separate directories, each with their own Bitcask database.
+下面列出了两个文件夹，其内容就是使用 Bitcask 时可以在硬盘上看到的。在这个例子中，我们使用
+的是有 64 个分区的环，所以有 64 个文件夹，各自对应到自己的 Bitcask 数据库。
 
 ```
 bitcask/
@@ -518,17 +453,16 @@ bitcask/
 `-- 981946412581700398168100746981252653831329677312-1316787078206121
 ```
 
-Note that when starting up the directories are created for each vnode
-partition's data however there are no Bitcask-specific files as yet.
+注意，节点刚启动时只会为每个虚拟节点分区创建保存数据的文件夹，不会有 Bitcask 相关的文件。
 
-After performing one "put" (write) into the Riak cluster running Bitcask.
+在使用 Bitcask 的 Riak 集群中执行一次PUT 请求（写操作）
 
 ```
 curl http://localhost:8098/riak/test/test -XPUT -d 'hello' -H 'content-type: text/plain'
 ```
 
-The "N" value for this cluster is 3 so you'll see that the three vnode
-partitions responsible for this data now have Bitcask database files.
+这个集群的 N 值是 3，所以你会看到有 3 个虚拟节点的分区响应了这个请求，这是就创建
+了 Bitcask 数据库文件。
 
 ```
 bitcask/
@@ -560,8 +494,7 @@ bitcask/
 
 ```
 
-As more data is written to the cluster, more Bitcask files are created until
-merges are triggered.
+随着数据不断的写入集群，Bitcask 文件的数量会不断增多，只到触发合并操作。
 
 ```
 bitcask/
@@ -596,4 +529,4 @@ bitcask/
 
 ```
 
-This is normal operational behavior for Bitcask.
+以上是 Bitcask 的常见表现。
