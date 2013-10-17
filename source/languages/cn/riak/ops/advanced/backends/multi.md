@@ -13,26 +13,21 @@ interest: false
 
 ## 概览
 
+Riak 允许在一个实例中使用多个存储后台。这对下面这两种情况非常有用：
 
-Riak allows you to run multiple backends within a single Riak instance.  This
-is very useful for two very different use cases.
+  1. 想在不同的 bucket 中使用不同的后台
+  2. 在不同的 bucket 中使用相同的后台，但使用方式不一样
 
-  1. You may want to use different backends for different buckets or
-  2. You may need to use the same storage engine in different ways for different buckets.
+Multi 后台允许在同一个集群内同时使用多种后台。
 
-The Multi backend allows you to configure more than one backend at the same time
-on a single cluster.
+## 安装
 
-## Installing Multi-Backend Support
+Riak 中包含了 Multi 后台，所以无需额外安装。
 
-Riak ships with Multi backend support included within the distribution so there
-is no separate installation required.
+## 设置
 
-## Configuring Multiple Backends
-
-Modify the default behavior by adding these settings in your
-[[app.config|Configuration-Files]].  The `multi_backend` configuration must be
-within the `riak_kv` section of the `app.config`.
+要想修改默认设置，请把下面的设置项目加入 [[app.config|Configuration-Files]] 文件。
+`multi_backend` 的设置必须放在 `app.config` 文件的 `riak_kv` 区中。
 
 ```erlang
 %% Riak KV config
@@ -44,11 +39,12 @@ within the `riak_kv` section of the `app.config`.
 ]}
 ```
 
-Then later anywhere in the `riak_kv` section (but you'll likely want this in the
-section with other backend-related information) add a section to configure the
-multiple backends.
+随便在 `riak_kv` 区中找个位置（可能会放在其他后台设置的附近）添加针对 Multi 后台的设置。
 
-<div class="info"><div class="title">Organizing Configuration</div><p>While these configuration directives can be placed anywhere within the <tt>riak_kv</tt> section of <tt>app.config</tt>, we recommend that you place them in the section with other backend-related settings to keep the settings organized.</p></div>
+<div class="info">
+<div class="title">设置的组织方式</div>
+<p>因为这些设置可以放在 <tt>riak_kv</tt> 区的任何位置，我们建议将其放在其他后台设置的附近。</p>
+</div>
 
 ```erlang
 %% Use bitcask by default
@@ -82,28 +78,26 @@ multiple backends.
 ]},
 ```
 
-<div class="note"><div class="title">Multi-Backend Memory Use</div>Each backend
-has settings for how much memory the backend can use. It might be for caching,
-like in LevelDB, or for the entire set of data, like in the Memory Backend. Each
-of these backends suggests allocating up to 50% of available memory for this.
-When using Multi Backend, it is important that the sum of all backend memory
-use is at 50% or less. Three backends each set to use 50% of available memory
-would cause problems.</div>
+<div class="note">
+<div class="title">Multi 后台的内存使用量</div>
+每种后台都有设置项目制定所用的内存量，这些内存可以用来缓存数据（LevelDB），或者用来存储
+整个数据集（“内存”后台）。每中后台都建议分配可用内存的 50%。使用 Multi 后台时，所有后台
+的内存总量要是可用内存的 50% 或更少。三种后台都设成可用内存的 50% 会导致问题。
+</div>
 
-<div class="note"><div class="title">Multi-Backend settings</div>
-Certain settings, such as Bitcask's `merge_window`, are set per-node,
-rather than per-backend, and as such must be set in the top level backend
-sections of your `app.config`.</div>
+<div class="note">
+<div class="title">Multi 后台的设置</div>
+某些设置，例如 Bitcask 的 <code>merge_window</code>，是在每个节点中设置的，而不是针对
+后台设置的，所以必须在 <code>app.config</code> 文件的顶级后台区中设置。
+</div>
 
-Once configured start the Riak cluster.  Riak will use the
-`multi_backend_default` for all new bucket storage unless you configure a
-bucket to use one of the alternate storage engines.  This can be done using
-either the Erlang console or the HTTP interface, both methods simply change the
-bucket properties.  Here are two examples:
+设置好后就可以启动 Riak 集群了。默认情况下，所有的新 bucket 都会
+使用 `multi_backend_default` 中的设置，除非设定使用其他的存储引擎。要想使用其他的存储引擎，
+乐意在 Erlang 控制台中设置，或通过 HTTP 接口设置，这两种方法都很简单，直接修改 bucket 的
+属性。下面是两个例子：
 
-  - Using the Erlang console
-    You can connect to a live node using the Erlang console and directly set
-    the bucket properties.
+  - 使用 Erlang 控制台
+    可以在 Erlang 控制台中直接连接运行中的节点，然后直接设置 bucket 的属性。
 
     ```bash
     $ riak attach
@@ -111,9 +105,8 @@ bucket properties.  Here are two examples:
     1> riak_core_bucket:set_bucket(<<"MY_BUCKET">>, [{backend, <<"second_bitcask_mult">>}]).
     ```
 
-  - Using the HTTP REST API
-    You can also connect to Riak using the HTTP API and change the bucket
-    properties.
+  - 使用 HTTP REST API
+    还可以通过 HTTP API 连接到 Riak，然后修改 bucket 的属性。
 
     ```
     $ curl -XPUT http://riaknode:8098/buckets/transient_example_bucketname/props \
@@ -121,6 +114,4 @@ bucket properties.  Here are two examples:
       -d '{"props":{"backend":"memory_mult"}}'
     ```
 
-Note that if you change the default bucket storage engine via the app.config
-settings, then you will need to restart the node, or nodes, for that change to
-take effect.
+注意，如果在 `app.config` 中修改了 bucket 默认使用的存储引擎，必须重启节点设置才能生效。
