@@ -11,17 +11,38 @@ moved: {
 }
 ---
 
+
 Riak has two configuration files located in `etc/` if you are using a source
-install and in `/etc/riak` if you used a binary install. The files are
-`app.config` and `vm.args`.
+install and in `/etc/riak` if you used a binary install. 
+{{#2.0.0+}}The files are `riak.conf` and `advanced.config`; however, if the 
+legacy files `app.config` and `vm.args` are present, Riak will use those 
+instead of the values in `riak.conf`.{{/2.0.0+}}
+{{#2.0.0-}}The files are `app.config` and `vm.args`.{{/2.0.0-}}
 
-The `app.config` file is used to set various attributes for the node such as the
-backend the node will use to store data. The `vm.args` file is used to pass
+{{#2.0.0+}}
+`app.config` and `vm.args` are legacy configuration filea. Fresh installations of Riak 2.0 
+and greater will not have these files.
+{{/2.0.0+}}
+
+{{#2.0.0-}}
+The {{#2.0.0+}}`riak.conf`{{/2.0.0+}}{{#2.0.0-}}`app.config`{{/2.0.0-}} file is used to set various 
+attributes for the node such as the backend the node will use to store data{{#2.0.0+}} and {{/2.0.0+}}{{#2.0.0-}}. The `vm.args` file is used{{/2.0.0-}} to pass
 parameters to the Erlang node such as the name or cookie of the Erlang node.
+{{/2.0.0-}}
 
+{{#2.0.0+}}
+## riak.conf
+{{/2.0.0+}}
+{{#2.0.0-}}
 ## app.config
+{{/2.0.0-}}
 
-Riak and the Erlang applications it depends on are configured by settings in the app.config file in the etc directory of the Riak node.
+{{#2.0.0+}}
+Riak is configured by settings in the `riak.conf` file in the etc directory of the Riak node. This file is in the format of `key = value` One setting per line, please.
+{{/2.0.0+}}
+
+{{#2.0.0-}}
+Riak and the Erlang applications it depends on are configured by settings in the `app.config` file in the etc directory of the Riak node.
 
 ```erlang
 [
@@ -36,15 +57,43 @@ Riak and the Erlang applications it depends on are configured by settings in the
     %% Other application configurations...
 ].
 ```
+{{/2.0.0-}}
 
 <div class="note">
-Note that lines prefixed with `%%` are comments
+Note that lines prefixed with `{{#2.0.0+}}#{{/2.0.0+}}{{#2.0.0-}}%%{{/2.0.0-}}` are comments
 </div>
+
+{{#2.0.0+}}
+<div class="note">
+`riak.conf` sometimes will have a key with a `$` in it. That means you can choose the name of that key.
+It's great for naming multiple of the same setting, like we'll see with protocol buffers in the next 
+section.
+</div>
+{{/2.0.0+}}
 
 {{#1.2.0+}}
 
 ### riak_api settings
 
+{{#2.0.0+}}
+ * **listener.protobuf.$name**
+    The IP address & port pair that the Protocol Buffers interface will bind to.
+    Multiple address:port pairs can be assigned, each with their own name.
+
+    IP address & port pairs are strings and can be dot separated octets for IPv4 and 
+    colon separated for IPv6. For example:
+
+
+    ```properties
+    ## internal protocol buffer listener
+    listener.protobuf.internal = 127.0.0.1:8098
+
+    ## external protocol buffer listener
+    listener.protobuf.external = 111.0.0.1:8098
+    ```
+
+{{/2.0.0+}}
+{{#2.0.0-}}
  * **pb_ip**
     The IP address that the Protocol Buffers interface will bind to.
     (default: `"127.0.0.1"`)
@@ -68,14 +117,17 @@ Note that lines prefixed with `%%` are comments
 
  * **pb_port**
 The port that the Protocol Buffers interface will bind to. (default: `8087`)
+{{/2.0.0-}}
 
- * **pb_backlog**
+ * {{#2.0.0+}}**protobuf.backlog**{{/2.0.0+}}{{#2.0.0-}}**pb_backlog**{{/2.0.0-}}
 The maximum length to which the queue of pending *simultaneous*
 protocol buffers connections may grow. If set, it must be an integer >= 0.
 If you anticipate a larger number of connections than the default being
 simultaneously initialized, set this number to a higher value accordingly.
 You should adjust this value to meet your anticipated simultaneous
 connection demand or if experiencing connection resets. (default: `5`)
+
+{{#2.0.0+}}jd: this is where I stopped for now.{{/2.0.0+}}
 
  * **disable_pb_nagle** Turns off Nagle's algorithm (aka TCP
 slow-start) for Protocol Buffers connections. This is equivalent to
@@ -399,6 +451,16 @@ The default lager options are like so:
                 ]},
 ```
 
+{{#2.0.0+}}
+## advanced.config
+
+The `advanced.config` file is for people who are using the `riak.conf` style
+config, but still need to access the underlying Erlangy settings of Riak. It 
+is styled exactly like `app.config`. Please see the 1.4.2 documentation on 
+`app.config`.
+{{/2.0.0+}}
+
+{{#2.0.0-}}
 ## vm.args
 
 Parameters for the Erlang node on which Riak runs are set in the vm.args file in the etc directory of the embedded Erlang node. Most of these settings can be left at their defaults until you are ready to tune performance.
@@ -411,6 +473,7 @@ More details about each of these settings can be found in the Erlang documentati
 
 Riak CS and Enterprise may make different choices for some of these;
 please rely on the `vm.args` file supplied with those packages.
+{{/2.0.0-}}
 
 #### -name
 Name of the Erlang node. (default: `riak@127.0.0.1`)
