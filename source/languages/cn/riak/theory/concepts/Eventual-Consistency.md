@@ -8,210 +8,146 @@ audience: intermediate
 keywords: [appendix, concepts]
 ---
 
-An introduction to eventual consistency and what it means in terms of handling data with Riak.
+本文介绍了最终一致性，及其在 Riak 处理数据时的作用。
 
-In a distributed and fault-tolerant environment like Riak, the
-unexpected is expected. That means that nodes may leave and join the
-cluster at any time, be it by accident (node failure, network
-partition, etc.) or on purpose, e.g. by explicitly removing a node
-from a Riak cluster. Even with one or more nodes down, the cluster
-is still expected to accept writes and serve reads, and the system is
-expected to return the same data from all nodes eventually, even the
-failed ones after they rejoined the cluster.
+在 Riak 这种分布式容错环境中，很多事情是无法预料的。随时都可能有节点离开集群，或者有新节点
+加入集群，还会发生一些意外事件（节点失效，网络隔断等），或者故意进行的操作，例如把节点从集群
+中删除。就算有几个节点下线了，集群照样能够进行写入和读取操作，即便是失效的节点重新加入了
+集群，系统还是能返回相同的数据。
 
-## A simple example of eventual consistency
+## 最终一致性的简单示例
 
-This basis for a simple example is a Riak cluster with five nodes and
-a default quorum of 3. That means every piece of data exists three
-times in this cluster. In this setup reads use a quorum of 2 to ensure
-at least two copies, whereas writes also use a quorum of 2 to enforce
-strong consistency.
+举个简单的例子，一个 Riak 集群，包含五个节点，默认的法定值是 3，即每份数据都会在集群中
+出现 3 次。我们设置读取的法定值是 2，保证至少能返回 2 个副本，写入的法定值也是 2，以获取
+较强的一致性。
 
-When data is written with a quorum of 2, Riak sends the write request
-to all three replicas anyway, but returns a successful reply when two
-of them acknowledged a successful write on their end. One node may
-even have been down, not acknowledging the write.
+写入的法定值是 2 时，Riak 还是会写入 3 个副本，但只要有两个响应就判定这次请求是成功的。
+可能有一个节点下线了，数据根本没写入。
 
-The purpose of this list of examples is to describe how the replica
-node that just failed gets its data back, so that at some undetermined
-point in the future, all replicas of a piece of data will be
-up-to-date. There are ways of controlling when a specific piece of
-data is consistent across all its replicas, but either way, the data
-will eventually be consistent on all of them.
+举这个例子的目的是要说明这个没有被写入副本的节点如何把数据取回来，在未来某个时刻，所有
+数据都是最新的。有很多中方法可以控制指定的数据何时能够保持所有副本的一致。不管使用哪种方法，
+最终所有的副本都会一致。
 
-Most of these scenarios are easy enough to reproduce. Most of the time
-you just need to determine the preference list for a key on a healthy
-cluster, take down X nodes and try a combination of read and write
-requests to see what happens in each case. It's also good to keep an
-eye on the logs to find out when hinted handoffs occur.
+大多数情况都很容易复现。大多数时候只要决定运行良好的集群中的键列表，下线 X 个节点，然后试着
+发起读写请求，看看会发生什么。最好也关注一下日志文件，看看提示移交操作是什么时候进行的。
 
-Before we dive into the failure scenarios, let's examine how a request
-in Riak is handled and spread across the replicas.
+在详解失败案例之前，先看一下 Riak 是如何处理请求，以及如何将其传布到所有副本的。
 
-## Anatomy of a Riak Request
+## 分析 Riak 请求
 
-To understand how eventual consistency is handled in a Riak
-environment, it's important to know how a request is handled
-internally.  There's not much magic involved, but it helps to
-understand things like read repair, and how the quorum is handled in
-read and write requests. Be sure to read the wiki page on
-[[Replication|Replication#Understanding-replication-by-example]]
-first, it has all the details on how data is replicated across nodes
-and what happens when a node becomes unavailable for read and write
-requests, the basics for how eventual consistency is handled in Riak.
+要想理解 Riak 是如何做到最终一致性的，最好先了解 Riak 是如何处理请求的。处理请求的过程没
+什么神秘的地方，可以帮助理解一些概念，例如读取修复，以及读写请求中是如何处理法定值的。在此
+之前，请先阅读“[[副本|Replication#Understanding-replication-by-example]]”一文。这篇
+文章详细介绍了数据如何在各节点中创建副本，节点不可访问时如何处理读写请求，这些
+都是 Riak 做到最终一致性的基础。
 
-Recall that every key belongs to N primary virtual nodes (vnodes)
-which are running on the physical nodes assigned to them in the
-ring. Secondary virtual nodes are run on nodes that are close to the
-primaries in the key space and stand-in for primaries when they are
-unavailable (also called fallbacks).
+回顾一下，每个键都属于 N 个主虚拟节点，这些虚拟节点运行在环分配的物理节点之上。副虚拟节点
+运行在靠近主虚拟节点的键空间的节点上，用来代替不可访问的主虚拟节点。
 
-The basic steps of a request in Riak are the following:
+Riak 中请求的基本步骤如下：
 
-* Determine the vnodes responsible for the key from the preference list
-* Send a request to all the vnodes determined in the previous step
-* Wait until enough requests returned the data to fulfill the read
-  quorum (if specified) or the basic quorum
-* Return the value to the client
+* 根据优先权列表决定哪些虚拟节点负责这个键
+* 向上一步中得到的全部虚拟节点发送请求
+* 等待，知道返回的响应满足读取操作的法定值（如果指定了这个值），或者基本法定值
+* 把值返回给客户端
 
-The steps are similar for both read and write requests, with some
-details different, we'll go into the differences in the examples
-below.
+读和写操作的步骤基本类似，只是有些细节不一样，我们会在后面说明具体的不同之处。
 
-In our example cluster, we'll assume that it's healthy and all nodes
-are available, that means sending requests to all three primary
-replicas of the key requested.
+在这个例子中，我们假设节点是健康的，所有节点都可访问，也就是说会向所有 3 个主节点中的副本
+发起请求。
 
-## Failure Scenarios
+## 失败的情况
 
-Now we'll go through a bunch of failure scenarios that could result in
-data inconsistencies, and we'll explore how they're resolved. Every
-scenario assumes a healthy cluster to begin with, where all nodes are
-available.
+现在我们要看几个会导致数据不一致的失败情况，介绍 Riak 是如何解决这个问题的。在所有这些情况
+中，我们都假设开始时集群是健康的，而且所有节点都可访问。
 
-In a typical failure scenario, at least one node goes down, leaving
-two replicas intact in the cluster. Clients can expect that reads with
-an R of 2 will still succeed, until the third replica comes back up
-again. It's up to the application's details to implement some sort of
-graceful degradation in an automated fashion or as a feature flip that
-can be tuned at runtime accordingly, or to simply retry when a piece
-of data is expected to be found, but a first request results in not
-found.
+一种典型的失败情形是，有一个节点下线了，剩下两个完好的副本。如果读取请求指定的 R 值是 2，
+那么客户端还是会把这次请求认定为成功，除非第三个副本再次上线了。莹莹程序要负责实现某种优雅
+降级方案，可以是自动执行的，也可以是在运行时可开启关闭的功能，或者当第一次请求未找到结果时
+再次发起请求。
 
-### Reading When One Primary Fails
+### 一个主节点失效时读取数据
 
-* Data is written to a key with W=3
-* One node goes down, it happens to be a primary for that key
-* Data is read from that key with R=3
-* Riak returns not\_found on first request
-* Read repair ensures data is replicated to a secondary node. Read
-  repair will always occur, regardless of the R value. Even with an R
-  of 2, read repair will kick in and ensure that all nodes responsible
-  for this particular data are consistent.
-* Subsequent reads return correct value with R=3, two values coming
-  from primary and one from secondary nodes
+* 写入数据时设定的 W 值是 3
+* 一个节点下线了，碰巧正是上一步写入数据所在的主节点
+* 读取该数据，R 值为 3
+* 第一次请求时 Riak 会返回 not\_found（未找到）
+* 读取修复确保会在副节点中创建副本。不管设定的 R 值是多少，读取修复功能都会启用。即使 R 值
+是 2，读取修复也会保证所有响应这次请求的节点返回的数据是一致的
+* 后续的读取请求（R=3）会返回正确的结果，其中 2 个副本来自主节点，1 个副本来自副节点
 
-Note that if we had requested with R=2 or less, the first request
-would have succeeded because 2 replicas are available.
+注意，如果设定的 R 值是 2 或更小，第一次请求会成功，因为有 2 个副本是可访问的。
 
-### Reading When Two Primaries Fail
+### 两个主节点失效时读取数据
 
-* Data is written to a key with W=3
-* Two nodes go down, they happen to be primaries for that key
-* Data is read from that key with R=3
-* Riak returns not\_found on first request
-* Read repair ensures data is replicated to secondary nodes, one value
-  coming from the remaining primary, two coming from secondaries
+* 写入数据时设定的 W 值是 3
+* 两个节点下线了，碰巧都是上一步写入数据所在的主节点
+* 读取该数据，R 值为 3
+* 第一次请求时 Riak 会返回 not\_found（未找到）
+* 读取修复确保会在副节点中创建副本，一个值来自主节点，令两个来自副节点
 
-This is similar to the scenario above, but initial read consistency
-expectations may degrade even further, leaving only one initial
-replica.
+这种情况和上面一种类似，但初始读取的一致性可能会进一步降级，只留下一个副本。
 
-### Reading When Three Primaries Fail
+### 三个主节点都失效时读取数据
 
-* Data is written to a key with W=3
-* All primary nodes responsible for the key go down
-* Data is read using R=3 (or any quorum)
+* 写入数据时设定的 W 值是 3
+* 负责处理该数据的所有主节点都下线了
+* 读取该数据，R 值为 3（或其他法定值）
 
-This incident will always yield a not found error, as no node is able
-to serve the request. Read-repair will not occur because no replicas
-will be found.
+这种情况总会返回未找到，因为没有节点回响请求。读取修复也无能为力，因为根本找不到副本。
 
-### Writing And Reading When One Primary Failed
+### 一个主节点失效时写入、读取数据
 
-* One primary goes down
-* Data is written with W=3
-* A secondary takes responsibility for the write
-* Reads with R=3 will immediately yield the desired result, as the
-  secondary node can satisfy the default quorum
+* 一个主节点下线了
+* 写入数据，W 值为 3
+* 一个副节点负责这次写入操作
+* 读取数据，R 值为 3，会立即获取所需结果，因为副节点能满足默认的法定值
 
-### Writing And Reading When One Primary Failed and Later Recovered
+### 一个主节点失效时写入数据，重新上线后读取数据
+Writing And Reading When One Primary Failed and Later Recovered
 
-* One primary goes down
-* Data is written with W=3
-* A secondary takes responsibility for the write
-* The primary comes back up
-* Within a default timeframe of 60 seconds, hinted handoff will occur,
-  transferring the updated data to the primary
-* After handoff occurred, the node can successfully serve requests
+* 一个主节点下线了
+* 写入数据，W 值为 3
+* 一个副节点负责这次写入操作
+* 主节点重新上线
+* 在 60 秒内，会进行提示移交，把更新后的数据传到该主节点中
+* 移交完成后，该节点就可以正常处理请求了
 
-### Edge Case: Writing And Reading During Handoff
+### 极端状况：在移交时写入、读取数据
 
-This is an extension of the previous scenario. The primary has
-recovered from failure and is again available to the cluster. As
-hinted handoff kicks in, the node has already re-claimed its position
-in the preference list and will serve requests for the key. Should the
-recovered node be hit with requests during handoff it's likely to
-return not\_founds for data that has been written to a secondary during
-its unavailability.
+这是上一种情况的延伸。主节点恢复了，重新上线。因为进行了提示移交，节点重新在优先权列表中声明
+了自己的位置，开始响应请求。如果在移交进行时收到请求，对那些在主节点下线期间被写入副节点的
+数据来说，很有可能会返回 not\_founds。
 
-In situations of limited degradation, this will not be an issue
-because the other two primaries will have the new data available;
-however in cases where multiple nodes have failed, you may experience
-a period of increased not found responses as the primaries catch up.
-In these cases, we encourage retrying the request a limited number of
-times until successful.
+在受限降级的情形中，这不是个问题，因为其他两个主节点中存有新的数据。不过如果有多个节点失效，
+就会有一段时间持续返回无法找到。针对这种情况，我们建议重新请求一定次数，知道成功为止。
 
-### Writing And Reading When Two Primaries Failed and One Recovers
+### 两个主节点失效、只有一个主节点恢复时进行写入、读取操作
 
-This is similar to the failure of a single primary. When one primary
-recovers, either hinted handoff or read repair kick in to ensure a
-following read with the default quorum can be served successfully. The
-same happens when the second failed primary comes back up again.
+这和只有一个主节点失效的情况类似。主要一个主节点恢复了，提示移交或者读取修复会确保后续指定
+法定值的读操作可以成功得到结果。如果第二个失败的节点恢复了，也会发生类似的事情。
 
-## Read Your Own Writes
+## 读取写入的那个对象
 
-It is desirable to always be able to read your own writes, even in a
-distributed database environment like Riak. When you write to a
-particular node with a W value that corresponds to the N value, the
-number of predefined replicas in your cluster, you can assume that a
-subsequent read will return the value you just wrote, given that no
-node in the cluster failed just that instance.
+即便是在像 Riak 这样的分布式数据库中，最好总是能够读取写入的那个对象。如果设定了符合 N 值
+的 W 值，把数据写入某个节点，集群中预先定义的副本数量（假设后续读取时取回的就是刚才写入的
+值）能保证没有节点会失效。
 
-However, node failure can occur at any point in time, so your
-application should be prepared to retry reads for objects that it
-expects to exist, both for reads on the same nodes as it just sent a
-write to, but also for reads from other nodes in the cluster.
+然而，节点随时都会失效，所以如果没有获得结果应用程序要能够重新读取，不光从刚刚写入的那个
+节点读取，还要从集群中的其他节点中读取。
 
-There is no guarantee that a write will make it to all replicas before
-another client asks a different node for the same object. A write may
-still be in flight, waiting for confirmation from even just one vnode,
-while another client already tries to read from a different or even
-the same physical node. Clients are unaware of partition and replica
-placement in your cluster, so they'll have to work around the
-potential issues that can occur. Latency can lead to unpredictable
-circumstances in these scenarios even in the milliseconds range.
+我们无法保证写入的数据在创建所有副本之前，客户端不会向其他节点请求这个对象。写入还在进行中，
+等待虚拟节点的确认，这时客户端已经要从不同的或甚至是相同的物理节点上读取这个对象。客户端
+不知道分区和副本在集群中的位置，所以还要处理一些潜在问题。即便只有毫秒级的迟延，也会导致不可
+预料的情况发生。
 
-In your application, if you rely on and expect objects you read to
-exist at any time, be prepared to retry a number of times when your
-code receives a not\_found from Riak. Ensure some way of
-exponential backoff and eventual failure or simply giving up in your
-application's code, when you can safely assume the value is indeed
-nonexistent, returning an older value or simply no value at all.
+在应用程序中，如果你期望要读取的对象随时都要存在，请确保当 Riak 返回 not\_found 时重试
+几次。如果可以断定请求的值不存在，请确保应用程序的代码中有某种指数退避和最终失败，或者直接
+放弃请求的功能，读取旧版数据或者干脆不返回数据。
 
-## Further Reading
+## 进一步阅读
 
-* Werner Vogels, et. al.: [Eventually Consistent - Revisited](http://www.allthingsdistributed.com/2008/12/eventually_consistent.html)
+* Werner Vogels 等人：[Eventually Consistent - Revisited](http://www.allthingsdistributed.com/2008/12/eventually_consistent.html)
 * Ryan Zezeski:
 [Riak Core, First Multinode](https://github.com/rzezeski/try-try-try/tree/master/2011/riak-core-first-multinode),
 [Riak Core, The vnode](https://github.com/rzezeski/try-try-try/tree/master/2011/riak-core-the-vnode,)

@@ -7,53 +7,47 @@ audience: intermediate
 keywords: [appendix, concepts]
 ---
 
-Buckets are used to define a virtual keyspace and provide the ability to define
-isolated non-default configuration. Buckets might be compared to tables or
-folders in relational databases or file systems, respectively. Buckets with
-default configuration are essentially free, while non-default configuration will
-be gossiped around the ring.
+bucket 存在的目的是定义一个虚拟的键空间，而且还能设定独立的非默认设置。bucket 有点类似
+关系型数据库中的表，或者文件系统中的文件夹。bucket 会继承默认设置，经过修改的设置会广播
+到整个环。
 
-## Configuration
+## 设置
 
-For each bucket a number of configuration properties can be selectively defined,
-overriding the defaults.
+每个 bucket 都可以设置一些属性，覆盖默认值。
 
 ### n_val
 
-*integer* (default: `3`). Specifies the number of copies of each object to be
-stored in the cluster. See [[Replication]].
+*整数*（默认值： `3`）。设定对象在集群中存储的副本数量。参见“[[副本|Replication]]”一文。
 
 ### allow_mult
 
-*boolean* (default: `false`). Determines whether sibling values can be created.
-See [[Siblings|Vector Clocks#Siblings]].
+*布尔值*（默认值：`false`）。设定是否创建兄弟数据。
+参见“[[兄弟数据|Vector Clocks#Siblings]]”一文。
 
 ### last_write_wins
 
-*boolean* (default: `false`). Indicates if an object's vector clocks will be
-used to decide the canonical write based on time of write in the case of a
-conflict. See [[Conflict resolution|Concepts#Conflict-resolution]].
+*布尔值*（默认值：`false`）。设定在出现冲突时，是否使用对象的向量时钟以时间标记这次独一
+无二的写入操作。参见“[[解决冲突|Concepts#Conflict-resolution]]”一文。
 
 ### r, pr, w, dw, pw, rw
 
-`all`, `quorum`, `one`, or an *integer* (default: `quorum`). Sets for reads and
-writes the number of responses required before an operation is considered
-successful. See [[Reading Data|Concepts#Reading-Data]] and [[Writing and
-Updating Data|Concepts#Writing and Updating Data]].
+`all`、`quorum`、`one`，或*整数*（默认值：`quorum`）。设定操作被认定为成功之前，读取或
+写入操作要收到多少个响应。参见“[[读取数据|Concepts#Reading-Data]]”和
+“[[写入及更新数据|Concepts#Writing and Updating Data]]”两篇文档。
 
 ### precommit
 
-A list of erlang or javascript functions to be executed before writing an
-object. See [[Pre-Commit Hooks|Using Commit Hooks#Pre-Commit-Hooks]].
+在写入一个对象之前要执行的 Erlang 或 JavaScript 函数列表。
+参见“[[Pre-Commit 钩子|Using Commit Hooks#Pre-Commit-Hooks]]”一文。
 
 ### postcommit
 
-A list of erlang functions to be executed after writing an object. See
-[[Post-Commit Hooks|Using Commit Hooks#Post-Commit-Hooks]].
+在写入一个对象之后要执行的 Erlang 函数列表。
+参见“[[Post-Commit 钩子|Using Commit Hooks#Post-Commit-Hooks]]”一文。
 
-For more details on setting bucket properties see [[Configuration
-Files|Configuration Files#default_bucket_props]],
-[[HTTP Set Bucket Properties]], or the documentation for your client driver.
+设置 bucket 属性的更详细介绍请阅读“[[设置文件|Configuration Files#default_bucket_props]]”、
+“[[通过 HTTP API 设置 bucket 属性|HTTP Set Bucket Properties]]”，以及针对所用客户端驱动的文档。
 
 ### backend
-Specify which named backend to use for the bucket when using `riak_kv_multi_backend`.
+
+如果使用 `riak_kv_multi_backend`，指定具体要使用哪个后台。

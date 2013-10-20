@@ -118,62 +118,43 @@ ___可用的同步策略___
 ]}
 ```
 
-<div class="note"><div class="title">Bitcask doesn't actually set O_SYNC on
-Linux</div><p>At the time of this writing, due to an unresolved Linux <a
-href="http://permalink.gmane.org/gmane.linux.kernel/1123952">kernel issue</a>
-related to the <a
-href="https://github.com/torvalds/linux/blob/master/fs/fcntl.c#L146..L198">implementation
-of <code>fcntl</code></a> it turns out that Bitcask will not set the
-<code>O_SYNC</code> flag on the file opened for writing, the call to
-<code>fcntl</code> doesn't fail, it is silently ignored by the Linux kernel.
-You will notice a <a
-href="https://github.com/basho/riak_kv/commit/6a29591ecd9da73e27223a1a55acd80c21d4d17f#src/riak_kv_bitcask_backend.erl">warning
-message</a> in the log files of the format:<br /><code>{sync_strategy,o_sync} not
-implemented on Linux</code><br /> indicating that this issue exists on your system.
-Without the <code>O_SYNC</code> setting enabled there is potential for data
-loss if the OS or system dies (power outtage, kernel panic, reboot without a
-sync) with dirty buffers not yet written to stable storage.</div>
+<div class="note">
+<div class="title">在 Linux 中 Bitcask 并不会真的设置 O_SYNC</div>
+<p>在写这篇文档时，因为 Linux 有一个<a
+href="http://permalink.gmane.org/gmane.linux.kernel/1123952">内核问题</a>牵涉到 <a
+href="https://github.com/torvalds/linux/blob/master/fs/fcntl.c#L146..L198"><code>fcntl</code> 的实现</a>，所以 Bitcask 并不会在写入的文件上设置 <code>O_SYNC</code> 旗标，但调用 <code>fcntl</code> 也不会失败，因为这个旗标直接被 Linux 内核忽略了。如果在日志文件中看到一个<a
+href="https://github.com/basho/riak_kv/commit/6a29591ecd9da73e27223a1a55acd80c21d4d17f#src/riak_kv_bitcask_backend.erl">警告消息</a>，形式如下：<br />
+<code>{sync_strategy,o_sync} not implemented on Linux</code><br />
+就说明你所用的系统存在这个问题。如果没设置 <code>O_SYNC</code> 旗标，一旦系统损坏，没有写入硬盘的缓冲数据就有可能丢失。
+</div>
 
-### Disk-Usage and Merging Settings
+### 硬盘使用和合并设置
 
-Riak K/V stores each vnode partition of the ring as a separate Bitcask
-directory within the configured bitcask data directory. Each of these
-directories will contain multiple files with key/value data, one or more
-"hint" files that record where the various keys exist within the data files,
-and a write lock file. The design of Bitcask allows for recovery even when
-data isn't fully synchronized to disk (partial writes). This is accomplished
-by maintaining data files that are append-only (never modified in-place) and
-are never reopened for modification (only reading).
+Riak K/V 会把环中每个虚拟节点分别存储在 Bitcask 数据文件夹中的独立子文件夹中。
+每个子文件夹都有很多文件用来存储键值对数据；一个或多个“提示”文件，记录每个键
+保存在哪个数据文件中了还有一个写锁定文件。Bitcask 的设计方式允许即便没有完全把
+数据同步到硬盘，仍能进行恢复操作。这种特性是得益于数据文件只能附加，无法重新
+打开修改。（只能读取）
 
-The data management strategy trades disk space for operational efficiency.
-There can be a significant storage overhead that is un-related to your
-working data set but can be tuned to best fit your usage. In short, disk
-space is used until a threshold is met, then unused space is reclaimed
-through a process of merging. The merge process traverses data files and
-reclaims space by eliminating out-of-date versions of key/value pairs writing
-only the current key/value pairs to a new set of files within the directory.
+这种数据管理方式为了操作性能会丧失一些硬盘空间，有很大一部分空间不会用来存储
+工作数据，但可以执行其他的操作减少使用量。简单来说，在达到每个极限值之前，硬盘
+空间可以一直正常使用，但超过这个值之后，就可以通过合并释放一些空间。合并时，
+遍历所有数据文件，删除过时的键值对，然后把当前版本的键值对写入一系列新的文件中。
 
-The merge process is affected by the settings described below. In the
-discussion, "dead" refers to keys that are no longer the latest value or
-those that have been deleted; "live" refers to keys that are the newest value
-and have not been deleted.
+合并过程会收到下面介绍的设置影响。在下面的讨论中，“死亡”的意思是键对应的值
+不是最新版本，要删除掉；“新鲜”表示键对应的值是最新的，不会被删除。
 
-#### Max File Size
+#### 文件大小最大值
 
-The `max_file_size` setting describes the maximum permitted size for any
-single data file in the Bitcask directory. If a write causes the current
-file to exceed this size threshold then that file is closed, and a new file
-is opened for writes.
+`max_file_size` 设定在 Bitcask 文件夹中可以保存的单个数据文件大小最大值。如果
+写入数据时超过了这个值，该文件会被关闭，打开一个新文件继续写入。
 
-Increasing `max_file_size` will cause Bitcask to create fewer, larger
-files, which are merged less frequently while decreasing it will cause
-Bitcask to create more numerous, smaller files, which are merged more
-frequently. If your ring size is 16 your servers could see as much as 32GB
-of data in the bitcask directories before the first merge is triggered
-irrespective of your working set size. Plan storage accordingly and don't
-be surprised by larger than working set on disk data sizes.
+增加 `max_file_size` 的值，Bitcask 会创建更少更大的文件，合并次数会少一些；
+而减小这个值 Bitcask 会创建更多更小的文件，合并次数就会多一些。如果环的大小
+为 16，服务器就能处理 32GB 的数据，如果超过这个大小就会进行第一次合并，而不管
+数据集的大小。请相应的规划存储，不要担心会超过硬盘中数据集的大小。
 
-Default is: `16#80000000` which is 2GB in bytes
+默认值是 `16#80000000`，即 2GB
 
 ```erlang
 {bitcask, [
@@ -183,21 +164,18 @@ Default is: `16#80000000` which is 2GB in bytes
 ]}
 ```
 
-#### Merge Window
+#### 合并时段
 
-The `merge_window` setting lets you specify when during the day merge
-operations are allowed to be triggered. Valid options are:
+`merge_window` 设定一天中的哪个时段允许进行合并操作。可选的值有：
 
-* `always` (default) No restrictions
-* `never` Merge will never be attempted
-* `{Start, End}` Hours during which merging is permitted, where `Start` and
-  `End` are integers between 0 and 23.
+* `always`：（默认值）不限制
+* `never`：不要进行合并
+* `{Start, End}`：进行合并的时间区间，`Start` 和 `End` 都可以取 0 到 23 之间的整数
 
-If merging has a significant impact on performance of your cluster, or your
-cluster has quiet periods in which little storage activity occurs, you may
-want to change this setting from the default.
+如果合并会严重影响集群的整体性能，或者有某个时间段存储活动量很少，那么就可以
+修改默认值。
 
-Default is: `always`
+默认值是 `always`
 
 ```erlang
 {bitcask, [
@@ -207,39 +185,29 @@ Default is: `always`
 ]}
 ```
 
-<div class="note"><div class="title"> `merge_window` and Multi-Backend</div>
-When using Bitcask with [[Multi-Backend|Multi]], please note that if you
-wish to use a merge window, you *must* set it in the global `bitcask`
-section of your `app.config`.  `merge_window` settings in per-backend
-sections are ignored.
+<div class="note">
+<div class="title">`merge_window` 和 Multi 后台</div>
+在 [[Multi 后台|Multi]]中使用 Bitcask 时，如果要设置合并时段，必须在全局 <code>app.config</code> 文件的 <code>bitcask</code> 区中设置，针对各后台的设置区中的 `merge_window` 会被忽略。
 </div>
 
+#### 合并触发条件
 
-#### Merge Triggers
+合并触发条件设置遇到什么样的情况时会执行合并操作。
 
-Merge triggers determine under what conditions merging will be
-invoked.
+*   _碎片_：`frag_merge_trigger` 设置文件中死亡键和总键数的比例达到多少
+    时进行合并。这个设置的值是个百分比（0-100）。例如，如果数据文件中有 6 个
+    死亡键，4 个新鲜键，那么在默认设置时就会触发合并操作。增加这个值合并次数就
+    少一点，减少这个值合并次数就多一些。
 
-* _Fragmentation_: The `frag_merge_trigger` setting describes what ratio of
-  dead keys to total keys in a file will trigger merging. The value of this
-  setting is a percentage (0-100). For example, if a data file contains 6
-  dead keys and 4 live keys, then merge will be triggered at the default
-  setting. Increasing this value will cause merging to occur less often,
-  whereas decreasing the value will cause merging to happen more often.
+    默认值：`60`
 
-  Default is: `60`
+*   _死亡字节_：`dead_bytes_merge_trigger` 设置单个文件中存储了多少死亡数据
+    时触发合并，单位为字节。如果文件到达或超过这个值，就会触发合并。增加这个值
+    合并次数就少一点，减少这个值合并次数就多一些。
 
-* _Dead Bytes_: The `dead_bytes_merge_trigger` setting describes how much
-  data stored for dead keys in a single file will trigger merging. The
-  value is in bytes. If a file meets or exceeds the trigger value for dead
-  bytes, merge will be triggered. Increasing the value will cause merging
-  to occur less often, whereas decreasing the value will cause merging to
-  happen more often.
+    只要数据文件夹中的任何一个文件达到了这个要求，Bitcask 就会尝试合并文件。
 
-  When either of these constraints are met by any file in the directory,
-  Bitcask will attempt to merge files.
-
-  Default is: `536870912` which is 512MB in bytes
+    默认值：`536870912`，即 512MB
 
 ```erlang
 {bitcask, [
@@ -251,38 +219,31 @@ invoked.
 ]}
 ```
 
-#### Merge Thresholds
+#### 合并范围
 
-Merge thresholds determine which files will be chosen to be included in a
-merge operation.
+合并范围设定哪些文件会包含在合并操作中。
 
-- _Fragmentation_: The `frag_threshold` setting describes what ratio of
-    dead keys to total keys in a file will cause it to be included in the
-    merge. The value of this setting is a percentage (0-100). For example,
-    if a data file contains 4 dead keys and 6 live keys, it will be included
-    in the merge at the default ratio. Increasing the value will cause fewer
-    files to be merged, decreasing the value will cause more files to be
-    merged.
+-   _碎片_：`frag_threshold` 设置文件中死亡键和总键数的比例达到多少
+    时，该文件会包含在此次合并操作中。这个设置的值是百分比（0-100）。例如，
+    一个文件中有 4 个死亡键和 6 个新鲜键，那么在默认设置时，这个文件就会包含
+    在合并操作中。增加这个值合并的文件数会少一点，减少这个值合并的文件就会
+    多一些。
 
-    Default is: `40`
+    默认值：`40`
 
-- _Dead Bytes_: The `dead_bytes_threshold` setting describes the minimum
-    amount of data occupied by dead keys in a file to cause it to be included
-    in the merge. Increasing the value will cause fewer files to be merged,
-    decreasing the value will cause more files to be merged.
+-   _死亡字节_：`dead_bytes_threshold` 设置死亡键至少占用了多少数据量时，该文件
+    会包含在此次合并中。增加这个值合并的文件数会少一点，减少这个值合并的文件就会
+    多一些。
 
-    Default is: `134217728` which is 128MB in bytes
+    默认值：`134217728`，即 128MB
 
-- _Small File_: The `small_file_threshold` setting describes the minimum
-    size a file must have to be _excluded_ from the merge. Files smaller
-    than the threshold will be included. Increasing the value will cause
-    _more_ files to be merged, decreasing the value will cause _fewer_ files
-    to be merged.
+-   _小型文件_：`small_file_threshold` 设置文件的大小大于多少时才不会包含在
+    合并操作中。小于设定值的文件会包含在合并操作中。增加这个值合并的文件数会
+    多一些，减少这个值合并的文件就会少一点。
 
-    Default is: `10485760` while is 10MB in bytes
+    默认值：`10485760`，即 10MB
 
-When any of these constraints are met for a single file, it will be
-included in the merge operation.
+当单个文件满足上述任何一个限制时，就会包含在合并操作中：
 
 ```erlang
 {bitcask, [
@@ -295,12 +256,12 @@ included in the merge operation.
 ]}
 ```
 
-<div class="note"><div class="title">Choosing Threshold Values</div><p>The
-values for <code>frag_threshold</code> and <code>dead_bytes_threshold</code>
-<i>must be equal to or less than their corresponding trigger values</i>. If
-they are set higher, Bitcask will trigger merges where no files meet the
-thresholds, and thus never resolve the conditions that triggered
-merging.</p></div>
+<div class="note">
+<div class="title">选择阈值</div>
+<p><code>frag_threshold</code> 和 <code>dead_bytes_threshold</code> 的值必须
+小于或等于相应的触发值。如果设高了，就没有文件能满足这些限制条件，也就不会触发
+合并操作。</p>
+</div>
 
 #### 折叠键阈值
 
