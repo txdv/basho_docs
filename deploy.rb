@@ -5,7 +5,7 @@ if ENV['AWS_CLOUDFRONT_DIST_ID'] == '' || ENV['AWS_S3_BUCKET'] == ''
   exit(0)
 end
 
-ENV['RIAK_DOCS_LANG'] = 'en'
+ENV['RIAK_DOCS_LANG'] = 'cn'
 
 `rm -rf build`
 if ARGV.length == 0

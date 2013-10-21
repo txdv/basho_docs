@@ -123,6 +123,7 @@ configure :build do
         s3.access_key_id = ENV['AWS_ACCESS_KEY_ID']
         s3.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
         s3.bucket = ENV['AWS_S3_BUCKET']
+        s3.region = 'ap-northeast-1'
       end
       activate :invalidate_cloudfront do |cf|
         cf.access_key_id = ENV['AWS_ACCESS_KEY_ID']
