@@ -21,12 +21,12 @@ h3.center-text 选择您要查看的项目
 div#select-project
   - version = $production ? "latest" : nil
   div.project
-    a href="/riakee/#{version || $versions[:riakee]}/"
+    a href="http://docs.basho.com/riakee/#{version || $versions[:riakee]}/"
       span.big
         | Riak&nbsp;
         strong Enterprise
       span.small
-        | 多数据中心同步 + 技术支持
+        | 多数据中心同步 + 技术支持 (English)
 
   div.separator
     div.vert-line
@@ -41,10 +41,10 @@ div#select-project
     div.vert-line
 
   div.project
-    a href="/riakcs/#{version || $versions[:riakcs]}/"
+    a href="http://docs.basho.com/riakcs/#{version || $versions[:riakcs]}/"
       span.big
         | Riak&nbsp;
         strong Cloud Storage
       span.small
-        | 简单，方便，兼容 s3
+        | 简单，方便，兼容 s3 (English)
 

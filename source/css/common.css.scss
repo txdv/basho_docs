@@ -296,6 +296,12 @@ body {
       .mainarticle {
         padding   : 70px 0 0 20px;
       }
+      a[href^="http://"], a[href^="https://"] {
+        padding:0;
+        width:auto;
+        height:auto;
+        background:transparent;
+      }
     }
   }
 }
