@@ -8,52 +8,41 @@ audience: intermediate
 keywords: [appendix, concepts]
 ---
 
-Links are metadata that establish one-way relationships between objects
-in Riak. They can be used to loosely model graph like relationships
-between objects in Riak.
+[[链接|Links]] 是一些元数据，在对象之间建立一种单向关联，可以表示类似对象关联这种松散的模型。
 
-The Link Header
----------------
+## 链接报头
 
-The way to read and modify links via the [[HTTP API]] is the HTTP Link
-header. This header emulates the purpose of &lt;link&gt; tags in HTML,
-that is, establishing relationships to other HTTP resources. The format
-that Riak uses is like so:
+使用 [[HTTP API]] 读取及修改链接是通过 Link 报头进行的。这个报头模拟了 HTML 中
+的 &lt;link&gt; 标签，建立和其他 HTTP 资源之间的关联。Riak 使用的格式如下：
 
 ```bash
 Link: </riak/bucket/key>; riaktag="tag"
 ```
 
-Inside the angle-brackets (&lt;,&gt;) is a relative URL to another object in
-Riak. The "tag" portion in double-quotes is any string identifier that
-has a meaning relevant to your application.
+尖括号中是一个相对地址，指向 Riak 中的另一个对象。双引号中的值可以是任意字符串，在应用程序
+中有一定意义。
 
-Objects can have multiple links by separating them with commas. For
-example, if an object was a participant in a doubly-linked list of
-objects, it might look like this:
+对象中可以有多个链接，使用逗号分隔。例如，如果对象中有两个链接的对象，那么报头如下：
 
 ```bash
 Link: </riak/list/1>; riaktag="previous", </riak/list/3>; riaktag="next"
 ```
 
-<div class="info">There is no artificial limit to the number of links an object can
-have. But, as adding links to an object does increase that object’s
-size, the same guidelines that apply to your data should also apply to
-your links: strike a balance between size and usability.</div>
+<div class="info">
+对象能包含的链接数量没有硬性限制。不过添加链接会增加对象的大小，针对数据的指导思想同样适用
+于链接：要在大小和可用性之间建立良好平衡。
+</div>
 
-Links in the Erlang API
------------------------
+## 在 Erlang API 中使用链接
 
-Links in the Erlang API are stored as tuples in the object metadata of
-this form:
+Erlang API 中的链接已元组的形式存储在对象的元数据中，格式如下：
 
 ```bash
 {{<<"bucket">>,<<"key">>},<<"tag">>}
 ```
 
-To access the links, use "riak\_object:get\_metadata/1" to retrieve the
-metadata "dict", and then retrieve the `<<"Links">>` key from that dict.
-Example:
+要读取链接，先使用 `riak\_object:get\_metadata/1` 读取元数据字典，然后再从字典中
+读取 `<<"Links">>` 键。例如：
 
 ```bash
 1> {ok, Object} = Client:get(<<"list">>,<<"2">>,1).
@@ -61,9 +50,7 @@ Example:
 3> Links = dict:fetch(<<"Links">>, Meta).
 [{{<<"list">>,<<"1">>},<<"previous">>},{{<<"list">>,<<"3">>},<<"next">>}]
 ```
-
-To store links back in the object, update the dict, update the object
-metadata, and put the object:
+要把链接存入对象，先更新字典来更新对象的元数据，然后在写入对象：
 
 ```bash
 4> NewMeta = dict:store(<<"Links">>, [{{<<"list">>,<<"0">>},<<"first">>}|Links], Meta).
@@ -71,18 +58,11 @@ metadata, and put the object:
 6> Client:put(NewObject,2).
 ```
 
-Link-walking
-------------
+## 链接遍历
 
-Link-walking (traversal) is a special case of
-[[MapReduce|Advanced MapReduce]] querying, and can be accessed
-through the [[HTTP Link Walking]]. Link-walks start at a single input
-object and follow links on that object to find other objects that match
-the submitted specifications. More than one traversal may be specified
-in a single request, with any number of the intermediate results
-returned. The final traversal in a link-walking request always returns
-results.
+链接遍历是一种特殊的 [[MapReduce|Advanced MapReduce]] 查询，
+可以通过 [[HTTP 链接遍历|HTTP Link Walking]] 进行。链接遍历从单个输入对象开始，跟踪该
+对象中的链接，找到符合查询条件的其他对象。单次请求中可以进行多次遍历，返回任意数量的中间
+结果。最后一次链接遍历总会返回结果。
 
--   [[Link-walking by
-    Example|http://basho.com/link-walking-by-example/]]
-    on the Basho Blog
+-   [[链接遍历举例|http://basho.com/link-walking-by-example/]]（来自 Basho 的博客）
