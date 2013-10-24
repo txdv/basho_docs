@@ -8,94 +8,102 @@ audience: intermediate
 keywords: [appendix, concepts]
 ---
 
-Replication is fundamental and automatic in Riak, providing security that your data will still be there if a node in your Riak cluster goes down. All data stored in Riak will be replicated to a number of nodes in the cluster according to the n_val property set on the bucket.
+副本是 Riak 的基础，能保证数据的安全性，即使集群中的节点下线了数据仍然存在。Riak 中存储的
+所有数据都会在一定数量的节点中创建副本，具体的数量由 bucket 的 n_val 属性设定。
 
 <div class="note">
-You can read more about Riak's [[Multi Data Center Replication: Architecture]].
+更多内容请阅读[[在多个数据中心之间创建副本：架构|Multi Data Center Replication: Architecture]]
 </div>
 
-## Selecting an N value (n_val)
-By default, Riak chooses an n_val of 3 for you. This means that data stored in the bucket will be replicated to 3 different nodes. For this to be effective, you need at least 3 nodes in your cluster.
+## 选择合适的 N 值(n_val)
 
-How to choose an N value depends largely on the application and the shape of the data. If your data is very transient and can be reconstructed easily by the application, choosing a lower N value will give you greater performance. If you need high assurance that data is available even after node failure, increasing the N value will help protect against loss. How many nodes do you expect will fail at any one time? Choose an N value larger than that and your data will still be accessible when they go down.
+默认情况下，n_val 的值是 3，即 bucket 中存储的数据会在三个节点中创建副本。为此，集群中至少
+要有 3 个节点。
 
-The N value also affects the behavior of read (GET) and write (PUT) requests. The tunable parameters you can submit with requests are bound by the N value. For example, if N=3, the maximum read quorum (known as “R”) you can request is also 3. If some nodes containing the data you are requesting are down, an R value larger than the number of available nodes with the data will cause the read to fail.
+如何选择 N 值很大程度上取决于应用程序的需求及数据的类型。如果数据是短期存储的，而且通过应用
+程序可以很容易的重建，选择较小的 N 值可以提高性能。如果需要保证数据的高可用性，即使节点失效
+仍能访问，那么提高 N 值可以避免丢失数据。某个时刻最多能接受多少个节点失效呢？根据这个数量来
+选择一个稍大的值，可以保证这么多节点失效后数据仍可访问。
 
-## Setting the N value (n_val)
-To change the N value for a bucket issue a PUT request to the bucket with the new value:
+N 值会影响读（GET）和写（PUT）请求的表现。可以随请求一起提交的参数会受到 N 值的限制。例如，
+N = 3，那么最大的读请求法定值（R 值）也是 3。如果包含所请求数据的节点下线了，大于可用节点
+数量的 R 值会导致这次请求失败。
+
+## 设置 N 值(n_val)
+
+要想修改 bucket 的 N 值，可以向这个 bucket 发起 PUT 请求，指定一个新值：
 
 ```bash
 curl -XPUT -H "Content-Type: application/json" -d '{"props":{"n_val":5}}' http://riak-host:8098/riak/bucket
 ```
 
-Changing the N value after a bucket has data in it is **not recommended**. If you do change the value, especially increasing it, you might need to force read repair. Overwritten objects and newly stored objects will automatically be replicated to the correct number of nodes.
+如果 bucket 中已经存有数据，这时不建议修改 N 值。如果一定要修改，特别是要增大，必须强制
+执行读取修复操作，这样已存的对象和新存入的对象就会自动在所设数量的节点中创建副本。
 
 {{#1.3.0+}}
 ## Active Anti-Entropy (AAE)
 
-Active anti-entropy (AAE) is a continuous background process that compares and repairs
-any divergent, missing, or corrupted replicas. Unlike [[read repair|Replication#Read-Repair]],
-which is only triggered when data is read, the active anti-entropy
-system ensures the integrity of all data stored in Riak. This is
-particularly useful in clusters containing “cold data”: data that may not be
-read for long periods of time, potentially years. Furthermore, unlike the repair
-command, active anti-entropy is an automatic process, requiring no user
-intervention and is enabled by default in Riak 1.3.
+AAE 是一个一直运行的后台程序，比较并修复有分歧、丢失或损坏的副本。[[读取修复|Replication#Read-Repair]]
+只在读取数据时触发，而 AAE 可以保证存储在 Riak 中全部数据的完整性。这个功能特别适合用于
+存有“冰封数据”（很长时间不会被读取的数据，可能是几年）的集群。AAE 不像 `repair` 命令，
+无需人工干预，会自动执行，而且从 Riak 1.3 开始默认启用。
 
-Riak’s active anti-entropy feature is based on hash tree exchange, which enables
-differences between replicas to be determined with minimal exchange of
-information. The amount of information exchanged in the process is
-proportional to the differences between two replicas, not the amount of data
-that they contain. Approximately the same amount of information is exchanged
-when there are 10 differing keys out of 1 million keys as when there are 10
-differing keys out of 10 billion keys. This enables Riak to provide continuous
-data protection regardless of cluster size.
+Riak 的 AAE 功能建立在哈希树交换的基础上，只交换最少的数据就能发现不同副本之间的差别。这个
+过程中交换的信息量和副本之间的差异成正比，和副本中存储的数据量无关。一百万个键中如果有 10 个
+不同的键，和一百亿个键中有 10 个不同的键，这两种情况交换的信息量几乎是相等的。这样不管集群
+的大小，Riak 就能提供持续的数据保护了。
 
-Additionally, Riak uses persistent, on-disk hash trees rather than purely in-
-memory trees, a key difference from similar implementations in other products.
-This allows Riak to maintain entropy information for billions of keys with
-minimal additional memory usage, as well as allows Riak nodes to be restarted
-without losing any anti-entropy information. Furthermore, Riak maintains the
-hash trees in real time, updating the tree as new write requests come in. This
-reduces the time it takes Riak to detect and repair missing/divergent replicas.
-For added protection, Riak periodically (default: once a week) clears and
-regenerates all hash trees from the on-disk K/V data. This enables Riak to
-detect silent data corruption to the on-disk data arising from bad disks and
-faulty hardware components.
+而且，Riak 中的哈希树持久的存储在硬盘中，而不是存在内存中，这是和其他类似产品的一个关键不同。
+这样 Riak 只需使用极少的额外内存就能维护十几亿个键，而且节点重启后不会丢失任何反熵信息。
+Riak 会实时维护哈希树，只要有新的写请求就会更新树，减少了 Riak 检测到丢失或有分歧的副本所用
+的时间。为了提升保护能力，Riak 会定期（默认为一周一次）从硬盘上存储的键值对数据清理并重建
+所有的哈希树。因此 Riak 可以检测到硬盘中的过期数据，不管是因为硬盘故障还是硬盘失效导致的。
 {{/1.3.0+}}
 
-## Read Repair
-Read repair occurs when a successful read occurs — that is, the quorum was met — but not all replicas from which the object was requested agreed on the value. There are two possibilities here for the errant nodes:
+## 读取修复
 
-  1. The node responded with a “not found” for the object, meaning it doesn't have a copy.
-  2. The node responded with a vector clock that is an ancestor of the vector clock of the successful read.
+读取修复在读取操作成功后执行，即满足法定值时，但并不是所有被请求的副本都会为这个值贡献力量。
+有两种可能性：
 
-When this situation occurs, Riak will force the errant nodes to update their object values based on the value of the successful read.
+  1. 返回“not found”，表示该节点没有这个对象的副本
+  2. 返回一个向量时钟，是这次成功读请求的祖先向量时钟
 
-### Forcing Read Repair
-When you increase the n_val on the bucket, you may start to get failed read operations, especially if the R value you use is larger than the number of replicas that originally stored the object. Forcing read repair will solve this issue.
+如果出现这两种情况，Riak 会强制这些节点基于成功的读请求获取的值来更新所存对象。
 
-For each object that fails read (or the whole bucket, if you like), read the object using an R value less than or equal to the original number of replicas. For example, if your original n_val was 3 and you increased it to 5, perform your read operations with R=3 or less. This will cause the nodes that do not have the object(s) yet to respond with “not found”, invoking read repair.
+### 强制执行读取修复
 
-## So what does N=3 really mean?
-N=3 simply means that three copies of each piece of data will be stored in the cluster. That is, three different partitions/vnodes will receive copies of the data. **There are no guarantees that the three replicas will go to three separate physical nodes**; however, the built-in functions for determining where replicas go attempts to distribute the data evenly.
+如果增加了 bucket 的 N 值，有可能会读取失败，尤其是当指定的 R 值比之前保存的副本数大时。
+这时可以强制执行读取修复。
 
-As nodes are added and removed from the cluster, the ownership of partitions changes and may result in an uneven distribution of the data. On some rare occasions, Riak will also aggressively reshuffle ownership of the partitions to achieve a more even balance.
+如果读取对象失败了，可以把 R 值设成比之前的副本数小或者相等。例如，如果之前的 N 值是 3，
+然后增加到 5，读请求时指定的 R 值就要设为 3 或者更小。这样还没有副本的节点会相应“not found”，
+触发执行读取修复。
 
-For cases where the number of nodes is less than the N value, data will likely be duplicated on some nodes. For example, with N=3 and 2 nodes in the cluster, one node will likely have one replica, and the other node will have two replicas.
+## 那么 N=3 到底是什么意思？
 
-## Understanding replication by example
-To better understand how data is replicated in Riak let's take a look at a put request for the bucket/key pair <<"my_bucket">>/<<"my_key">>. Specifically we'll focus on two parts of the request, routing an object to a set of partitions and storing an object on a partition.
+N=3 就是说每个数据都会在集群中存有 3 个副本，即 3 个不同的分区（虚拟节点）中会各保存一个
+数据的副本。**但无法保证这 3 个副本会分别存入 3 个物理节点中**。不过，内建的函数会尝试
+尽量均匀的分布数据。在某些小概率事件中，Riak 会强制重整分区的所有权，以其获得更好的均布。
 
-### Routing an object to a set of partitions
+如果节点的数量小于 N 值，某些节点上会存有多份副本。例如，N=3，集群中只有 2 个节点，那么其中
+一个节点可能只有一个副本，而另一个节点则有两个副本。
 
-  * Assume we have 3 nodes
-  * Assume we store 3 replicas per object (N=3)
-  * Assume we have 8 partitions (ring_creation_size=8)
+## 通过实例理解副本
 
-**It is not recommended to use such a small ring size; this is for demonstration purposes only.**
+为了更好地理解数据是如何在 Riak 中创建副本的，我们来对 <<"my_bucket">>/<<"my_key">> 这个
+“bucket/键”组合发送一个 PUT 请求。我们会特别关注这次请求的如下两部分：把对象分发到一系列
+分区中，在分区中排序对象。
 
-With only 8 partitions our ring will look approximately as follows (response from riak_core_ring_manager:get_my_ring/0 truncated for clarity):
+### 把对象分发到一系列分区中
+
+  * 假设有 3 个节点
+  * 假设每个对象存有 3 个副本（N=3）
+  * 假设有 8 个分区（ring_creation_size=8）
+
+**不建议使用这么写的环，这里只做演示用。**
+
+只有 8 个分区的环类似下面这样（为了节省空间，riak_core_ring_manager:get_my_ring/0 的
+响应被适当截断了）：
 
 ```erlang
 (dev1@127.0.0.1)3> {ok,Ring} = riak_core_ring_manager:get_my_ring().
@@ -109,14 +117,14 @@ With only 8 partitions our ring will look approximately as follows (response fro
 {1278813932664540053428224228626747642198940975104, 'dev2@127.0.0.1'}]
 ```
 
-The node handling this request hashes the Bucket/Key combination:
+处理这个请求的节点会计算“bucket/键”组合的哈希值：
 
 ```erlang
 (dev1@127.0.0.1)4> DocIdx = riak_core_util:chash_key({<<"my_bucket">>, <<"my_key">>}).
 <<183,28,67,173,80,128,26,94,190,198,65,15,27,243,135,127,121,101,255,96>>
 ```
 
-The DocIdx hash is a 160 bit integer:
+DocIdx 哈希是 160 位的整数：
 
 ```erlang
 (dev1@127.0.0.1)5> <<I:160/integer>> = DocIdx.
@@ -125,7 +133,7 @@ The DocIdx hash is a 160 bit integer:
 1045375627425331784151332358177649483819648417632
 ```
 
-The node looks up the hashed key in the ring which returns a list of “preferred” partitions for the given key.
+节点会在环中查找计算得到的哈希值，返回一组优先选择的分区：
 
 ```erlang
 (node1@127.0.0.1)> Preflist = riak_core_ring:preflist(DocIdx, Ring).
@@ -139,7 +147,7 @@ The node looks up the hashed key in the ring which returns a list of “preferre
 {913438523331814323877303020447676887284957839360, 'dev3@127.0.0.1'}]
 ```
 
-The node chooses the first N partitions from the list, the remaining partitions of the “preferred” list are retained as fallbacks to use if any of the target partitions are unavailable.
+节点选择前 N 个分区，其他的分区则作为备用，以防选中的分区不可访问：
 
 ```erlang
 (dev1@127.0.0.1)9> {Targets, Fallbacks} = lists:split(N, Preflist).
@@ -153,13 +161,13 @@ The node chooses the first N partitions from the list, the remaining partitions 
 {913438523331814323877303020447676887284957839360, 'dev3@127.0.0.1'}]}
 ```
 
-The partition information returned from the ring contains a partition identifier and the parent node of that partition:
+环返回的分区信息包含分区的标示符和该分区所属的（父）节点：
 
 ```erlang
 {1096126227998177188652763624537212264741949407232, 'dev1@127.0.0.1'}
 ```
 
-The requesting node sends a message to each parent node with the object and partition identifier (pseudo-code for clarity):
+接受请求的节点向每个父节点发送消息，包含对象和分区的标识符（为了演示，下面的代码是虚构的）：
 
 ```erlang
 'dev1@127.0.0.1' ! {put, Object, 1096126227998177188652763624537212264741949407232}
@@ -167,7 +175,9 @@ The requesting node sends a message to each parent node with the object and part
 'dev1@127.0.0.1' ! {put, Object, 0}
 ```
 
-If any of the target partitions fail the node sends the object to one of the fallbacks. When the message is sent to the fallback node the message references the object and original partition identifier. For example, if `dev2@127.0.0.1` were unavailable the requesting node would then try each of the fallbacks. The fallbacks in this example are:
+如果向目标分区存入数据失败了，节点就会把对象发送到后备分区中。发送到后备节点的消息会引用
+对象，以及之前分区的标识符。例如，如果 `dev2@127.0.0.1` 不可访问，那么接受请求的节点会
+尝试每一个后备节点。本例中的后备节点如下：
 
 ```erlang
 {182687704666362864775460604089535377456991567872, 'dev2@127.0.0.1'}
@@ -175,17 +185,30 @@ If any of the target partitions fail the node sends the object to one of the fal
 {548063113999088594326381812268606132370974703616, 'dev1@127.0.0.1'}
 ```
 
-The next available fallback node would be `dev3@127.0.0.1`. The requesting node would send a message to the fallback node with the object and original partition identifier:
+第二个后备节点是 `dev3@127.0.0.1`。接受请求的节点会向后备节点发送一个消息，包含对象，以及
+之前分区的标识符。
 
 ```erlang
 'dev3@127.0.0.1' ! {put, Object, 1278813932664540053428224228626747642198940975104}
 ```
 
-Note that the partition identifier in the message is the same that was originally sent to `dev2@127.0.0.1` only this time it is being sent to `dev3@127.0.0.1`. Even though `dev3@127.0.0.1` is not the parent node of that partition, it is smart enough to hold on to the object until `dev2@127.0.0.1` returns to the cluster.
+注意，上面这个消息中的分区标识符和发给 `dev2@127.0.0.1` 消息中的标识符一样，只不过这次
+接受方是 `dev3@127.0.0.1`。即使 `dev3@127.0.0.1` 不是那个分区的父节点，Riak 还是足够
+智能，先把数据存在 `dev3@127.0.0.1` 中，只到 `dev2@127.0.0.1` 重新加入集群。
 
-## Processing partition requests
-Processing requests per partition is fairly simple. Each node runs a single process (riak_kv_vnode_master) that distributes requests to individual partition processes (riak_kv_vnode). The riak_kv_vnode_master process maintains a list of partition identifiers and corresponding partition processes. If a process does not exist for a given partition identifier a new process is spawned to manage that partition.
+## 处理到各分区的请求
 
-The riak_kv_vnode_master process treats all requests the same and spawns partition processes as needed even when nodes receive requests for partitions they do not own. When a partition`s parent node is unavailable, requests are sent to fallback nodes (handoff). The riak_kv_vnode_master process on the fallback node spawns a process to manage the partition even though the partition does not belong to the fallback node.
+处理到各分区的请求很简单。每个节点上都运行着一个进程（riak_kv_vnode_master），把请求分发
+到不同的分区进程（riak_kv_vnode）。riak_kv_vnode_master 进程维护着一个分区标识符列表，
+以及各分区对应的分区进程。如果某个分区标识符没有进程，系统就会派生一个新进程。
 
-The individual partition processes perform hometests throughout the life of the process. The hometest checks if the current node (node/0) matches the parent node of the partition as defined in the ring. If the process determines that the partition it is managing belongs on another node (the parent node) it will attempt to contact that node. If that parent node responds the process will handoff any objects it has processed for that partition and shutdown. If that parent node does not respond the process will continue to manage that partition and check the parent node again after a delay. The hometest is also run by partition processes to account for changes in the ring such as the addition or removal of nodes to the cluster.
+riak_kv_vnode_master 进程会平等的对待所有请求，如果需要，即便是当节点处理的请求不会针对
+其所含分区时，还会派生新的分区进程。如果分区的父节点不可访问，请求会被转发（移交）到后备节
+点上。后备节点上的 riak_kv_vnode_master 进程会派生一个进程管理这个分区，即使该分区不属于
+这个后备节点。
+
+每个分区进程在整个生命周期内都会进行“归属测试”（hometest），检查当前节点（node/0)）是不是
+环中定义的分区父节点。如果检测到分区属于另一（父）节点，会尝试联系那个节点。如果那个节点有
+响应，就会把当前节点中存储的所有数据移交到那个节点的分区中，然后关闭当前节点。如果那个节点
+无响应，进程就会继续管理这个分区，等待一段时间后再做检查。分区进程也会做“归属测试”，以获悉
+环的变动，例如集群中节点的增删。
