@@ -8,197 +8,188 @@ index: true
 keywords: [comparisons, couchdb]
 ---
 
-This is intended to be a brief, objective and technical comparison of Riak and CouchDB.  The CouchDB version described is 1.2.x. The Riak version described is Riak 1.2.x. If you feel this comparison is unfaithful at all for whatever reason, please [fix it](https://github.com/basho/basho_docs/issues/new) or send an email to **docs@basho.com**.
+本文旨在简略客观的从技术角度对比 Riak 和 CouchDB。对比时使用的 CouchDB 版
+本是 1.2.x，使用的 Riak 版本是 1.2.x。如果你觉得比较的结果不准确，
+请[修正](https://github.com/basho/basho_docs/issues/new)，
+或者发邮件到 **docs@basho.com**。
 
-## At A Very High Level
+## 总体比较
 
-* Riak and CouchDB are both Apache 2.0 licensed
-* Riak is written primarily in Erlang with some bits in C; CouchDB is written in Erlang
+* Riak 和 CouchDB 都基于 Apache 2.0 协议
+* Riak 大部分都是使用 Erlang 开发的，还有少部分 CouchDB 全部是由 Erlang 开发的。
 
-## Feature/Capability Comparison
+## 特性/性能对比
 
-The table below gives a high level comparison of Riak and CouchDB features/capabilities.  To keep this page relevant in the face of rapid development on both sides, low level details are found in links to Riak and CouchDB online documentation.
+下面的表格站在一定的高度上对比了 Riak 和 CouchDB 的特性和性能。为了保证这个
+表格能跟上快速开发的节奏，较低层面的细节都链接到了 Riak 和 CouchDB 的在线文档。
 
 <table>
     <tr>
 
-        <th WIDTH="15%">Feature/Capability</th>
+        <th WIDTH="15%">特性/性能</th>
         <th WIDTH="42%">Riak</th>
         <th WIDTH="43%">CouchDB</th>
     </tr>
     <tr>
-        <td>Data Model</td>
-        <td>Riak stores key/value pairs in a higher level namespace called a bucket.
+        <td>数据模型</td>
+        <td>Riak 把键值对存储在称为 bucket 的命名空间中。
             <ul>
-              <li>[[Buckets, Keys, and Values|Concepts#Buckets%2C-Keys%2C-and-Values]] </li>
+              <li>[[Bucket，键和值|Concepts#Buckets-Keys-and-Values]] </li>
             </ul>
         </td>
-        <td>CouchDB's data format is JSON stored as documents (self-contained records with no intrinsic relationships), grouped into "database" namespaces.
+        <td>CouchDB 的数据格式是 JSON，存储在文档中（其中的记录无内在联系），然后以“database”这个命名空间分组。
             <ul>
-                <li>[[Document API|http://wiki.apache.org/couchdb/HTTP_Document_API]]</li>
-            </ul>
-        </td>
-    </tr>
-    <tr>
-        <td>Storage Model</td>
-        <td>Riak has a modular, extensible local storage system which lets you plug-in a backend store of your choice to suit your use case. The default backend is Bitcask.
-            <ul>
-              <li>[[Riak Supported Storage Backends|Choosing a Backend]]</li>
-            </ul>
-
-        You can also write your own storage backend for Riak using our [[backend API|Backend API]].
-     </td>
-        <td>CouchDB stores data to disk by "append-only" files. As the files continue to grow, they require occasional compaction.
-            <ul>
-             <li>[[Indexes and File|http://guide.couchdb.org/draft/btree.html]]</li>
+                <li>[[文档 API|http://wiki.apache.org/couchdb/HTTP_Document_API]]</li>
             </ul>
         </td>
     </tr>
     <tr>
-        <td>Data Access and APIs</td>
-        <td>Riak offers two primary interfaces (in addition to raw Erlang access):
-			<ul>
-			  <li>[[HTTP|HTTP API]]</li>
-			<li>[[Protocol Buffers|PBC API]]</li>
-			</ul>
-			Riak Client libraries are wrappers around these APIs, and client support exists for dozens of languages. 
-			<ul>
-			<li>[[Client Libraries]]</li>
-			<li>[[Community Projects]]</li>
-			</ul>
-			</td>
-        <td>CouchDB provides an HTTP API for both data access and administration.
+        <td>存储模型</td>
+        <td>Riak 的存储系统是模块化可扩展的，允许用户根据寻妖选择适合的后台。默认的后台是 Bitcask。
+            <ul>
+              <li>[[Riak 支持的存储后台|Choosing a Backend]]</li>
+            </ul>
 
-                <ul>
-                <li>[[Document API|http://wiki.apache.org/couchdb/HTTP_Document_API]]</li>
-                <li>[[View API|http://wiki.apache.org/couchdb/HTTP_view_API]]</a></li>
+            用户还可以使用 Riak 提供的[[后台 API|Backend API]]自行编写存储后台。
+        </td>
+        <td>CouchDB 通过“只能添加到最后”的文件把数据存到硬盘。随着文件数量的增多，需要不时进行压缩。
+            <ul>
+                <li>[[索引和文件|http://guide.couchdb.org/draft/btree.html]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>数据访问和 API</td>
+        <td>Riak（除了原始的 Erlang 接口）主要提供了两种接口：
+            <ul>
+                <li>[[HTTP|HTTP API]]</li>
+                <li>[[Protocol Buffers|PBC API]]</li>
+            </ul>
+            Riak 客户端代码库封装了这些 API，支持很多编程语言。
+            <ul>
+                <li>[[客户端代码库|Client Libraries]]</li>
+                <li>[[社区项目|Community Projects]] </li>
+            </ul>
+        </td>
+        <td>CouchDB 提供有 HTTP API，可以用来访问数据，也可做数据库管理。
+            <ul>
+                <li>[[文档 API|http://wiki.apache.org/couchdb/HTTP_Document_API]]</li>
+                <li>[[视图 API|http://wiki.apache.org/couchdb/HTTP_view_API]]</a></li>
                 <li>[[DB API|http://wiki.apache.org/couchdb/HTTP_database_API]]</a></li>
-                </ul>
-
-            The CouchDB community supports many client libraries.
-            <ul>
-              <li>[[Client-Libraries|http://wiki.apache.org/couchdb/Related_Projects/#Libraries]]</li>
-            </ul>
-     </td>
-    </tr>
-    <tr>
-        <td>Query Types and Query-ability</td>
-        <td>There are currently four ways to query data in Riak
-            <ul>
-            <li>Primary key operations (GET, PUT, DELETE, UPDATE)</li>
-            <li>[[MapReduce|Using MapReduce]]</li>
-            <li>[[Using Secondary Indexes]]</li>
-            <li>[[Using Search]]</li>
             </ul>
 
-    </td>
-        <td>CouchDB is generally queried by direct ID lookups, or by creating MapReduce "views" that CouchDB runs to create a queryable index for querying by or computing other attributes. In addition, the ChangesAPI shows documents in the order they were last modified. Finally, there exist some community plugins to expand CouchDB's queryability, such as the CouchDB-Lucene full-text search plugin.
-
+            CouchDB 社区开发了很多客户端代码库。
             <ul>
-            <li>[[Views|http://wiki.apache.org/couchdb/HTTP_view_API]]</li>
-            <li>[[Changes Notifications|http://guide.couchdb.org/draft/notifications.html]]</li>
-            <li>[[Lucene Plugin|https://github.com/rnewson/couchdb-lucene/]]</li>
-            <ul>
-    </td>
-    </tr>
-    <tr>
-        <td>Data Versioning and Consistency</td>
-        <td> Riak uses a data structure called a vector clock to reason about causality and staleness of stored values. Vector clocks enable clients to always write to the database in exchange for consistency conflicts being resolved at read time by either application or client code. Vector clocks can be configured to store copies of a given datum based on size and age of said datum.   There is also an option to disable vector clocks and fall back to simple time-stamp based "last-write-wins".
-            <ul>
-              <li>[[Vector Clocks]]</li>
-              <li>[[Why Vector Clocks Are Easy|http://basho.com/blog/technical/2010/01/29/why-vector-clocks-are-easy/]]</li>
-              <li>[[Why Vector Clocks Are Hard|http://basho.com/blog/technical/2010/04/05/why-vector-clocks-are-hard/]]</li>
+              <li>[[客户端代码库|http://wiki.apache.org/couchdb/Related_Projects/#Libraries]]</li>
             </ul>
-         </td>
-
-        <td>CouchDB replicates newer document versions between nodes, making it an eventually consistent system. CouchDB uses Multi-Version Concurrency Control (MVCC) to avoid locking the database file during writes. Conflicts are left to the application to resolve at write time. Older document versions (called revisions) may be lost when the append-only database file is compacted.
-            <ul>
-              <li>[[Eventual Consistency|http://guide.couchdb.org/draft/consistency.html]]</li>
-            </ul>
-     </td>
-    </tr>
-        <td>Concurrency</td>
-        <td> In Riak, any node in the cluster can coordinate a read/write operation for any other node. Riak stresses availability for writes and reads, and puts the burden of resolution on the client at read time.
-         </td>
-
-        <td>Because of CouchDB's append-only value mutation, individual instances will not lock. When distributed, CouchDB won't allow updating similarly keyed document without a preceding version number, and conflicts must be manually resolved before concluding a write.
-
-            <ul>
-                <li>[[No Locking|http://guide.couchdb.org/draft/consistency.html#locking]]</li>
-                <li>[[Conflict Management|http://guide.couchdb.org/draft/conflicts.html]]</li>
-            </ul>
-     </td>
-    </tr>
-    <tr>
-        <td>Replication</td>
-        <td>Riak's replication system is heavily influenced by the Dynamo Paper and Dr. Eric Brewer's CAP Theorem. Riak uses consistent hashing to replicate and distribute N copies of each value around a Riak cluster composed of any number of physical machines. Under the hood, Riak uses virtual nodes to handle the distribution and dynamic rebalancing of data, thus decoupling the data distribution from physical assets.
-            <ul>
-              <li>[[Replication]]</li>
-              <li>[[Clustering|Concepts#Clustering]]</li>
-            </ul>
-
-            The Riak APIs expose tunable consistency and availability parameters that let you select which level configuration is best for your use case. Replication is configurable at the bucket level when first storing data in Riak. Subsequent reads and writes to that data can have request-level parameters.
-                <ul>
-                    <li>[[Reading, Writing, and Updating Data|Concepts#Reading%2C-Writing%2C-and-Updating-Data]]</li>
-                </ul>
-
-     </td>
-        <td>CouchDB incrementally replicates document changes between nodes. It can be deployed with master/master or master/slave replication. Replication can be finely controlled by way of replication filters.
-
-            <ul>
-            <li>[[Replication|http://wiki.apache.org/couchdb/Replication]]</li>
-            </ul>
-     </td>
-    </tr>
-    <tr>
-        <td>Scaling Out and In</td>
-        <td>Riak allows you to elastically grow and shrink your cluster while evenly balancing the load on each machine. No node in Riak is special or has any particular role. In other words, all nodes are masterless. When you add a physical machine to Riak, the cluster is made aware of its membership via gossiping of ring state. Once it's a member of the ring, it's assigned an equal percentage of the partitions and subsequently takes ownership of the data belonging to those partitions. The process for removing a machine is the inverse of this. Riak also ships with a comprehensive suite of command line tools to help make node operations simple and straightforward.
-
-    <ul>
-        <li>[[Adding and Removing Nodes]]</li>
-        <li>[[Command Line Tools]]</li>
-    </ul>
         </td>
-        <td>Out of the box, CouchDB is focused on a master-master replication of values (using MVCC to help with conflict resolution). There are external projects that help manage a CouchDB cluster, such as BigCouch (also Apache 2.0 licensed), that shards values across multiple nodes.
+    </tr>
+    <tr>
+        <td>查询类型和查询能力</td>
+        <td>目前在 Riak 中有四种查询数据的方式
+            <ul>
+                <li>主键操作（GET, PUT, DELETE, UPDATE）</li>
+                <li>[[MapReduce|Using MapReduce]]</li>
+                <li>[[使用二级索引|Using Secondary Indexes]]</li>
+                <li>[[使用搜索|Using Search]]</li>
+            </ul>
+        </td>
+        <td>CouchDB 一般是直接通过 ID 查找进行查询的，也可以创建 MapReduce 视图生成可查询的索引用来查询，或者计算其他属性。除此之外，ChangesAPI 还可以按照最后修改时间的顺序列出文档。还要很多社区开发的插件，扩展了 CouchDB 的查询能力，例如全文搜索插件 CouchDB-Lucene。
+            <ul>
+                <li>[[视图|http://wiki.apache.org/couchdb/HTTP_view_API]]</li>
+                <li>[[变更提醒|http://guide.couchdb.org/draft/notifications.html]]</li>
+                <li>[[Lucene 插件|https://github.com/rnewson/couchdb-lucene/]]</li>
+            <ul>
+        </td>
+    </tr>
+    <tr>
+        <td>数据版本和一致性</td>
+        <td>Riak 使用向量时钟推导存储数据的因果关系和过期情况。使用向量时钟可以让客户端始终能向数据库写入数据，在读取时由应用程序或客户端代码来解决冲突。还可以设置向量时钟基于数据的大小和寿命存储副本。还可以完全禁用向量时钟，使用简单的基于时间戳的“最后一次写入获胜”机制。
+            <ul>
+              <li>[[向量时钟|Vector Clocks]]</li>
+              <li>[[为什么向量始终很简单|http://basho.com/blog/technical/2010/01/29/why-vector-clocks-are-easy/]]</li>
+              <li>[[为什么向量始终很难|http://basho.com/blog/technical/2010/04/05/why-vector-clocks-are-hard/]]</li>
+            </ul>
+        </td>
 
+        <td>CouchDB 会为新版本的文档在不同的节点中创建副本，让其变成一个最终一致性的系统。CouchDB 使用“多版本并发控制”（Multi-Version Concurrency Control，MVCC）机制避免在写入时锁定数据库文件。数据冲突由应用程序在写入时解决。压缩只能附加到最后的数据库文件时，较旧版本的文档可能会丢失。
+            <ul>
+              <li>[[最终一致性|http://guide.couchdb.org/draft/consistency.html]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>并发性</td>
+        <td>在 Riak 中，集群中的任何一个节点都可以处理另一个节点的读取和写入操作。Riak 为写入和读取提供了较高的可用性，把重担都交给读取时的客户端。
+        </td>
+        <td>因为 CouchDB 的值只能附加到文件最后，单独的实例是无法被锁定的。在分布式系统中，如果没有之前的版本数，无法更新具有相似键的文档，而且冲突必须在写入之前手动解决。
+            <ul>
+                <li>[[不锁定|http://guide.couchdb.org/draft/consistency.html#locking]]</li>
+                <li>[[冲突管理|http://guide.couchdb.org/draft/conflicts.html]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>副本</td>
+        <td>Riak 的副本系统重度依赖 Dynamo 和 Dr. Eric Brewer 的 CAP 定理。Riak 使用一致性哈希创建副本，然后把 N 个副本分发到由任意数量物理设备组成的集群中。在底层，Riak 使用虚拟节点处理数据的分发和动态平衡，因此解耦了从物理资源分发出来的数据。
+            <ul>
+              <li>[[副本|Replication]]</li>
+              <li>[[集群|Concepts#Clustering]]</li>
+            </ul>
+            Riak API 开放了可以调整的一致性和可用性参数，允许用户设置一个合适的水平。副本在 bucket 层面设置，要在第一次存储数据前设定好。后续的读写操作可以设置针对每次请求的参数。
+
+            <ul>
+                <li>[[读、写、更新数据|Concepts#Reading-Writing-and-Updating-Data]]</li>
+            </ul>
+        </td>
+        <td>CouchDB 增量式地为文档的变化在不同的节点中创建副本。可以创建“主-主”副本，或者“主-从”副本。副本可以通过副本过滤器管良好控。
+            <ul>
+                <li>[[副本|http://wiki.apache.org/couchdb/Replication]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>扩放</td>
+        <td>Riak 允许用户弹性的提升和减小集群的大小，而且最终在每个设备上做到负载平衡。Riak 中没有特殊的节点，或者具有特殊角色的节点。也就是说，所有节点都是无主的。如果增加了物理设备，集群会通过环状态广播得知这一变化。一旦成为环成员后，就会赋给相同比例的分区，然后负责这些分区中的数据。删除设备就是上述过程的反操作。Riak 还提供了一套完整的命令行工具，让节点操作更简单直观。
+
+            <ul>
+                <li>[[添加和删除节点|Adding and Removing Nodes]]</li>
+                <li>[[命令行工具|Command Line Tools]]</li>
+            </ul>
+        </td>
+        <td>CouchDB 默认关注的是“主-主”副本（使用 MVCC 帮助解决冲突）。有一些项目可以用来管理 CouchDB 集群，例如 BigCouch（也基于 Apache 2.0 协议），可以把值分布到多个节点中。
             <ul>
                 <li>[[BigCouch|http://bigcouch.cloudant.com/]]</li>
-                <li>[[Sharding (on Wikipedia)|http://en.wikipedia.org/wiki/Sharding]]</li>
+                <li>[[Sharding（维基百科）|http://en.wikipedia.org/wiki/Sharding]]</li>
             </ul>
-    </td>
-    </tr>
-    <tr>
-        <td>Multi-Datacenter Replication and Awareness</td>
-
-        <td>Riak features two distinct types of replication. Users can replicate to any number of nodes in one cluster (which is usually contained within one datacenter over a LAN) using the Apache 2.0 licensed database. Riak Enterprise, Basho's commercial extension to Riak, is required for Multi-Datacenter deployments (meaning the ability to run active Riak clusters in N datacenters).
-
-        <ul>
-            <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
-        </ul>
-
         </td>
-        <td>CouchDB can be configured to run in multiple datacenters. Robust awareness will generally require a third part solution, or by developing replication filters.
-
-            <ul>
-            <li>[[Filtered Replication|http://wiki.apache.org/couchdb/Replication#Filtered_Replication]]</li>
-            <li>[[The Split Brain|http://guide.couchdb.org/draft/conflicts.html#brain]]</li>
-            </ul>
-
-    </td>
     </tr>
     <tr>
-        <td>Graphical Monitoring/Admin Console</td>
-        <td>Riak ships with Riak Control, an open source graphical console for monitoring and managing Riak clusters.
+        <td>在多数据中心之间创建副本</td>
+        <td>Riak 中有两种类型的副本。用户可以使用 Apache 2.0 数据库在一个集群中创建任意数量的副本（通常在 LAN 中的同一个数据中心）。如果要在多个数据中心之间创建副本（可以在 N 个数据中心中运行 Riak 集群），就要使用 Riak Enterprise，Basho 开发的 Raik 商业扩展。
+            <ul>
+                <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
+            <ul>
+        </td>
+        <td>适当设置后，CouchDB 可以运行在多个数据中心上。鲁棒意识需要第三方解决方案，或者自行开发副本过滤器。
+            <ul>
+                <li>[[过滤副本|http://wiki.apache.org/couchdb/Replication#Filtered_Replication]]</li>
+                <li>[[裂脑|http://guide.couchdb.org/draft/conflicts.html#brain]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>图形化监控/管理控制台</td>
+        <td>Riak 提供有 Riak Control，这是个开源图形化控制台，可以监控和管理 Riak 集群。
             <ul>
                 <li>[[Riak Control]]</li>
-                <li>[[Introducing Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
+                <li>[[介绍 Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
             </ul>
-    </td>
-        <td>CouchDB ships with a graphical interface called Futon.
-
+        </td>
+        <td>CouchDB 提供了图形化界面，叫做 Futon。
             <ul>
-                <li>[[Welcome to Futon|http://guide.couchdb.org/draft/tour.html#welcome]]</li>
+                <li>[欢迎使用 Futon|http://guide.couchdb.org/draft/tour.html#welcome]]</li>
             </ul>
-     </td>
+        </td>
     </tr>
 </table>
