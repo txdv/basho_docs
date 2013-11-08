@@ -16,7 +16,7 @@ keywords: [comparisons, couchdb]
 ## 总体比较
 
 * Riak 和 CouchDB 都基于 Apache 2.0 协议
-* Riak 大部分都是使用 Erlang 开发的，还有少部分 CouchDB 全部是由 Erlang 开发的。
+* Riak 大部分都是使用 Erlang 开发的，还有少部分 C。CouchDB 全部是由 Erlang 开发的。
 
 ## 特性/性能对比
 
@@ -188,7 +188,7 @@ keywords: [comparisons, couchdb]
         </td>
         <td>CouchDB 提供了图形化界面，叫做 Futon。
             <ul>
-                <li>[欢迎使用 Futon|http://guide.couchdb.org/draft/tour.html#welcome]]</li>
+                <li>[[欢迎使用 Futon|http://guide.couchdb.org/draft/tour.html#welcome]]</li>
             </ul>
         </td>
     </tr>

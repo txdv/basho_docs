@@ -8,210 +8,195 @@ index: true
 keywords: [comparisons, mongodb]
 ---
 
-This is intended to be a brief, objective and technical comparison of Riak and MongoDB.  The MongoDB version described is 2.2.x. The Riak version described is Riak 1.2.x. If you feel this comparison is unfaithful at all for whatever reason, please [fix it](https://github.com/basho/basho_docs/issues/new) or send an email to **docs@basho.com**.
+本文旨在简略客观的从技术角度对比 Riak 和 MongoDB。对比时使用的 MongoDB 版
+本是 2.2.x，使用的 Riak 版本是 1.2.x。如果你觉得比较的结果不准确，
+请[修正](https://github.com/basho/basho_docs/issues/new)，
+或者发邮件到 **docs@basho.com**。
 
-## At A Very High Level
+## 总体比较
 
-* Riak is Apache 2.0 licensed; MongoDB is distributed under the AGPL
-* Riak is written primarily in Erlang with some bits in C; MongoDB is written in C++
+* Riak 基于 Apache 2.0 协议；MongoDB 基于 AGPL 协议
+* Riak 大部分都是使用 Erlang 开发的，还有少部分 C。MongoDB 使用 C++ 开发
 
-## Feature/Capability Comparison
+## 特性/性能对比
 
-The table below gives a high level comparison of Riak and MongoDB features/capabilities.  To keep this page relevant in the face of rapid development on both sides, low level details are found in links to Riak and MongoDB online documentation.
+下面的表格站在一定的高度上对比了 Riak 和 MongoDB 的特性和性能。为了保证这个
+表格能跟上快速开发的节奏，较低层面的细节都链接到了 Riak 和 MongoDB 的在线文档。
 
 <table>
     <tr>
-
-        <th WIDTH="15%">Feature/Capability</th>
+        <th WIDTH="15%">特性/性能</th>
         <th WIDTH="42%">Riak</th>
         <th WIDTH="43%">MongoDB</th>
     </tr>
     <tr>
-        <td>Data Model</td>
-        <td>Riak stores key/value pairs in a higher level namespace called a bucket.
+        <td>数据模型</td>
+        <td>Riak 把键值对存储在称为 bucket 的命名空间中。
             <ul>
-              <li>[[Buckets, Keys, and Values|Concepts#Buckets-Keys-and-Values]] </li>
+              <li>[[Bucket，键和值|Concepts#Buckets-Keys-and-Values]] </li>
             </ul>
         </td>
-        <td>MongoDB's data format is BSON (binary equivalent to JSON) stored as documents (self-contained records with no intrinsic relationships). Documents in MongoDB may store any of the defined BSON types and are grouped in collections.
+        <td>MongoDB 使用的数据格式是 BSON（binary equivalent to JSON），以文档（所含的记录内在无关联）的形式存储。MongoDB 中的文档可以保存所定义的任何 BSON 类型，而且以集合分组。
             <ul>
-                <li>[[Documents|http://www.mongodb.org/display/DOCS/Documents]]</li>
-                <li>[[Data Types and Conventions|http://www.mongodb.org/display/DOCS/Data+Types+and+Conventions]]</li>
-
-            </ul>
-        </td>
-    </tr>
-    <tr>
-        <td>Storage Model</td>
-        <td>Riak has a modular, extensible local storage system which lets you plug-in a backend store of your choice to suit your use case. The default backend is Bitcask.
-            <ul>
-              <li>[[Riak Supported Storage Backends|Choosing a Backend]]</li>
-            </ul>
-
-        You can also write your own storage backend for Riak using our [[backend API|Backend API]].
-     </td>
-        <td> MongoDB's default storage system is the Memory-Mapped Storage Engine. It uses memory mapped files for all disk I/O.  It is the responsibility of the OS to manage flushing data to disk and paging data in and out.
-            <ul>
-             <li>[[Caching|http://www.mongodb.org/display/DOCS/Caching]]</li>
+                <li>[[文档|http://www.mongodb.org/display/DOCS/Documents]]</li>
+                <li>[[数据类型和约定|http://www.mongodb.org/display/DOCS/Data+Types+and+Conventions]]</li>
             </ul>
         </td>
     </tr>
     <tr>
-        <td>Data Access and APIs</td>
-        <td>Riak offers two primary interfaces (in addition to raw Erlang access):
-			<ul>
-			  <li>[[HTTP|HTTP API]]</li>
-			<li>[[Protocol Buffers|PBC API]]</li>
-			</ul>
-			Riak Client libraries are wrappers around these APIs, and client support exists for dozens of languages. 
-			<ul>
-			  <li>[[Client Libraries]]</li>
-			  <li>[[Community Projects]]</li>
-			</ul>
-			</td>
-        <td> MongoDB uses a custom, socket-based wire protocol with BSON as the interchange format. 
-	
-			<ul>
-				<li><a href="http://www.mongodb.org/display/DOCS/Mongo+Wire+Protocol">Mongo Wire Protocol</a></li>
-			</ul>
-			
-			10Gen and the Mongo community support many client libraries.
-			<ul>	
-			  <li>[[Client-Libraries|http://www.mongodb.org/display/DOCS/Drivers]]</li>
-			</ul>
-	 </td>
-    </tr>
-    <tr>
-        <td>Query Types and Query-ability</td>
-        <td>There are currently four ways to query data in Riak
+        <td>存储模型</td>
+        <td>Riak 的存储系统是模块化可扩展的，允许用户根据寻妖选择适合的后台。默认的后台是 Bitcask。
             <ul>
-            <li>Primary key operations (GET, PUT, DELETE, UPDATE)</li>
-            <li>[[MapReduce|Using MapReduce]]</li>
-            <li>[[Using Secondary Indexes]]</li>
-            <li>[[Using Search]]</li>
+              <li>[[Riak 支持的存储后台|Choosing a Backend]]</li>
             </ul>
 
-    </td>
-        <td>MongoDB has a query interface that has some similarities to relational databases, including secondary indexes that can be derived from the stored documents. MongoDB also has a facilities for performing MapReduce queries and ad-hoc queries on documents. Hadoop support is available, too.
-                <ul>
-                <li>[[Querying|http://www.mongodb.org/display/DOCS/Querying]]</li>
-                <li>[[Indexes|http://www.mongodb.org/display/DOCS/Indexes]]</li>
+            用户还可以使用 Riak 提供的[[后台 API|Backend API]]自行编写存储后台。
+        </td>
+        <td>MongoDB 默认的存储系统是 Memory-Mapped Storage Engine，所有的硬盘 IO 都是用内存映射文件。数据冲刷到硬盘和分页是由操作系统负责的。
+            <ul>
+             <li>[[缓存|http://www.mongodb.org/display/DOCS/Caching]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>数据访问和 API</td>
+        <td>Riak（除了原始的 Erlang 接口）主要提供了两种接口：
+            <ul>
+                <li>[[HTTP|HTTP API]]</li>
+                <li>[[Protocol Buffers|PBC API]]</li>
+            </ul>
+            Riak 客户端代码库封装了这些 API，支持很多编程语言。
+            <ul>
+                <li>[[客户端代码库|Client Libraries]]</li>
+                <li>[[社区项目|Community Projects]] </li>
+            </ul>
+        </td>
+        <td>MongoDB 使用自定义基于套接字的 Wire Protocal 和 BSON 作为交换格式。
+            <ul>
+                <li><a href="http://www.mongodb.org/display/DOCS/Mongo+Wire+Protocol">Mongo Wire Protocol</a></li>
+            </ul>
+            10Gen 和 Mongo 社区开发了很多客户端代码库。
+            <ul>
+              <li>[[客户端代码库|http://www.mongodb.org/display/DOCS/Drivers]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>查询类型和查询能力</td>
+        <td>目前在 Riak 中有四种查询数据的方式
+            <ul>
+                <li>主键操作（GET, PUT, DELETE, UPDATE）</li>
+                <li>[[MapReduce|Using MapReduce]]</li>
+                <li>[[使用二级索引|Using Secondary Indexes]]</li>
+                <li>[[使用搜索|Using Search]]</li>
+            </ul>
+        </td>
+        <td>MongoDB 的查询接口和关系型数据库很像，还包含可以从所存文档创建的二级索引。MongoDB 还支持对文档进行 MapReduce 查询和即席查询（ad-hoc query）。而且也支持 Hadoop。
+            <ul>
+                <li>[[查询|http://www.mongodb.org/display/DOCS/Querying]]</li>
+                <li>[[索引|http://www.mongodb.org/display/DOCS/Indexes]]</li>
                 <li>[[MapReduce|http://www.mongodb.org/display/DOCS/MapReduce]]</li>
-                <li>[[MongoDB Hadoop Adapter|https://github.com/mongodb/mongo-hadoop]]</li>
+                <li>[[MongoDB 的 Hadoop 适配器|https://github.com/mongodb/mongo-hadoop]]</li>
             <ul>
-    </td>
+        </td>
     </tr>
     <tr>
-        <td>Data Versioning and Consistency</td>
-        <td> Riak uses a data structure called a vector clock to reason about causality and staleness of stored values. Vector clocks enable clients to always write to the database in exchange for consistency conflicts being resolved at read time by either application or client code. Vector clocks can be configured to store copies of a given datum based on size and age of said datum.   There is also an option to disable vector clocks and fall back to simple time-stamp based "last-write-wins".
+        <td>数据版本和一致性</td>
+        <td>Riak 使用向量时钟推导存储数据的因果关系和过期情况。使用向量时钟可以让客户端始终能向数据库写入数据，在读取时由应用程序或客户端代码来解决冲突。还可以设置向量时钟基于数据的大小和寿命存储副本。还可以完全禁用向量时钟，使用简单的基于时间戳的“最后一次写入获胜”机制。
             <ul>
-              <li>[[Vector Clocks]]</li>
-              <li>[[Why Vector Clocks Are Easy|http://basho.com/blog/technical/2010/01/29/why-vector-clocks-are-easy/]]</li>
-              <li>[[Why Vector Clocks Are Hard|http://basho.com/blog/technical/2010/04/05/why-vector-clocks-are-hard/]]</li>
+              <li>[[向量时钟|Vector Clocks]]</li>
+              <li>[[为什么向量始终很简单|http://basho.com/blog/technical/2010/01/29/why-vector-clocks-are-easy/]]</li>
+              <li>[[为什么向量始终很难|http://basho.com/blog/technical/2010/04/05/why-vector-clocks-are-hard/]]</li>
             </ul>
-         </td>
-
-        <td>MongoDB exhibits strong consistency.  Eventually consistent reads can be accomplished via secondaries.  A MongoDB  cluster (with auto-sharding and replication) has a master server at a given point in time for each shard.
+        </td>
+        <td>MongoDB 是强一致性的数据库。通过次级读操作可以实现最终一致性的读取。每个分片中某个时刻 MongoDB 集群（有自动分片和副本）中都有一个主服务器。
             <ul>
-              <li>[[On Distributed Consistency|http://blog.mongodb.org/post/475279604/on-distributed-consistency-part-1]]</li>
+              <li>[[关于分布式一致性|http://blog.mongodb.org/post/475279604/on-distributed-consistency-part-1]]</li>
             </ul>
-     </td>
+        </td>
     </tr>
-        <td>Concurrency</td>
-        <td> In Riak, any node in the cluster can coordinate a read/write operation for any other node. Riak stresses availability for writes and reads, and puts the burden of resolution on the client at read time.
-         </td>
-
-        <td>MongoDB relies on locks for consistency. As of version 2.2, MongoDB has a DB Level Lock for all operations.
+        <td>并发性</td>
+        <td>在 Riak 中，集群中的任何一个节点都可以处理另一个节点的读取和写入操作。Riak 为写入和读取提供了较高的可用性，把重担都交给读取时的客户端。
+        </td>
+        <td>MongoDB 的一致性依赖于锁定。从 2.2 开始，MongoDB 为所有操作提供了 DB Level Lock。
             <ul>
-                <li>[[Locks|http://docs.mongodb.org/manual/administration/monitoring/#locks]]</li>
+                <li>[[锁定|http://docs.mongodb.org/manual/administration/monitoring/#locks]]</li>
                 <li>[[DB Level Locking|https://jira.mongodb.org/browse/SERVER-4328]]</li>
-                <li>[[How Does Concurrency Work?|http://www.mongodb.org/display/DOCS/How+does+concurrency+work]]</li>
+                <li>[[如何处理并发？|http://www.mongodb.org/display/DOCS/How+does+concurrency+work]]</li>
             </ul>
-     </td>
-    </tr>
-    <tr>
-        <td>Replication</td>
-        <td>Riak's replication system is heavily influenced by the Dynamo Paper and Dr. Eric Brewer's CAP Theorem. Riak uses consistent hashing to replicate and distribute N copies of each value around a Riak cluster composed of any number of physical machines. Under the hood, Riak uses virtual nodes to handle the distribution and dynamic rebalancing of data, thus decoupling the data distribution from physical assets.
-            <ul>
-              <li>[[Replication]]</li>
-              <li>[[Clustering|Concepts#Clustering]]</li>
-            </ul>
-
-            The Riak APIs expose tunable consistency and availability parameters that let you select which level configuration is best for your use case. Replication is configurable at the bucket level when first storing data in Riak. Subsequent reads and writes to that data can have request-level parameters.
-                <ul>
-                    <li>[[Reading, Writing, and Updating Data|Concepts#Reading-Writing-and-Updating-Data]]</li>
-                </ul>
-
-     </td>
-        <td>Mongo manages replication via replica sets, a form of asynchronous master/slave replication. Traditional master/slave replication is available but not recommended.
-            <ul>
-            <li>[[Replication|http://www.mongodb.org/display/DOCS/Replication]]</li>
-            <li>[[Replica Sets|http://www.mongodb.org/display/DOCS/Replica+Sets]]</li>
-            <li>[[Master/Slave|http://www.mongodb.org/display/DOCS/Master+Slave]]</li>
-            </ul>
-     </td>
-    </tr>
-    <tr>
-        <td>Scaling Out and In</td>
-        <td>Riak allows you to elastically grow and shrink your cluster while evenly balancing the load on each machine. No node in Riak is special or has any particular role. In other words, all nodes are masterless. When you add a physical machine to Riak, the cluster is made aware of its membership via gossiping of ring state. Once it's a member of the ring, it's assigned an equal percentage of the partitions and subsequently takes ownership of the data belonging to those partitions. The process for removing a machine is the inverse of this. Riak also ships with a comprehensive suite of command line tools to help make node operations simple and straightforward.
-
-    <ul>
-        <li>[[Adding and Removing Nodes]]</li>
-        <li>[[Command Line Tools]]</li>
-    </ul>
         </td>
-        <td>Mongo relies on sharding for scaling out. This involves designating a certain server to hold certain chunks of the data as the data set grows.
-
-            <ul>
-                <li>[[Sharding in MongoDB|http://www.mongodb.org/display/DOCS/Sharding]]</li>
-                <li>[[Sharding Introduction|http://www.mongodb.org/display/DOCS/Sharding+Introduction]]</li>
-                <li>[[Sharding (on Wikipedia)|http://en.wikipedia.org/wiki/Sharding]]</li>
-
-            </ul>
-
-            To scale in, MongoDB has support for removing shards from your database.
-            <ul>
-                <li>[[Removing Shards|http://docs.mongodb.org/manual/administration/sharding/#remove-a-shard-from-a-cluster]]</li>
-            </ul>
-
-    </td>
     </tr>
     <tr>
-        <td>Multi-Datacenter Replication and Awareness</td>
-
-        <td>Riak features two distinct types of replication. Users can replicate to any number of nodes in one cluster (which is usually contained within one datacenter over a LAN) using the Apache 2.0 licensed database. Riak Enterprise, Basho's commercial extension to Riak, is required for Multi-Datacenter deployments (meaning the ability to run active Riak clusters in N datacenters).
-
-        <ul>
-            <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
-        </ul>
-
+        <td>副本</td>
+        <td>Riak 的副本系统重度依赖 Dynamo 和 Dr. Eric Brewer 的 CAP 定理。Riak 使用一致性哈希创建副本，然后把 N 个副本分发到由任意数量物理设备组成的集群中。在底层，Riak 使用虚拟节点处理数据的分发和动态平衡，因此解耦了从物理资源分发出来的数据。
+            <ul>
+              <li>[[副本|Replication]]</li>
+              <li>[[集群|Concepts#Clustering]]</li>
+            </ul>
+            Riak API 开放了可以调整的一致性和可用性参数，允许用户设置一个合适的水平。副本在 bucket 层面设置，要在第一次存储数据前设定好。后续的读写操作可以设置针对每次请求的参数。
+            <ul>
+                <li>[[读、写、更新数据|Concepts#Reading-Writing-and-Updating-Data]]</li>
+            </ul>
         </td>
-        <td>MongoDB can be configured to run in multiple datacenters via various options.
-
+        <td>Mongo 使用副本集合管理副本，这是一种异步主从副本。传统的主从副本也可以使用，但不推荐。
             <ul>
-                    <li><a href="http://www.mongodb.org/display/DOCS/Data+Center+Awareness">Datacenter Awareness</a></li>
+            <li>[[副本|http://www.mongodb.org/display/DOCS/Replication]]</li>
+            <li>[[副本集合|http://www.mongodb.org/display/DOCS/Replica+Sets]]</li>
+            <li>[[主从|http://www.mongodb.org/display/DOCS/Master+Slave]]</li>
             </ul>
-
-    </td>
+        </td>
     </tr>
     <tr>
-        <td>Graphical Monitoring/Admin Console</td>
-        <td>Riak ships with Riak Control, an open source graphical console for monitoring and managing Riak clusters.
+        <td>扩放</td>
+        <td>Riak 允许用户弹性的提升和减小集群的大小，而且最终在每个设备上做到负载平衡。Riak 中没有特殊的节点，或者具有特殊角色的节点。也就是说，所有节点都是无主的。如果增加了物理设备，集群会通过环状态广播得知这一变化。一旦成为环成员后，就会赋给相同比例的分区，然后负责这些分区中的数据。删除设备就是上述过程的反操作。Riak 还提供了一套完整的命令行工具，让节点操作更简单直观。
+            <ul>
+                <li>[[添加和删除节点|Adding and Removing Nodes]]</li>
+                <li>[[命令行工具|Command Line Tools]]</li>
+            </ul>
+        </td>
+        <td>Mongo 集群的增大依赖于分片，随着数据的增长，要选定一个服务器来存储数据片段。
+            <ul>
+                <li>[[MongoDB 中的分片|http://www.mongodb.org/display/DOCS/Sharding]]</li>
+                <li>[[分片介绍|http://www.mongodb.org/display/DOCS/Sharding+Introduction]]</li>
+                <li>[[分片（维基百科）|http://en.wikipedia.org/wiki/Sharding]]</li>
+            </ul>
+            减小集群可以从数据库中删除分片。
+            <ul>
+                <li>[[删除分片|http://docs.mongodb.org/manual/administration/sharding/#remove-a-shard-from-a-cluster]]</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>在多数据中心之间创建副本</td>
+        <td>Riak 中有两种类型的副本。用户可以使用 Apache 2.0 数据库在一个集群中创建任意数量的副本（通常在 LAN 中的同一个数据中心）。如果要在多个数据中心之间创建副本（可以在 N 个数据中心中运行 Riak 集群），就要使用 Riak Enterprise，Basho 开发的 Raik 商业扩展。
+            <ul>
+                <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
+            <ul>
+        </td>
+        <td>MongoDB 设置后可以运行在多个数据中心上。
+            <ul>
+                <li><a href="http://www.mongodb.org/display/DOCS/Data+Center+Awareness">Datacenter Awareness</a></li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>图形化监控/管理控制台</td>
+        <td>Riak 提供有 Riak Control，这是个开源图形化控制台，可以监控和管理 Riak 集群。
             <ul>
                 <li>[[Riak Control]]</li>
-                <li>[[Introducing Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
+                <li>[[介绍 Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
             </ul>
-    </td>
-        <td>MongoDB does not ship with a graphical monitoring/admin console.  However, several community projects have developed graphical monitoring/admin programs.
+        </td>
+        <td>MongoDB 没有提供图形化监控和管理控制台。不过很多由社区项目开发了图形化监控和管理程序。
             <ul>
-                <li>[[Monitoring and Diagnostics|http://www.mongodb.org/display/DOCS/Monitoring+and+Diagnostics]]</li>
-                <li>[[Admin UIs|http://www.mongodb.org/display/DOCS/Admin+UIs]]</li>
+                <li>[[监控和诊断|http://www.mongodb.org/display/DOCS/Monitoring+and+Diagnostics]]</li>
+                <li>[[管理界面|http://www.mongodb.org/display/DOCS/Admin+UIs]]</li>
             </ul>
 
-            10Gen offers a hosted monitoring service.
+            10Gen 提供有托管的监控服务。
 
             <ul>
-            <li><a href="http://www.10gen.com/mongodb-monitoring-service">Mongo Monitoring Service</a></li>
+                <li><a href="http://www.10gen.com/mongodb-monitoring-service">Mongo 监控服务</a></li>
             </ul>
      </td>
     </tr>

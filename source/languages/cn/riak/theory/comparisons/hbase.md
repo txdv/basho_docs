@@ -140,58 +140,57 @@ keywords: [comparisons, hbase]
                 <li>[[读、写、更新数据|Concepts#Reading-Writing-and-Updating-Data]]</li>
             </ul>
         </td>
-        <td>HBase supports in-cluster and between-cluster replication. In-cluster replication is handled by HDFS and replicates underlying data files according to Hadoop's settings. Between-cluster replicates by an eventually consistent master/slave push, or more recently added (experimental) master/master and cyclic (where each node plays the role of master and slave) replication.
+                <td>HBase 支持在集群内和集群间创建副本。集群内的副本由 HDFS 处理，底层的数据文件副本由 Hadoop 设置。集群间由最终一致性主从推送副本，或者由最近新加的主主推送和周期推送（各节点既可以作为主节点也可以作为从节点）。
         <ul>
-        <li>[[Replication|http://hbase.apache.org/replication.html]]</li>
+        <li>[[副本|http://hbase.apache.org/replication.html]]</li>
         </ul>
      </td>
     </tr>
     <tr>
-        <td>Scaling Out and In</td>
-        <td>Riak allows you to elastically grow and shrink your cluster while evenly balancing the load on each machine. No node in Riak is special or has any particular role. In other words, all nodes are masterless. When you add a physical machine to Riak, the cluster is made aware of its membership via gossiping of ring state. Once it's a member of the ring, it's assigned an equal percentage of the partitions and subsequently takes ownership of the data belonging to those partitions. The process for removing a machine is the inverse of this. Riak also ships with a comprehensive suite of command line tools to help make node operations simple and straightforward.
-    <ul>
-        <li>[[Adding and Removing Nodes]]</li>
-        <li>[[Command Line Tools]]</li>
-    </ul>
-        </td>
-        <td>HBase shards by way or regions, that automatically split and redistribute growing data. A crash on a region requires crash recovery. HBase can be made to scale in with some intervention on the part of the developer or DBA.
+        <td>扩放</td>
+        <td>Riak 允许用户弹性的提升和减小集群的大小，而且最终在每个设备上做到负载平衡。Riak 中没有特殊的节点，或者具有特殊角色的节点。也就是说，所有节点都是无主的。如果增加了物理设备，集群会通过环状态广播得知这一变化。一旦成为环成员后，就会赋给相同比例的分区，然后负责这些分区中的数据。删除设备就是上述过程的反操作。Riak 还提供了一套完整的命令行工具，让节点操作更简单直观。
+
             <ul>
-                <li>[[Regions|http://hbase.apache.org/book/regions.arch.html]]</li>
-                <li>[[Node Management|http://hbase.apache.org/book/node.management.html]]</li>
-                <li>[[HBase Architecture|http://hbase.apache.org/book/architecture.html]]</li>
+                <li>[[添加和删除节点|Adding and Removing Nodes]]</li>
+                <li>[[命令行工具|Command Line Tools]]</li>
             </ul>
-    </td>
+        </td>
+        <td>HBase 根据线路和地区分片，自动分离并重新分发不断增多的数据。某个地区的数据损坏了，需要进行复原操作。HBase 的扩放需要开发者或 DBA 干预。
+            <ul>
+                <li>[[地区|http://hbase.apache.org/book/regions.arch.html]]</li>
+                <li>[[节点管理|http://hbase.apache.org/book/node.management.html]]</li>
+                <li>[[HBase 架构|http://hbase.apache.org/book/architecture.html]]</li>
+            </ul>
+        </td>
     </tr>
     <tr>
-        <td>Multi-Datacenter Replication and Awareness</td>
-
-        <td>Riak features two distinct types of replication. Users can replicate to any number of nodes in one cluster (which is usually contained within one datacenter over a LAN) using the Apache 2.0 licensed database. Riak Enterprise, Basho's commercial extension to Riak, is required for Multi-Datacenter deployments (meaning the ability to run active Riak clusters in N datacenters).
-        <ul>
-            <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
-        </ul>
-
-        </td>
-        <td>HBase shards by way of regions, that themselves may be replicated across multiple datacenters.
+        <td>在多数据中心之间创建副本</td>
+        <td>Riak 中有两种类型的副本。用户可以使用 Apache 2.0 数据库在一个集群中创建任意数量的副本（通常在 LAN 中的同一个数据中心）。如果要在多个数据中心之间创建副本（可以在 N 个数据中心中运行 Riak 集群），就要使用 Riak Enterprise，Basho 开发的 Raik 商业扩展。
             <ul>
-              <li>[[Node Management|http://hbase.apache.org/replication.html]]</li>
+                <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
+            <ul>
+        </td>
+        <td>HBase 根据线路和地区分片，因此可以在多个数据中心之间创建副本。
+            <ul>
+              <li>[[节点管理|http://hbase.apache.org/replication.html]]</li>
             </ul>
-    </td>
+        </td>
     </tr>
     <tr>
-        <td>Graphical Monitoring/Admin Console</td>
-        <td>Riak ships with Riak Control, an open source graphical console for monitoring and managing Riak clusters.
+        <td>图形化监控/管理控制台</td>
+        <td>Riak 提供有 Riak Control，这是个开源图形化控制台，可以监控和管理 Riak 集群。
             <ul>
                 <li>[[Riak Control]]</li>
-                <li>[[Introducing Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
+                <li>[[介绍 Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
             </ul>
-    </td>
-        <td>HBase has a few community supported graphical tools, and a command-line admin console.
-        <ul>
-        <li>[[Admin Console Tools|http://hbase.apache.org/book/ops_mgt.html#tools]]</li>
-        <li>[[Eclipse Dev Plugin|http://wiki.apache.org/hadoop/Hbase/EclipseEnvironment]]</li>
-        <li>[[HBase Manager|http://sourceforge.net/projects/hbasemanagergui/]]</li>
-        <li>[[GUI Admin|https://github.com/zaharije/hbase-gui-admin]]</li>
-        </ul>
-     </td>
+        </td>
+        <td>HBase 中有很多由社区开发的图形化工具和命令行管理控制台。
+            <ul>
+                <li>[[管理控制台工具|http://hbase.apache.org/book/ops_mgt.html#tools]]</li>
+                <li>[[Eclipse 开发插件|http://wiki.apache.org/hadoop/Hbase/EclipseEnvironment]]</li>
+                <li>[[HBase 管理器|http://sourceforge.net/projects/hbasemanagergui/]]</li>
+                <li>[[GUI 管理|https://github.com/zaharije/hbase-gui-admin]]</li>
+            </ul>
+        </td>
     </tr>
 </table>
