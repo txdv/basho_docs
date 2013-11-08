@@ -8,185 +8,189 @@ index: true
 keywords: [comparisons, hbase]
 ---
 
-This is intended to be a brief, objective and technical comparison of Riak and HBase. The HBase version described is 0.94.x. The Riak version described is Riak 1.2.x. If you feel this comparison is unfaithful at all for whatever reason, please [fix it](https://github.com/basho/basho_docs/issues/new) or send an email to **docs@basho.com**.
+本文旨在简略客观的从技术角度对比 Riak 和 HBase。对比时使用的 HBase 版
+本是 0.94.x，使用的 Riak 版本是 1.2.x。如果你觉得比较的结果不准确，
+请[修正](https://github.com/basho/basho_docs/issues/new)，
+或者发邮件到 **docs@basho.com**。
 
-## At A Very High Level
+## 总体比较
 
-* Riak and HBase are both Apache 2.0 licensed
-* Riak is based on Amazon's Dynamo paper; HBase is based on Google's BigTable
-* Riak is written primarily in Erlang with some C; HBase is written in Java
+* Riak 和 HBase 都基于 Apache 2.0 协议
+* Riak 基于 Amazon 的 Dynamo 论文；HBase 基于 Google 的 BigTable
+* Riak 大部分都是使用 Erlang 开发的，还有少部分 C。HBase 全部使用 Java 开发
 
-## Feature/Capability Comparison
+## 特性/性能对比
 
-The table below gives a high level comparison of Riak and HBase features and capabilities. To keep this page relevant in the face of rapid development on both sides, low level details are found in links to Riak and HBase online documentation.
+下面的表格站在一定的高度上对比了 Riak 和 HBase 的特性和性能。为了保证这个
+表格能跟上快速开发的节奏，较低层面的细节都链接到了 Riak 和 HBase 的在线文档。
 
 <table>
     <tr>
-        <th WIDTH="15%">Feature/Capability</th>
+        <th WIDTH="15%">特性/性能</th>
         <th WIDTH="42%">Riak</th>
         <th WIDTH="43%">HBase</th>
     </tr>
     <tr>
-        <td>Data Model</td>
-        <td>Riak stores key/value pairs in a higher level namespace called a bucket.
+        <td>数据模型</td>
+        <td>Riak 把键值对存储在称为 bucket 的命名空间中。
             <ul>
-              <li>[[Buckets, Keys, and Values|Concepts#Buckets, Keys, and Values]] </li>
+              <li>[[Bucket，键和值|Concepts#Buckets-Keys-and-Values]] </li>
             </ul>
         </td>
-        <td>HBase stores data in a pre-defined column family format (each grouping of data has a key, and any number of column attributes which may be versioned individually). Data in HBase is sorted, sparse, and physically grouped by column family (rather than by row, as in a relational database). HBase calls their groupings "tables".
+        <td>HBase 的数据存储在预先定义好的列族格式中（每组数据有个键，还有任意数量的属性，每个属性都可以单独做版本控制）。HBase 中的数据是有序的，而且很稀疏，以列族分组（不像关系型数据库中是以行分组的）。在 HBase 中分组也叫做“表”。
             <ul>
-                <li>[[HBase Data Model|http://hbase.apache.org/book/datamodel.html]]</li>
-                <li>[[Supported Data Types|http://hbase.apache.org/book/supported.datatypes.html]]</li>
+                <li>[[HBase 数据模型|http://hbase.apache.org/book/datamodel.html]]</li>
+                <li>[[支持的数据类型|http://hbase.apache.org/book/supported.datatypes.html]]</li>
             </ul>
         </td>
     </tr>
     <tr>
-        <td>Storage Model</td>
-        <td>Riak has a modular, extensible local storage system which features pluggable backend stores designed to fit a variety of use cases. The default Riak backend store is Bitcask.
+        <td>存储模型</td>
+        <td>Riak 的存储系统是模块化可扩展的，允许用户根据寻妖选择适合的后台。默认的后台是 Bitcask。
             <ul>
-              <li>[[Riak Supported Storage Backends|Choosing a Backend]]</li>
+              <li>[[Riak 支持的存储后台|Choosing a Backend]]</li>
             </ul>
-        You can also write your own storage backend for Riak using our [[backend API|Backend API]].
-     </td>
-        <td>Hadoop Distributed File System (HDFS) is the storage system used by HBase. Data is stored in MemStores and StoreFiles, where data is streamed to disk (implemented via HFiles, a format based on BigTable's SSTable). Implementations generally use the native JVM-managed I/O file stream.
+
+            用户还可以使用 Riak 提供的[[后台 API|Backend API]]自行编写存储后台。
+        </td>
+        <td>HBase 使用的存储系统是 Hadoop 分布式文件系统（Hadoop Distributed File System，HDFS）。数据存储在 MemStores 和 StoreFiles 中，然后再流入硬盘（通过 HFiles 实现，这种格式基于 BigTable 的 SSTable）。实现的过程一般使用内置的由 JVM 管理的 IO 文件流。
             <ul>
              <li>[[HDFS|http://en.wikipedia.org/wiki/Apache_Hadoop#Hadoop_Distributed_File_System]]</li>
-             <li>[[Hadoop Uses HDFS|http://hbase.apache.org/book/arch.hdfs.html]]</li>
+             <li>[[Hadoop 使用 HDFS|http://hbase.apache.org/book/arch.hdfs.html]]</li>
             </ul>
         </td>
     </tr>
     <tr>
-        <td>Data Access and Application Programming Interfaces (APIs)</td>
-        <td>In addition to raw Erlang access, Riak offers two primary APIs:
+        <td>数据访问和 API</td>
+        <td>除了原始的 Erlang 接口，Riak 还提供了两种接口：
 			<ul>
 				<li>[[HTTP|HTTP API]]</li>
 				<li>[[Protocol Buffers|PBC API]]</li>
 			</ul>
-			Riak Client libraries are wrappers around these APIs, and client support exists for dozens of languages.
+			Riak 客户端代码库封装了这些 API，支持很多编程语言。
 			<ul>
-				<li>[[Client Libraries]]</li><li>[[Community Projects]]</li>
+				<li>[[客户端代码库|Client Libraries]]</li>
+                <li>[[社区项目|Community Projects]]</li>
 			</ul>
-			</td>
-        <td>HBase communicates primarily through code that runs on the JVM (Java, Jython, Groovy, etc.). Alternatively, HBase provides external protocols; either REST or Thrift (a cross-language data service format).
+		</td>
+        <td>HBase 基本上是通过运行在 JVM（Java，Jython，Groovy 等）中的代码进行通讯的。HBase 也支持其他协议，REST 和 Thrift（支持多种编程语言的数据服务格式）。
             <ul>
-                <li>[[Java Interface|http://hbase.apache.org/book/architecture.html]]</li>
+                <li>[[Java 接口|http://hbase.apache.org/book/architecture.html]]</li>
                 <li>[[REST|http://wiki.apache.org/hadoop/Hbase/Stargate]]</li>
                 <li>[[Thrift|http://thrift.apache.org/]]</li>
             </ul>
-     </td>
+        </td>
     </tr>
     <tr>
-        <td>Query Types and Query-ability</td>
-        <td>There are currently four ways to query Riak.
+        <td>查询类型和查询能力</td>
+        <td>目前在 Riak 中有四种查询数据的方式
             <ul>
-            <li>Primary key operations (GET, PUT, DELETE, UPDATE)</li>
-            <li>[[MapReduce|Using MapReduce]]</li>
-            <li>[[Using Secondary Indexes]]</li>
-            <li>[[Using Search]]</li>
+                <li>主键操作（GET, PUT, DELETE, UPDATE）</li>
+                <li>[[MapReduce|Using MapReduce]]</li>
+                <li>[[使用二级索引|Using Secondary Indexes]]</li>
+                <li>[[使用搜索|Using Search]]</li>
             </ul>
-
-    </td>
-        <td>HBase has two query options: looking up values by getting/scanning through ordered keys (optionally filtering out values or using a secondary index), or by using Hadoop to perform MapReduce.
+        </td>
+        <td>HBase 由两种查询方式：扫描整个有序键列表查找值（过滤值，或者使用二级索引），或者使用 Hadoop 执行 MapReduce 查询。
             <ul>
-                <li>[[Scanning|http://hbase.apache.org/book/client.filter.html]]</li>
+                <li>[[扫描|http://hbase.apache.org/book/client.filter.html]]</li>
                 <li>[[MapReduce|http://hbase.apache.org/book/mapreduce.html]]</li>
-                <li>[[Secondary Indexes|http://hbase.apache.org/book/secondary.indexes.html]]</li>
+                <li>[[二级索引|http://hbase.apache.org/book/secondary.indexes.html]]</li>
             </ul>
-    </td>
+        </td>
     </tr>
     <tr>
-        <td>Data Versioning and Consistency</td>
-        <td>Riak uses a data structure called a vector clock to reason about causality and staleness of stored values. Vector clocks enable clients to always write to the database in exchange for consistency conflicts being resolved at read time by either application or client code. Vector clocks can be configured to store copies of a given datum based on size and age of said datum. There is also an option to disable vector clocks and fall back to simple time-stamp based "last-write-wins".
+        <td>数据版本和一致性</td>
+        <td>Riak 使用向量时钟推导存储数据的因果关系和过期情况。使用向量时钟可以让客户端始终能向数据库写入数据，在读取时由应用程序或客户端代码来解决冲突。还可以设置向量时钟基于数据的大小和寿命存储副本。还可以完全禁用向量时钟，使用简单的基于时间戳的“最后一次写入获胜”机制。
             <ul>
-              <li>[[Vector Clocks]]</li>
-              <li>[[Why Vector Clocks Are Easy|http://basho.com/blog/technical/2010/01/29/why-vector-clocks-are-easy/]]</li>
-              <li>[[Why Vector Clocks Are Hard|http://basho.com/blog/technical/2010/04/05/why-vector-clocks-are-hard/]]</li>
+              <li>[[向量时钟|Vector Clocks]]</li>
+              <li>[[为什么向量始终很简单|http://basho.com/blog/technical/2010/01/29/why-vector-clocks-are-easy/]]</li>
+              <li>[[为什么向量始终很难|http://basho.com/blog/technical/2010/04/05/why-vector-clocks-are-hard/]]</li>
             </ul>
-         </td>
-        <td>HBase has strongly consistent reads/writes. Data may be autosharded across regions and redistributed as data changes.
+        </td>
+        <td>HBase 的读写时强一致的。数据可能会在整个地区中被自动分片，修改数据后就会自动重新分发。
 
-        Column families may contain an unbounded number of versions, with optional TTL.
+            列族可以包含不限数量的版本，以及可选的 TTL。
             <ul>
-                <li>[[Consistent Architecture|http://hbase.apache.org/book/architecture.html#arch.overview.nosql]]</li><li>[[Time to Live|http://hbase.apache.org/book/ttl.html]]</li>
+                <li>[[一致性架构|http://hbase.apache.org/book/architecture.html#arch.overview.nosql]]</li>
+                <li>[[Time to Live|http://hbase.apache.org/book/ttl.html]]</li>
             </ul>
-     </td>
+        </td>
     </tr>
-        <td>Concurrency</td>
-        <td> In Riak, any node in the cluster can coordinate a read/write operation for any other node. Riak stresses availability for writes and reads, and puts the burden of resolution on the client at read time.
-         </td>
-
-        <td>HBase guarantees write atomicity and locks per row. HBase has also recently added multi-action and multi-row local transactions (though you cannot mix read/write actions).
+    <tr>
+        <td>并发性</td>
+        <td>在 Riak 中，集群中的任何一个节点都可以处理另一个节点的读取和写入操作。Riak 为写入和读取提供了较高的可用性，把重担都交给读取时的客户端。
+        </td>
+        <td>HBase 能保证写入的原子性，并会锁定每个行。最近 HBase 还加入了多操作和多行的本地事务（不过无法混合使用读、写这两个操作）。
             <ul>
-                <li>[[Consistency Guarantees|http://hbase.apache.org/acid-semantics.html]]</li>
+                <li>[[一致性保证|http://hbase.apache.org/acid-semantics.html]]</li>
                 <li>[[http://hadoop-hbase.blogspot.com/2012/03/acid-in-hbase.html]]</li>
             </ul>
-     </td>
+        </td>
     </tr>
     <tr>
-        <td>Replication</td>
-        <td>Riak's replication system is heavily influenced by the Dynamo Paper and Dr. Eric Brewer's CAP Theorem. Riak uses consistent hashing to replicate and distribute N copies of each value around a Riak cluster composed of any number of physical machines. Under the hood, Riak uses virtual nodes to handle the distribution and dynamic rebalancing of data, thus decoupling the data distribution from physical assets.
+        <td>副本</td>
+        <td>Riak 的副本系统重度依赖 Dynamo 和 Dr. Eric Brewer 的 CAP 定理。Riak 使用一致性哈希创建副本，然后把 N 个副本分发到由任意数量物理设备组成的集群中。在底层，Riak 使用虚拟节点处理数据的分发和动态平衡，因此解耦了从物理资源分发出来的数据。
             <ul>
-              <li>[[Replication]]</li>
-              <li>[[Clustering|Concepts#Clustering]]</li>
+              <li>[[副本|Replication]]</li>
+              <li>[[集群|Concepts#Clustering]]</li>
             </ul>
-
-            The Riak APIs expose tunable consistency and availability parameters that let you select which level of configuration is best for your use case. Replication is configurable at the bucket level when first storing data in Riak. Subsequent reads and writes to that data can have request-level parameters.
-                <ul>
-                    <li>[[Reading, Writing, and Updating Data|Concepts#Reading, Writing, and Updating Data]]</li>
-                </ul>
-     </td>
-        <td>HBase supports in-cluster and between-cluster replication. In-cluster replication is handled by HDFS and replicates underlying data files according to Hadoop's settings. Between-cluster replicates by an eventually consistent master/slave push, or more recently added (experimental) master/master and cyclic (where each node plays the role of master and slave) replication.
+            Riak API 开放了可以调整的一致性和可用性参数，允许用户设置一个合适的水平。副本在 bucket 层面设置，要在第一次存储数据前设定好。后续的读写操作可以设置针对每次请求的参数。
+            <ul>
+                <li>[[读、写、更新数据|Concepts#Reading-Writing-and-Updating-Data]]</li>
+            </ul>
+        </td>
+                <td>HBase 支持在集群内和集群间创建副本。集群内的副本由 HDFS 处理，底层的数据文件副本由 Hadoop 设置。集群间由最终一致性主从推送副本，或者由最近新加的主主推送和周期推送（各节点既可以作为主节点也可以作为从节点）。
         <ul>
-        <li>[[Replication|http://hbase.apache.org/replication.html]]</li>
+        <li>[[副本|http://hbase.apache.org/replication.html]]</li>
         </ul>
      </td>
     </tr>
     <tr>
-        <td>Scaling Out and In</td>
-        <td>Riak allows you to elastically grow and shrink your cluster while evenly balancing the load on each machine. No node in Riak is special or has any particular role. In other words, all nodes are masterless. When you add a physical machine to Riak, the cluster is made aware of its membership via gossiping of ring state. Once it's a member of the ring, it's assigned an equal percentage of the partitions and subsequently takes ownership of the data belonging to those partitions. The process for removing a machine is the inverse of this. Riak also ships with a comprehensive suite of command line tools to help make node operations simple and straightforward.
-    <ul>
-        <li>[[Adding and Removing Nodes]]</li>
-        <li>[[Command Line Tools]]</li>
-    </ul>
-        </td>
-        <td>HBase shards by way or regions, that automatically split and redistribute growing data. A crash on a region requires crash recovery. HBase can be made to scale in with some intervention on the part of the developer or DBA.
+        <td>扩放</td>
+        <td>Riak 允许用户弹性的提升和减小集群的大小，而且最终在每个设备上做到负载平衡。Riak 中没有特殊的节点，或者具有特殊角色的节点。也就是说，所有节点都是无主的。如果增加了物理设备，集群会通过环状态广播得知这一变化。一旦成为环成员后，就会赋给相同比例的分区，然后负责这些分区中的数据。删除设备就是上述过程的反操作。Riak 还提供了一套完整的命令行工具，让节点操作更简单直观。
+
             <ul>
-                <li>[[Regions|http://hbase.apache.org/book/regions.arch.html]]</li>
-                <li>[[Node Management|http://hbase.apache.org/book/node.management.html]]</li>
-                <li>[[HBase Architecture|http://hbase.apache.org/book/architecture.html]]</li>
+                <li>[[添加和删除节点|Adding and Removing Nodes]]</li>
+                <li>[[命令行工具|Command Line Tools]]</li>
             </ul>
-    </td>
+        </td>
+        <td>HBase 根据线路和地区分片，自动分离并重新分发不断增多的数据。某个地区的数据损坏了，需要进行复原操作。HBase 的扩放需要开发者或 DBA 干预。
+            <ul>
+                <li>[[地区|http://hbase.apache.org/book/regions.arch.html]]</li>
+                <li>[[节点管理|http://hbase.apache.org/book/node.management.html]]</li>
+                <li>[[HBase 架构|http://hbase.apache.org/book/architecture.html]]</li>
+            </ul>
+        </td>
     </tr>
     <tr>
-        <td>Multi-Datacenter Replication and Awareness</td>
-
-        <td>Riak features two distinct types of replication. Users can replicate to any number of nodes in one cluster (which is usually contained within one datacenter over a LAN) using the Apache 2.0 licensed database. Riak Enterprise, Basho's commercial extension to Riak, is required for Multi-Datacenter deployments (meaning the ability to run active Riak clusters in N datacenters).
-        <ul>
-            <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
-        </ul>
-
-        </td>
-        <td>HBase shards by way of regions, that themselves may be replicated across multiple datacenters.
+        <td>在多数据中心之间创建副本</td>
+        <td>Riak 中有两种类型的副本。用户可以使用 Apache 2.0 数据库在一个集群中创建任意数量的副本（通常在 LAN 中的同一个数据中心）。如果要在多个数据中心之间创建副本（可以在 N 个数据中心中运行 Riak 集群），就要使用 Riak Enterprise，Basho 开发的 Raik 商业扩展。
             <ul>
-              <li>[[Node Management|http://hbase.apache.org/replication.html]]</li>
+                <li><a href="http://basho.com/products/riak-enterprise/">Riak Enterprise</a></li>
+            <ul>
+        </td>
+        <td>HBase 根据线路和地区分片，因此可以在多个数据中心之间创建副本。
+            <ul>
+              <li>[[节点管理|http://hbase.apache.org/replication.html]]</li>
             </ul>
-    </td>
+        </td>
     </tr>
     <tr>
-        <td>Graphical Monitoring/Admin Console</td>
-        <td>Riak ships with Riak Control, an open source graphical console for monitoring and managing Riak clusters.
+        <td>图形化监控/管理控制台</td>
+        <td>Riak 提供有 Riak Control，这是个开源图形化控制台，可以监控和管理 Riak 集群。
             <ul>
                 <li>[[Riak Control]]</li>
-                <li>[[Introducing Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
+                <li>[[介绍 Riak Control|http://basho.com/blog/technical/2012/02/22/Riak-Control/]]
             </ul>
-    </td>
-        <td>HBase has a few community supported graphical tools, and a command-line admin console.
-        <ul>
-        <li>[[Admin Console Tools|http://hbase.apache.org/book/ops_mgt.html#tools]]</li>
-        <li>[[Eclipse Dev Plugin|http://wiki.apache.org/hadoop/Hbase/EclipseEnvironment]]</li>
-        <li>[[HBase Manager|http://sourceforge.net/projects/hbasemanagergui/]]</li>
-        <li>[[GUI Admin|https://github.com/zaharije/hbase-gui-admin]]</li>
-        </ul>
-     </td>
+        </td>
+        <td>HBase 中有很多由社区开发的图形化工具和命令行管理控制台。
+            <ul>
+                <li>[[管理控制台工具|http://hbase.apache.org/book/ops_mgt.html#tools]]</li>
+                <li>[[Eclipse 开发插件|http://wiki.apache.org/hadoop/Hbase/EclipseEnvironment]]</li>
+                <li>[[HBase 管理器|http://sourceforge.net/projects/hbasemanagergui/]]</li>
+                <li>[[GUI 管理|https://github.com/zaharije/hbase-gui-admin]]</li>
+            </ul>
+        </td>
     </tr>
 </table>
