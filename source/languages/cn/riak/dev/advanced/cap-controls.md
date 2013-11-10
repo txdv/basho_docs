@@ -14,23 +14,23 @@ interest: [
 ]
 ---
 
-Here, we are going to talk about how Riak distributes your data around the cluster and lets you tune your levels of consistency and availability. This has immense value and implications for your applications, and it's one of the Riak features that we feel truly differentiates us.
+本文我们要介绍 Riak 是如何把数据分发到整个集群的，以及如何调整一致性和可用性等级。调整的过程因应用程序而已，这也是 Riak 区别于其他同类产品的特性之一。
 
-At the bottom of this page there is a final screencast that briefly touches on how to adjust your replication levels to match your application and business needs. Before you watch that, however, have a quick read of the content below.
+本文末尾有一个视频，简单介绍了如何调整副本等级以满足程序和业务需求。不过在观看这个视频之前，请先大致阅读下面的内容。
 
-## A Primer on N, R, and W
+## N，R 和 W 简介
 
-Riak exposes "CAP Controls" to the developers in such a way that they can, down to the Bucket level, tune how many copies of data we want to store. We do this using N, R, and W values.
+Riak 把 CAP 交由开发者控制，可以在 bucket 层级上调整要存储多少副本，我们需要做的是设置 N，R 和 W 这三个值。
 
-Riak's guiding design principle is Dr. Eric Brewer's CAP Theorem. The CAP theorem defines distributed systems in terms of three desired properties: Consistency, Availability, and Partition (failure) tolerance. The theorem states you can only rely on having two of the three properties at any time.
+Riak 设计的指导理论是 Dr. Eric Brewer 的 CAP 定理。CAP 定理为分布式系统定义了三个特性：一致性（C），可用性（A），分区容忍性（P）。该定理指出，任意时刻只能依赖三个特性中的两个特性。
 
-Riak chooses to focus on the A and P of CAP. The choice puts Riak in the eventually consistent camp. However, the window for "eventually consistent" is in terms of milliseconds which can be good enough for many applications.
+Riak 选择关注 CAP 中的 A 和 P。这中选择使 Riak 加入了最终一致性阵营。不过最终一致性的窗口是以毫秒来衡量的，已经能满足多数应用程序的需求。
 
-### N Value and Replication
+### N 值和副本
 
-All data stored in Riak will be replicated to a number of nodes in the cluster according to the N value (n_val) property set on the bucket. By default, Riak chooses an n_val of "3" for you. This means that data stored in the bucket will be replicated to three different nodes, thus storing three copies. For this to be effective, you need at least three physical nodes in your cluster. (We can, however, demonstrate its merits with local nodes.)
+Riak 中存储的所有数据都会根据 bucket 的 N 值在一定数量的节点上创建副本。Riak 默认设置的 n 值是 3，所以会在 3 个不同的节点中创建副本。为了能真正创建 3 个副本，集群中至少要有 3 个物理节点。（可以使用本地节点做演示。）
 
-To change the N value for a bucket (to something different than the default) issue a PUT request to the bucket with the new N value. If you still have your three node Riak cluster running, try this:
+要想修改 bucket 的 N 值，可以向 bucket 发起 PUT 请求。如果包含 3 个节点的集群还在运行，请试一下下面的命令：
 
 ```
 $ curl -v -XPUT http://127.0.0.1:8091/riak/another_bucket \
@@ -38,29 +38,32 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/another_bucket \
   -d '{"props":{"n_val":2}}'
 ```
 
-This will change the n_val of the bucket "another_bucket" to two, meaning that each piece of data in that bucket will be replicated to two partitions in the cluster.
+这个命令会把名为“another_bucket”的 bucket 的 n_val 改为 2，即该 bucket 中的数据会在两个分区中创建副本。
 
-<div class="note"><div class="title">A Word on Setting the N Value</div><code>n_val</code> must be greater than 0 and less than or equal to the number of actual nodes in your cluster to get all the benefits of replication. And, we advise against modifying the n_val of a bucket after its initial creation as this may result in failed reads because the new value may not be replicated to all the appropriate partitions.</div>
+<div class="note">
+	<div class="title">修改 N 值时的注意事项</div>
+	<code>n_val</code> 必须大于 0，且要小于或等于集群中节点的数量，这样才能充分发挥副本的作用。我们建议创建 bucket 后不要修改 n_val，这么做可能会导致读取失败，因为新写入的值可能没有在相应的分区中创建副本。
+</div>
 
-### R Value and Read Failure Tolerance
+### R 值和读取失败容忍
 
-So we changed the Bucket n_val to 2 with that last command.
+使用上面的命令，我们把 bucket 的 n_val 改为了 2。
 
-Riak allows the client to supply an "R value" on each direct fetch. The R value represents the number of Riak nodes which must return results for a read before the read is considered successful. This allows Riak to provide read availability even when nodes are down or laggy.
+Riak 允许客户端在直接读取时指定 R 值，这个值指明，如果这次读取操作是成功的，必须有多少节点返回结果。这样，即便节点下线出现延迟，也能保证读取的可用性。
 
-For example, in this HTTP request, the r value is set to 1:
+例如，在下面这个 HTTP 请求中，r 值被设为 1：
 
 ```bash
 http://127.0.0.1:8091/riak/images/1.png?r=1
 ```
 
-This means that Riak will return a copy of that data if at least 1 copy is present in your cluster.
+只要集群中存有至少一个副本，就会返回数据。
 
-### W Value and Write Fault Tolerance
+### W 值和写入失败容忍
 
-Riak also allows the client to supply a "W value" on each update. The W value represents the number of Riak nodes which must report success before an update is considered complete. This allows Riak to provide write availability even when nodes are down or laggy.
+Riak 还允许客户端更新数据时指定 W 值，这个值表明，如果这次更新操作是成功的，必须有多少节点成功响应。这样，即便节点下线或出现延迟，也能保证写入的可用性。
 
-In this PUT operation, you can see the w value set to 3.
+在下面这个 PUT 请求中，W 值被设为 3。
 
 ```
 $ curl -v -XPUT http://127.0.0.1:8091/riak/docs/story.txt?w=3 \
@@ -68,21 +71,21 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/docs/story.txt?w=3 \
   --data-binary @story.txt
 ```
 
-### Symbolic Consistency Names
+### 符号名
 
-Riak 0.12 introduced "symbolic" consistency options for R and W that can be easier to use and understand. They are:
+Riak 0.12 为 R 和 W 值提供了符号名，用起来更方便，也易于理解。这些符号名是：
 
-* *all* - All replicas must reply. This is the same as setting R or W equal to N.
-* *one* - This is the same as sending 1 as the R or W value.
-* *quorum* - A majority of the replicas must respond, that is, "half plus one". For the default N value of 3, this calculates to 2.
-* *default* - Uses whatever the per-bucket consistency property is for R or W, which may be any of the above values, or an integer.
+* *all* - 所有节点都要应答。等价于把 R 或 W 设为和 N 值一样
+* *one* - 等价于把 R 或 W 值设为 1
+* *quorum* - 大多数节点要做出应答，即半数加一个。对于默认的 N 值 3，结果就是 2
+* *default* - 把 R 或 W 设为各 bucket 的一致性属性值，可以是上述 3 个中的任何一个，或者是一个整数
 
-Not submitting an R or W value is the same as sending "default".
+如果不指定 R 和 W 值，就等同于将其设为“default”。
 
-## N, R and W in Action
+## N，R 和 W 实操
 
-Here is brief screencast that will show you just how the N, R, and W values function in our running three node Riak cluster:
+下面是一个视频，介绍了 N、R 和 W 值是如何影响包含 3 个节点的 Riak 集群的：
 
 <div style="display:none" class="iframe-video" id="http://player.vimeo.com/video/11172656"></div>
 
-<p><a href="http://vimeo.com/11172656">Tuning CAP Controls in Riak</a> from <a href="http://vimeo.com/bashotech">Basho Technologies</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+<p><a href="http://vimeo.com/11172656">调整 Riak 的 CAP</a>，<a href="http://vimeo.com/bashotech">Basho Technologies</a> 制作，存放在 <a href="http://vimeo.com">Vimeo</a> 上。</p>

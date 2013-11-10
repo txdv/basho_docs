@@ -8,84 +8,117 @@ audience: advanced
 keywords: [developers, mapreduce]
 ---
 
-MapReduce, the programming paradigm popularized by [[Google|http://research.google.com/archive/mapreduce.html]], is provided by Riak to aggregate results as background batch processes. The first half of this advanced treatment go into more advanced examples than [[Using MapReduce]]. The second half is a deep dive into how Riak has implemented MapReduce.
+MapReduce 是 [[Google|http://research.google.com/archive/mapreduce.html]] 倡导
+的编程范式，Raik 将其用作后台批量进程聚合结果。本文前半部分介绍 MapReduce 的高级用法，
+后半部分说明 Riak 是如何实现 MapReduce 的。
 
 ## MapReduce
 
-MapReduce is a programming paradigm, popularized by Google. In Riak, MapReduce is the primary method for non-primary-key-based querying.
+MapReduce 是 Google 倡导的编程范式。在 Raik 中，MapReduce 是不依赖主键的主要查询方式。
 
-Riak enables you to run MapReduce jobs through both the Erlang API and the HTTP API. For this tutorial we are going to use the HTTP API.
+在 Raik 中，可以通过 Erlang API 和 HTTP API 两种方式运行 MapReduce 作业。本文我们将
+使用 HTTP API。
 
-### Why do we use MapReduce for Querying Riak?
+### 为什么要使用 MapReduce 进行查询？
 
-Key-value stores like Riak generally have very little functionality beyond just storing and fetching objects. MapReduce adds the capability to perform more powerful queries over the data stored in Riak. It also fits nicely with the functional programming orientation of Riak's core code and the distributed nature of the data storage.
+像 Raik 这种键值对存储系统出了保存和读取对象之外基本没什么其他功能。MapReduce 增强了查询
+功能，也非常符合面向函数编程的 Raik 核心代码和数据存储的分布式特性。
 
-The main goal of MapReduce is to spread the processing of a query across many systems to take advantage of parallel processing power. This is generally done by dividing the query into several steps, dividing the dataset into several chunks, and then running those step/chunk pairs on separate physical hosts. Riak's MapReduce has an additional goal: increasing data-locality. When processing a large dataset, it's often much more efficient to take the computation to the data than it is to bring the data to the computation.
+MapReduce 主要目标是把查询操作传布到多个系统，发挥并行处理的优势。MapReduce 把查询分成很多
+步骤，把数据集分成多个片段，然后在各物理主机的数据片段上执行这些步骤。在 Raik 中，
+MapReduce 还有一个目的：增进数据的局限性。处理大型数据集时，在数据上做计算，比把数据引入
+计算过程要高效。
 
-"Map" and "Reduce" are both phases in the query process. Map functions take one piece of data as input, and produce zero or more results as output. If you're familiar with "mapping over a list" in functional programming style, you're already familiar with "map" steps in a map/reduce query.
-
+“Map”和“Reduce”是查询过程中的两个步骤。“Map”接受一些输入数据，生成一个或多个输出结果。
+如果你熟悉函数式编程中的“列表映射”（mapping over a list），对 map/reduce 查询中的“Map”
+这一步就不会陌生。
 
 <!-- MapReduce-Implementation.md -->
 
-## How Riak Spreads Processing
+## Riak 如何传布处理过程
 
-The remainder of this page details how Riak implements MapReduce. It covers how Riak spreads processing across the cluster, the mechanics of how queries are specified and run, how to run MapReduce queries through the HTTP and Erlang APIs, streaming MapReduce, phase functions, and configuration details.
+本文剩下的部分将详细介绍 Raik 是如何实现 MapReduce 的，包括 Riak 是如何把处理过程传布到
+整个集群的，如何指定及运行查询，如何通过 HTTP API 和 Erlang API 运行 MapReduce 查询，
+streaming MapReduce，步骤函数和设置。
 
-When processing a large dataset, it's often much more efficient to take the computation to the data than it is to bring the data to the computation.  In practice, your MapReduce job code is likely less than 10 kilobytes, it is more efficient to send the code to the gigs of data being processed, than to stream gigabytes of data to your 10k of code.
+处理大型数据集时，在数据上做计算，比把数据引入计算过程要高效。MapReduce 作业的代码基本上
+都不超过 10KB，因此把这些代码发送到数 GB 的数据，比把数 GB 的数据引入代码更高效。
 
-It is Riak's solution to the data-locality problem that determines how Riak spreads the processing across the cluster.  In the same way that any Riak node can coordinate a read or write by sending requests directly to the other nodes responsible for maintaining that data, any Riak node can also coordinate a MapReduce query by sending a map-step evaluation request directly to the node responsible for maintaining the input data. Map-step results are sent back to the coordinating node, where reduce-step processing can produce a unified result.
+Riak 对数据局限性的处理决定了如何把处理过程传布到整个集群。Riak 节点可以协调读或写操作，把
+请求直接发给负责维护这些数据的节点，与此相同，Riak 节点也能协调 MapReduce 查询，把“Map”
+这一步的计算请求直接发给负责维护输入数据的节点。“Map”步骤的结果会回传给负责协调的节点，然后
+“Reduce”步骤可以生成唯一的结果。
 
-Put more simply: Riak runs map-step functions right on the node holding the input data for those functions, and it runs reduce-step functions on the node coordinating the MapReduce query.
+简单一点来说，Riak 在保存输入数据的节点上运行“Map”步骤，然后再负责协调 MapReduce 查询的
+节点上运行“Reduce”步骤。
 
-## How Riak's MR Queries Are Specified
+## 如何指定 MapReduce 查询
 
-MapReduce queries in Riak have two components: a list of inputs and a list of "steps", or "phases".
+在 Raik 中，MapReduce 查询由两部分组成：输入列表和步骤列表。
 
-Each element of the input list is a bucket-key pair.  This bucket-key pair may also be annotated with "key-data", which will be passed as an argument to a map function, when evaluated on the object stored under that bucket-key pair.
+输入列表中的元素是“bucket/键”组合。在“bucket/键”组合对应的对象上计算时，还可以使用
+“键/数据”组合注解“bucket/键”组合，“键/数据”组合会作为参数传入“Map”函数。
 
-Each element of the phases list is a description of a map function, a reduce function, or a link function.  The description includes where to find the code for the phase function (for map and reduce phases), static data passed to the function every time it is executed during that phase, and a flag indicating whether or not to include the results of that phase in the final output of the query.
+步骤列表中的元素是“Map”函数、“Reduce”函数或“Link”函数的描述信息。描述信息中说明了到哪里寻找
+步骤（Map 和 Reduce）函数的代码，执行各步时传入函数的静态数据，以及一个旗标，指明是否要在
+查询的最终结果中包含各步的结果。
 
-The phase list describes the chain of operations each input will flow through.  That is, the initial inputs will be fed to the first phase in the list, and the output of that phase will be fed as input to the next phase in the list.  This stream will continue through the final phase.
+步骤列表说明了输入数据的操作流程，原始的输入会传给列表中的第一个步骤，得到的结果会作为输入
+传给下一个步骤，直到完成列表中的所有步骤为止。
 
-## How Phases Work
+## 各步骤是如何工作的
 
-### Map Phase
+### Map 步骤
 
-The input list to a map phase must be a list of (possibly annotated) bucket-key pairs.  For each pair, Riak will send the request to evaluate the map function to the partition that is responsible for storing the data for that bucket-key.  The vnode hosting that partition will lookup the object stored under that bucket-key, and evaluates the map function with the object as an argument.  The other arguments to the function will be the annotation, if any is included, with the bucket-key, and the static data for the phase, as specified in the query.
+Map 步骤的输入列表必须是一系列“bucket/键”组合（还可以有注解）。对每个键值对，Riak 都会向
+存储对应数据的分区发送请求，计算 Map 函数。分区所在的虚拟节点会查找“bucket/键”组合对应的
+数据，将其传入 Map 函数。如果有注解，会协同“bucket/键”组合和静态数据一起传入 Map 函数。
 
-### Reduce Phase
+### Reduce 步骤
 
-Reduce phases accept any list of data as input, and produce any list of data as output.  They also receive a phase-static value, specified in the query definition.
+Reduce 步骤接受任意数据列表作为输入，然后生成任意的数据列表作为结果。Reduce 步骤还可以接受
+查询中指定的步骤静态值。
 
-The important thing to understand is that the function defining the reduce phase may be evaluated multiple times, and the input of later evaluations will include the output of earlier evaluations.
+注意，Reduce 步骤函数可以多次计算，前面的计算结果会传入后续的计算。
 
-For example, a reduce phase may implement the <a href="http://en.wikipedia.org/wiki/Union_(set_theory)#Definition" target="_blank">set-union</a> function.  In that case, the first set of inputs might be `[1,2,2,3]`, and the output would be `[1,2,3]`.  When the phase receives more inputs, say `[3,4,5]`, the function will be called with the concatenation of the two lists: `[1,2,3,3,4,5]`.
+例如，Reduce 步骤可能实现了 [set-union](http://en.wikipedia.org/wiki/Union_(set_theory)#Definition) 函数。
+此时，如果输入列表是 `[1,2,2,3]`，那么输出为 `[1,2,3]`。如果又输入了 `[3,4,5]`，
+那么传入的输入列表是两个列表合并后的结果，即 `[1,2,3,3,4,5]`。
 
-Other systems refer to the second application of the reduce function as a "re-reduce".  There are at least a couple of reduce-query implementation strategies that work with Riak's model.
+其他系统把第二次计算称为“re-reduce”。在 Raik 中，有很多 Reduce 查询实现策略。
 
-One strategy is to implement the phase preceding the reduce phase, such that its output is "the same shape" as the output of the reduce phase.  This is how the examples in this document are written, and the way that we have found produces cleaner code.
+其中一种策略是在 Reduce 步骤之前实现，这样其输出数据的形式就和 Reduce 步骤一样了。本文中
+的示例代码使用的都是这种方式，我们觉得使用这种方式编写的代码更整洁。
 
-An alternate strategy is to make the output of a reduce phase recognizable, such that it can be extracted from the input list on subsequent applications.  For example, if inputs from the preceding phase are numbers, outputs from the reduce phase could be objects or strings.  This would allow the function to find the previous result, and apply new inputs to it.
+还有一种策略是让 Reduce 步骤的输出便于识别，这样在后续的处理过程中就能从输入列表中将其提取
+出来了。例如，如果上一步的输入是数字，Reduce 步骤的输出可以是对象或字符串。这样，函数就能
+找到上一步的结果，然后在其上附加新的输入。
 
-### How a Link Phase Works in Riak
+### “Link”步骤是如何工作的
 
-Link phases find links matching patterns specified in the query definition.  The patterns specify which buckets and tags links must have.
+Link 步骤会找到匹配查询条件的链接。查询条件中指明链接中必须包含哪些 bucket 和标签。
 
-"Following a link" means adding it to the output list of this phase.  The output of this phase is often most useful as input to a map phase, or another reduce phase.
+“跟踪链接”的意思是将其加入“Link”步骤的输出列表。Link 步骤的结果经常会作为 Map 步骤
+或其他 Reduce 步骤的输入。
 
-## HTTP API Examples
+## HTTP API 示例
 
-Riak supports writing MapReduce query functions in JavaScript and Erlang, as well as specifying query execution over the [[HTTP API]].
+Riak 支持使用 JavaScript 和 Erlang 编写 MapReduce 查询函数，
+可以通过 [[HTTP API]] 进行查询操作。
 
-<div class="note"><div class="title">"bad encoding" error</div>If you receive an error "bad encoding" from a MapReduce query that includes phases in Javascript, verify that your data does not contain incorrect Unicode escape sequences.  Data being transferred into the Javascript VM must be in Unicode format.</div>
+<div class="note">
+<div class="title">“bad encoding”错误</div>
+如果 MapReduce 查询报错“bad encoding”，而且查询中包含使用 Javascript 编写的函数，请确保
+数据中没有错误的 Unicode 转义字符。传入 Javascript VM 的数据必须使用 Unicode 格式。
+</div>
 
-### HTTP Example
+### HTTP 示例
 
-This example will store several chunks of text in Riak, and then compute word counts on the set of documents, using MapReduce via the HTTP API.
+这个例子会把一些数据存入 Raik，然后通过 HTTP API 使用 MapReduce 计算文档中各单词出现的次数。
 
-#### Load data
+#### 加载数据
 
-We will use the Riak HTTP interface to store the texts we want to process:
+我们使用 Riak 的 HTTP 接口存入文本：
 
 ```bash
 $ curl -XPUT -H "content-type: text/plain" \
@@ -115,11 +148,9 @@ well.
 EOF
 ```
 
+#### 运行查询
 
-#### Run query
-
-With data loaded, we can now run a query:
-
+加载数据后，现在可以运行查询了：
 
 ```bash
 $ curl -X POST -H "content-type: application/json" \
@@ -153,19 +184,18 @@ function(v) {
 EOF
 ```
 
-And we end up with the word counts for the three documents.
+得到的结果是三个文档中各单词出现的次数。
 
 ```javascript
 [{"the":8,"rabbit":2,"hole":1,"went":1,"straight":1,"on":2,"like":1,"a":6,"tunnel":1,"for":2,"some":1,"way":1,"and":5,"then":1,"dipped":1,"suddenly":3,"down":2,"so":2,"that":1,"alice":3,"had":3,"not":1,"moment":1,"to":3,"think":1,"about":1,"stopping":1,"herself":2,"before":1,"she":4,"found":1,"falling":1,"very":3,"deep":1,"well":2,"was":3,"considering":1,"in":2,"her":5,"own":1,"mind":1,"as":2,"could":1,"hot":1,"day":1,"made":1,"feel":1,"sleepy":1,"stupid":1,"whether":1,"pleasure":1,"of":5,"making":1,"daisy":1,"chain":1,"would":1,"be":1,"worth":1,"trouble":1,"getting":1,"up":1,"picking":1,"daisies":1,"when":1,"white":1,"with":1,"pink":1,"eyes":1,"ran":1,"close":1,"by":2,"beginning":1,"get":1,"tired":1,"sitting":1,"sister":2,"bank":1,"having":1,"nothing":1,"do":1,"once":1,"or":3,"twice":1,"peeped":1,"into":1,"book":2,"reading":1,"but":1,"it":2,"no":1,"pictures":2,"conversations":1,"what":1,"is":1,"use":1,"thought":1,"without":1,"conversation":1}]
 ```
 
+#### 解说
 
-#### Explanation
+想知道各句法的意思，或了解其他句法，请阅读下一小节。下面简单解说了这个 map/reduce 示例：
 
-For more details about what each bit of syntax means, and other syntax options, read the following sections.  As a quick explanation of how this example map/reduce query worked, though:
-
-* The objects named *p1*, *p2*, and *p5* from the `alice` bucket were given as inputs to the query.
-* The map function from the phase was run on each object.  The function:
+* `alice` 这个 bucket 中名为 *p1*、*p2* 和 *p5* 的对象是查询的输入
+* Map 步骤的函数在每个对象上运行
 
 ```javascript
 function(v) {
@@ -179,12 +209,12 @@ function(v) {
     }
   return counts;
 }
-
 ```
 
-creates a list of JSON objects, one for each word (non-unique) in the text.  The object has as a key, the word, and as the value for that key, the integer 1.
+上述函数会创建一个 JSON 对象列表，文本中的每个单词（可重复出现）都对应一个元素。列表中各元素
+都有一个键，即单词本身，以及一个值，整数 1。
 
-* The reduce function from the phase was run on the outputs of the map functions.  The function:
+* Reduce 步骤的函数在 Map 步骤的输出结果上运行
 
 ```javascript
 function(values) {
@@ -201,21 +231,29 @@ function(values) {
 }
 ```
 
-looks at each JSON object in the input list.  It steps through each key in each object, and produces a new object. That new object has a key for each key in every other object, the value of that key being the sum of the values of that key in the other objects.  It returns this new object in a list, because it may be run a second time on a list including that object and more inputs from the map phase.
+上述函数会检查输入列表中的每个 JSON 对象，生成一个新对象，其键不变，值是这个键出现在其他对象
+中的数量总和。创建的新对象还会以列表的形式输出，因为 Reduce 函数还可以再次在包含该对象的列表
+上运行，或者可以从 Map 步骤接收更多的输入数据。
 
-* The final output is a list with one element: a JSON object with a key for each word in all of the documents (unique), with the value of that key being the number of times the word appeared in the documents.
+* 最终的输出结果是只有一个元素的列表，这个元素是 JSON 对象，所包含的元素其键是所有文档中的
+单词（没有重复），其值是这个单词在文档中出现的次数。
 
-### HTTP Query Syntax
+### HTTP 查询句法
 
-Map/Reduce queries are issued over HTTP via a *POST* to the `/mapred` resource.  The body should be `application/json` of the form `{"inputs":[...inputs...],"query":[...query...]}`
+通过 HTTP 运行的 Map/Reduce 查询是发送到 `/mapred` 资源上的 *POST* 请求。
+请求主体应该是 `application/json` 类型，符合这种格式 `{"inputs":[...inputs...],"query":[...query...]}`。
 
-Map/Reduce queries have a default timeout of 60000 milliseconds (60 seconds). The default timeout can be overridden by supplying a different value, in milliseconds, in the JSON document `{"inputs":[...inputs...],"query":[...query...],"timeout": 90000}`
+Map/Reduce 查询默认的请求超时时间是 60000 毫秒（60 秒）。默认的超时时间可以修改，使用这个
+请求主体 `{"inputs":[...inputs...],"query":[...query...],"timeout": 90000}`。
 
-When the timeout hits, the node coordinating the MapReduce request cancels it and returns an error to the client. When and if you are going to hit the default timeout depends on the size of the data involved and on the general load of your cluster. If you find yourself hitting the timeout regularly, consider increasing it even more or reduce the amount of data required to run the MapReduce request.
+如果请求超时了，协调 MapReduce 查询的节点会终止查询操作，向客户端发送错误信息。何时以及是否
+会超时取决于涉及到的数据大小和集群的负载。如果经常超时，就要考虑把超时时间设的大一点，或者减少
+运行 MapReduce 请求使用的数据量。
 
-#### Inputs
+#### 输入
 
-The list of input objects is given as a list of 2-element lists of the form `[Bucket,Key]` or 3-element lists of the form `[Bucket,Key,KeyData]`.
+输入数据可以使用包含两个元素的列表形式 `[Bucket,Key]`，也可以使用包含三个列表的形式 `[Bucket,Key,KeyData]`。
+
 
 You may also pass just the name of a bucket `({"inputs":"mybucket",...})`, which is equivalent to passing all of the keys in that bucket as inputs (i.e. "a map/reduce across the whole bucket").  You should be aware that this triggers the somewhat expensive "list keys" operation, so you should use it sparingly. A bucket input may also be combined with [[Key Filters|Using Key Filters]] to limit the number of objects processed by the first query phase.
 
@@ -223,7 +261,7 @@ If you're using Riak Search, the list of inputs can also [[reference a search qu
 
 If you've enabled Secondary Indexes, the list of inputs can also [[reference a Secondary Index query|Using Secondary Indexes#Examples]].
 
-#### Query
+#### 查询
 
 The query is given as a list of phases, each phase being of the form `{PhaseType:{...spec...}}`.  Valid `{PhaseType}` values are "map", "reduce", and "link".
 
