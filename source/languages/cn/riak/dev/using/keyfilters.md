@@ -8,34 +8,34 @@ audience: beginner
 keywords: [developers, mapreduce, keyfilters]
 ---
 
-Key filters are a way to pre-process [[MapReduce|Using MapReduce]] inputs from a full bucket query simply by examining the key without loading the object first. This is especially useful if your keys are composed of domain-specific information that can be analyzed at query-time.
+键过滤器可以对 [[MapReduce|Using MapReduce]] 的输入数据进行预处理，只检查键而无需加载对象。如果键中包含特定的信息就可以使用键过滤器在查询时进行预先分析。
 
-## Understanding key filters
+## 理解键过滤器
 
-Key filters can be thought of as a series or pipeline of [[transformations|Using Key Filters#Transform-functions]] and [[predicates|Using Key Filters#Predicate-functions]] that attempt to match keys produced by the list-keys operation.  Keys that match the predicates are fed into the MapReduce query as if they had been specified manually.
+键过滤器可以看成一系列[[转换操作|Using Key Filters#Transform-functions]]和[[判定操作|Using Key Filters#Predicate-functions]]，尝试对列键操作生成的键进行匹配。满足判定函数的键会提供给 MapReduce 查询，就行手动提供输入数据一样。
 
-To illustrate this, let's contrive an example.  Let's say we're storing customer invoices with a key constructed from the customer name and the date, in a bucket called "invoices".  Here are some sample keys:
+下面举例说明。加入我们把客户的发票存储在“invoices”这个 bucket 中，有一个键由客户名称和日期组成，下面是几个键示例：
 
 <notextile><pre>basho-20101215
 google-20110103
 yahoo-20090613</pre></notextile>
 
-Given that key scheme, here are some queries we will be able to do simply with key filters:
+对于这样的键，我们可以使用键过滤器进行一些查询：
 
-* Find all invoices from a given customer.
-* Find all invoices from a range of dates.
-* Find invoices from customers who have names containing the word "solutions".
-* Find invoices that were sent on the 3rd of June.
+* 查找某个客户的所有发票
+* 查找某段时间内的所有发票
+* 查找客户名中包含“solutions”的发票
+* 查找6月3日发送的发票
 
-Solutions to these queries are shown in the [[examples|Using Key Filters#Example-query-solutions]] below.
+具体的查询方法参见下面的[[示例|Using Key Filters#Example-query-solutions]]
 
-Once the keys are filtered to only the items we care about, the normal MapReduce pipeline can further filter, transform, extract, and aggregate all the data we are interested in.
+把键过滤到只保留我们关心的信息之后，使用常规的 MapReduce 作业就可以进一步过滤、转换、提取并聚合我们需要的数据了。
 
-## Constructing key filters
+## 键过滤器的结构
 
-Key filters change the structure of the "inputs" portion of the MapReduce query.
+键过滤器会修改 MapReduce 查询的输入数据。
 
-When submitting a query in JSON format, this makes the inputs a JSON object containing two entries, "bucket" and "key_filters". All filters are specified as arrays, even if the filter takes no arguments. Example:
+如果以 JSON 格式提交查询，JSON 对象中要包含两个元素：bucket 和 key_filters。所有的过滤器，包括不接受参数的过滤器，都要以数组的形式指定。如下例所示：
 
 ```javascript
 {
@@ -47,27 +47,25 @@ When submitting a query in JSON format, this makes the inputs a JSON object cont
 }
 ```
 
-When submitting a query from the Erlang local or Protocol Buffers client, the inputs become a two-tuple where the first element is the bucket as a binary, and the second element is a list of filters. Like the JSON format, the filters are specified as lists, even for filters with no arguments, and the filter names are binaries.
+如果从本地 Erlang 客户端或 Protocol Buffers 客户端提交查询，输入数据就是包含两个元素的元组，第一个元素是 bucket 名，第二个元素是过滤器列表。和 JSON 格式一样，这里的过滤器也要以列表的形式指定，包括不接受参数的过滤器。过滤器的名字使用二进制格式。
 
 ```erlang
 riakc_pb_socket:mapred(Pid, {<<"invoices">>, [[<<"ends_with">>,<<"0603">>]]}, Query).
 ```
 
+## 键过滤器函数
 
-## Key Filter Functions
+Riak 键过滤器有两种函数：转换和判定。
 
-Riak Key Filter provides two kinds of function manipulators: transform and predicate.
+转换过滤器函数对键进行处理，把键转换成一种可以被[[判定函数|Key Filters Reference#Predicate-functions]]处理的格式。每个函数的描述文本都使用 JSON 格式。
 
-Transform key-filter functions manipulate the key so that it can be turned into a format suitable for testing by the [[predicate functions|Key Filters Reference#Predicate-functions]].  Each function description is followed by a sample usage in JSON notation.
+判定过滤器函数对输入进行测试，返回 `true` 或 `false`。鉴于此，判定函数应该在一系列键过滤器的最后，而且经常放在[[转换函数|Key Filters Reference#Transform-functions]]之后。
 
-Predicate key-filter functions perform a test on their inputs and return true or false. As such, they should be specified last in a sequence of key-filters and are often preceded by [[transform functions|Key Filters Reference#Transform-functions]].
+键过滤器函数的详细列表可以在“[[键过滤器参考手册Key Filters Reference]]”中查看。
 
-A full list of keyfilter functions can be found in the [[Key Filters Reference]].
+## 查询方法示例
 
-
-## Example query solutions
-
-Find all invoices for a given customer
+查找某个客户的所有发票：
 
 ```javascript
 {
@@ -79,7 +77,7 @@ Find all invoices for a given customer
 }
 ```
 
-Find all invoices from a range of dates
+查找某段时间内的所有发票：
 
 ```javascript
 {
@@ -92,7 +90,7 @@ Find all invoices from a range of dates
 }
 ```
 
-Find invoices from customers who have names containing the word "solutions"
+查找客户名中包含“solutions”的发票：
 
 ```javascript
 {
@@ -106,7 +104,7 @@ Find invoices from customers who have names containing the word "solutions"
 }
 ```
 
-Find invoices that were sent on the 3rd of June
+查找6月3日发送的发票：
 
 ```javascript
 {

@@ -8,47 +8,46 @@ audience: beginner
 keywords: [developers, commit-hooks]
 ---
 
-## Overview
+## 概述
 
-Pre- and post-commit hooks are invoked before or after a riak_object is persisted and can greatly enhance the functionality of any application. Commit hooks can:
+pre-commit 和 post-commit 钩子分别在 riak_object 持久存储前后调用，可以大大增强应用程序的功能。commit 钩子可以：
 
-- allow a write to occur with an unmodified object
-- modify the object
-- Fail the update and prevent any modifications
+- 不修改写入的对象
+- 修改对象
+- 终止更新，禁止一切修改
 
-Post-commit hooks are notified after the fact and should not modify the riak_object. Updating riak_objects in post-commit hooks can cause nasty feedback loops which will wedge the hook into an infinite cycle unless the hook functions are carefully written to detect and short-circuit such cycles.
+Post-commit 在存储完成后调用，不应该修改 riak_object。在 post-commit 中修改 riak_object 可能导致回馈循环，最终形成无限循环，除非钩子函数编写的很小心，提供了终止这种循环的功能。
 
-Pre- and post-commit hooks are defined on a per-bucket basis and are stored in the target bucket's properties. They are run once per successful response to the client.
+pre-commit 和 post-commit 钩子在各 bucket 中定义，存在 bucket 的属性中。每次成功响应客户端时都会调用这两个钩子。
 
-## Configuration
+## 设置
 
-Configuring either pre- or post-commit hooks is very easy. Simply add a reference to your hook function to the list of functions stored in the correct bucket property. Pre-commit hooks are stored under the bucket property *precommit*. Post-commit hooks use the bucket property *postcommit*.
+pre-commit 和 post-commit 钩子的设置都很简单，直接把钩子函数的引用加入 bucket 的钩子函数列表即可。pre-commit 钩子存储在 bucket 的  *precommit* 属性中。post-commit 钩子存储在 bucket 的 *postcommit* 属性中。
 
-Pre-commit hooks can be implemented as named Javascript functions or as Erlang functions. The configuration for each is given below:
+pre-commit 钩子可以使用具名 JavaScript 函数或 Erlang 函数编写。各自的设置如下：
 
-Javascript: `{"name": "Foo.beforeWrite"}`
-Erlang: `{"mod": "foo", "fun": "beforeWrite"}`
+Javascript：`{"name": "Foo.beforeWrite"}`
+Erlang：`{"mod": "foo", "fun": "beforeWrite"}`
 
-Post-commit hooks can be implemented in Erlang only, and is described in more detail under [[Advanced Commit Hooks]]. The reason for this restriction is Javascript cannot call Erlang code and, thus, is prevented from doing anything useful. This restriction will be revisited when the state of Erlang/Javascript integration is improved. Post-commit hooks use the same function reference syntax as pre-commit hooks.
+post-commit 钩子只能使用 Erlang 编写，详细内容请阅读“[[commit 钩子高级用法|Advanced Commit Hooks]]”。之所以制定这个限制是因为 JavaScript 不能调用 Erlang 代码，因此也就不能做什么有用的工作。当我们增强了 Erlang/JavaScript 集成程度后，会再重新审视这个限制。post-commit 钩子使用的函数引用句法和 pre-commit 一样。
 
-See [[Advanced MapReduce]] for steps to define your own pre-defined Javascript named functions.
+定义 JavaScript 具名函数的步骤请参阅“[[高级 MapReduce 用法|Advanced MapReduce]]”。
 
-## Pre-Commit Hooks
+## Pre-Commit 钩子
 
-### API & Behavior
+### API 和行为表现
 
-Pre-commit hook functions should take a single argument, the riak_object being modified. Remember that deletes are also considered "writes" so pre-commit hooks will be fired when a delete occurs. Hook functions will need to inspect the object for the *X-Riak-Deleted* metadata entry to determine when a delete is occurring.
+pre-commit 钩子函数应该接受一个参数，即要修改的 riak_object。还记得吗，删除也被认为是一种“写入操作”，所以删除对象时也会调用 pre-commit 钩子。如果执行删除操作，钩子函数应该检查对象是否具有 *X-Riak-Deleted* 元数据。
 
-Erlang pre-commit functions are allowed three possible return values:
+使用 Erlang 编写的 pre-commit 函数可以有三种返回结果：
 
-- A riak_object -- This can either be the same object passed to the function or an updated version. This allows hooks to modify the object before they are written.
-- `fail` -- The atom *fail* will cause Riak to fail the write and send a 403 Forbidden along with a generic error message about why the write was blocked.
-- `{fail, Reason}` -- The tuple `{fail, Reason}` will cause the same behavior as in #2 with the addition of `Reason` used as the error text.
+- 一个 riak_object -- 可以返回传入的对象，或者修改后的对象。允许在对象写入之前对其进行修改
+- `fail` -- 禁止 Raik 写入对象，并返回“403 Forbidden”和错误消息告知为什么终止了写入
+- `{fail, Reason}` -- `{fail, Reason}` 元组和第 2 类返回结果一样，只是会把 `Reason` 作为错误消息
 
-Errors that occur when processing Erlang pre-commit hooks will be reported in the `sasl-error.log` file with lines that start with "problem invoking hook".
+在处理 Erlang pre-commit 钩子时发生的错误会写入 `sasl-error.log` 日志文件，每行以“problem invoking hook”开头。
 
-##### Erlang Pre-commit Example
-
+##### Erlang Pre-commit 示例
 
 ```erlang
 %% Limits object values to 5MB or smaller
@@ -59,16 +58,13 @@ precommit_limit_size(Object) ->
   end.
 ```
 
+使用 JavaScript 编写的 pre-commit 钩子也要接受一个参数，即用 JSON 编码后的 riak_object。这里用到的 JSON 和 Riak MapReduce 中一样。JavaScript pre-commit 函数可以有三种返回结果：
 
-Javascript pre-commit functions should also take a single argument, the JSON encoded version of the riak_object being modified. The JSON format is exactly the same as Riak's map/reduce. Javascript pre-commit functions are allowed three possible return values:
+- JSON 编码的 Riak 对象 -- 除了使用 JSON 格式外，其他的都和 Erlang 函数的第一种返回结果完全一样。在写入数据之前会把对象自动转换成原生格式
+- `fail` -- 和 Erlang 函数的第2中返回结果完全一样，会终止写入操作
+- `{"fail": Reason}`  -- 这个 JSON Hash 和 Erlang 的第3种返回结果作用一样。`Reason` 必须是 JavaScript 字符串格式
 
-- A JSON encoded Riak object -- Aside from using JSON, this is exactly the
-same as #1 for Erlang functions. Riak will automatically convert it back to it's native format before writing.
-- `fail` -- The Javascript string "fail" will cause Riak to fail the write in exactly the same way as #2 for Erlang functions.
-- `{"fail": Reason}`  -- The JSON hash will have the same effect as #3 for Erlang functions. Reason must be a Javascript string.
-
-*Javascript Pre-commit Example*
-
+*Javascript Pre-commit 示例*
 
 ```javascript
 // Makes sure the object has JSON contents
@@ -82,14 +78,13 @@ function precommitMustBeJSON(object){
 }
 ```
 
+### 钩子链
 
-### Chaining
+bucket 的 *precommit* 属性默认值是空列表。向这个列表中加入一个或多个 pre-commit 钩子函数后（方法如上），Riak 就会在创建、更新或删除对象时调用钩子。如果钩子终止了操作则会停止运行钩子。
 
-The default value of the bucket *precommit* property is an empty list. Adding one or more pre-commit hook functions, as documented above, to the list will cause Riak to start evaluating those hook functions when bucket entries are created, updated, or deleted. Riak stops evaluating pre-commit hooks when a hook function fails the commit.
+##### 示例
 
-##### Example
-
-Pre-commit hooks can be used in many ways in Riak. One such way to use pre-commmit hooks is to validate data before it is written to Riak.  Below is an example that uses Javascript to validate a JSON object before it is written to Riak.
+Riak 的 pre-commit 钩子有多种用法。其中一种用法是，在写入数据之前对其进行数据验证。下面的例子使用 Javascript 验证 JSON 对象的句法是否合法。
 
 ```javascript
 //Sample Object
@@ -146,13 +141,13 @@ function validateData(data){
 }
 ```
 
-## Post-Commit Hooks
+## Post-Commit 钩子
 
-### API & Behavior
+### API 和行为表现
 
-Post-commit hooks are run after the write has completed successfully. Specifically, the hook function is called by riak_kv_put_fsm immediately before the calling process is notified of the successful write. Hook functions must accept a single argument, the riak_object instance just written. The return value of the function is ignored. As with pre-commit hooks, deletes are considered writes so post-commit hook functions will need to inspect object metadata for the presence of *X-Riak-Deleted* to determine when a delete has occurred.  Errors that occur when processing post-commit hooks will be reported in the `sasl-error.log` file with lines that start with "problem invoking hook".
+post-commit 钩子在数据成功写入会执行。更确切的说，钩子函数会在调用程序把这次写入操作标记为成功之前的一瞬间被 riak_kv_put_fsm 调用。钩子函数必须接受一个参数，即刚写入的 riak_object 实例，任何返回值都会被忽略。和 pre-commit 钩子一样，删除也被认为是一种写入操作，进行删除操作时，post-commit 钩子会检查对象的元数据中是否包含 *X-Riak-Deleted*。执行 post-commit 钩子过程中发生的错误会写入 `sasl-error.log` 日志文件，每行以“problem invoking hook”开头。
 
-##### Example
+##### 示例
 
 ```erlang
 %% Creates a naive secondary index on the email field of a JSON object
@@ -180,7 +175,6 @@ postcommit_index_on_email(Object) ->
     C:put(IndexObj).
 ```
 
+### 钩子链
 
-### Chaining
-
-The default value of the bucket *postcommit* property is an empty list. Adding one or more post-commit hook functions, as documented above, to the list will cause Riak to start evaluating those hook functions immediately after data has been created, updated, or deleted. Each post-commit hook function runs in a separate process so it's possible for several hook functions, triggered by the same update, to execute in parallel. _All post-commit hook functions are executed for each create, update, or delete._
+bucket 的 *postcommit* 属性默认值是空列表。向这个列表中加入一个或多个 post-commit 钩子函数后（方法如上），Riak 就会在创建、更新或删除对象后调用钩子。每个钩子都在单独的进程中运行，所以同一个更新操作可以调用多个钩子，并行执行。_每个创建、更新和删除操作都会执行列表中的所有钩子函数。_
