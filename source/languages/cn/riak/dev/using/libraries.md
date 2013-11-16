@@ -123,53 +123,50 @@ Basho 官方支持多种编程语言的开源客户端和环境。
 
 | 最终一致性                              | Erlang                    | Java | PHP     | Python  | Ruby          |
 |----------------------------------------|---------------------------|------|---------|---------|---------------|
-| Exposes siblings                       | ✓                         | ✓    | ✓       | ✓       | ✓             |
-| Sibling resolution policies/strategies | ✗                         | ✓    | ✗       | ✓       | ✓             |
+| 支持兄弟数据                             | ✓                         | ✓    | ✓       | ✓       | ✓             |
+| 相抵数据解决方案                         | ✗                         | ✓    | ✗       | ✓       | ✓             |
 | Mutators (encapsulating change ops)    | ✗                         | ✓    | ✗       | ✗       | ✗             |
 
-| Domain Types/Object Mapping            | Erlang                    | Java | PHP     | Python* | Ruby*         |
+| 主要数据类型/对象映射                    | Erlang                    | Java | PHP     | Python* | Ruby*         |
 |----------------------------------------|---------------------------|------|---------|---------|---------------|
-| Abstract domain types w/reification    | ✗                         | ✓    | partial | ✓       | ✓             |
-| Embedded/nested domain types           | ✗                         | ✓    |         | ✓       | ✓             |
-| Domain-level sibling resolution        | ✗                         | ✓    | ✗       | ✗       | ✓             |
-| Secondary index integration            | ✗                         | ✓    | partial | ✓       | ✓             |
-| Search integration                     | ✗                         | ✓    | ✗       | ✓       | ✗             |
+| 物化抽象主要数据类型                      | ✗                         | ✓    | 部分支持 | ✓       | ✓             |
+| 主要数据类型嵌套                         | ✗                         | ✓    |         | ✓       | ✓             |
+| 在特定领域层次处理兄弟数据                 | ✗                         | ✓    | ✗       | ✗       | ✓             |
+| 集成二级索引                             | ✗                         | ✓    | 部分支持 | ✓       | ✓             |
+| 集成 Riak Search                        | ✗                         | ✓    | ✗       | ✓       | ✗             |
 
+很多[[社区项目|community projects]]都支持 Python 和 Ruby 中的主要数据类型和对象映射。上表中列出的支持情况是下面这些项目集成的功能：
 
-Various [[community projects]] provide support for domain types and
-object mapping in Python and Ruby. The values in the table above
-represent the aggregate features of the projects listed below:
+- *Ruby*: [ripple](https://github.com/basho/ripple)，[risky](https://github.com/aphyr/risky) 和 [curator](https://github.com/braintree/curator)
+- *Python*: [riakkit](https://github.com/shuhaowu/riakkit)，[riakalchemy](https://github.com/Linux2Go/riakalchemy) 和 [django-riak-engine](https://github.com/oubiwann/django-riak-engine)
 
-- *Ruby*: [ripple](https://github.com/basho/ripple), [risky](https://github.com/aphyr/risky), and [curator](https://github.com/braintree/curator).
-- *Python*: [riakkit](https://github.com/shuhaowu/riakkit), [riakalchemy](https://github.com/Linux2Go/riakalchemy), and [django-riak-engine](https://github.com/oubiwann/django-riak-engine).
+## 社区开发的代码库
 
-## Community Libraries
-
-The Riak Community is developing at a break-neck pace, and the number of community-contributed libraries and drivers is growing right along side it. Here is a list of projects that may suit your programming needs or curiosities. If you know of something that needs to be added or are developing something that you wish to see added to this list, please fork the [Riak Docs repo on GitHub](https://github.com/basho/basho_docs) and send us a pull request.
+Riak 社区的开发很活跃，代码库和驱动的数量不断增长。下面列出了可能符合你所用编程语言需求的项目，也可以满足你的好奇心。如果你知道有其他项目可以加到这个列表中，或者你自己开发的项目想加入这个列表，请在 GitHub 上 fork [这各 repo](https://github.com/basho/basho_docs)，然后发送 pull request。
 
 <div class="info">
-All of these projects and libraries are at various stages of completeness and may not suit your application's needs based on their level of maturity and activity.
+这里列出的项目和代码库的完成度不一，可能并不符合你的程序需求。
 </div>
 
-### Client Libraries and Frameworks
+### 客户端代码库和框架
 
 *C/C++*
 
-* [[riak-cpp|https://github.com/ajtack/riak-cpp]] - A C++ Riak client library for use with C++11 compilers
-* [[Riak C Driver|https://github.com/fenek/riak-c-driver]] - A library to communicate with Riak using cURL and Protocol Buffers
-* [[Riack|https://github.com/trifork/riack]] - A simple C client library
-* [[Riack++|https://github.com/TriKaspar/riack_cpp]] - A C++ wrapper around riack
+* [[riak-cpp|https://github.com/ajtack/riak-cpp]] - Riak 的 C++ 客户端代码库，用于 C++11 编译器
+* [[Riak C Driver|https://github.com/fenek/riak-c-driver]] - 使用 cURL 和 Protocol Buffers 与 Riak 通信的代码库
+* [[Riack|https://github.com/trifork/riack]] - 简单地 C 客户端代码库
+* [[Riack++|https://github.com/TriKaspar/riack_cpp]] - riack 的 C++ 包装库
 
 *Clojure*
 
-* [[knockbox|https://github.com/reiddraper/knockbox]] - An eventual-consistency toolbox for Clojure
-* [[Welle|http://clojureriak.info]] - An expressive Clojure client with batteries included
-* [[clj-riak|http://github.com/mmcgrana/clj-riak]] - Clojure bindings to the Riak Protocol Buffers API
-* [[sumo|https://github.com/reiddraper/sumo]] - A Protocol Buffer specific client for Riak with K/V, 2i, and MapReduce support
+* [[knockbox|https://github.com/reiddraper/knockbox]] - 为 Clojure 开发的最终一致性工具集
+* [[Welle|http://clojureriak.info]] - Riak 的 Clojure 客户端代码库
+* [[clj-riak|http://github.com/mmcgrana/clj-riak]] - 绑定到 Riak Protocol Buffers API 上的 Clojure 代码库
+* [[sumo|https://github.com/reiddraper/sumo]] - Riak 的 Protocol Buffer 客户端，支持 K/V 存储，2i 和 MapReduce
 
 *ColdFusion*
 
-* [[Riak-Cache-Extension|https://github.com/getrailo/Riak-Cache-Extension]] - A Riak-backed cache extension for Railo/ColdFusion
+* [[Riak-Cache-Extension|https://github.com/getrailo/Riak-Cache-Extension]] - 基于 Riak 的 Railo/ColdFusion 缓存扩展
 
 *Common Lisp*
 
@@ -178,19 +175,19 @@ All of these projects and libraries are at various stages of completeness and ma
 
 *Dart*
 
-* [[riak-dart|http://code.google.com/p/riak-dart/]] - HTTP client for Riak written in Dart.
+* [[riak-dart|http://code.google.com/p/riak-dart/]] - 使用 Dart 开发的 Riak HTTP 客户端
 
 *Django*
 
-* [[django-riak-sessions|https://github.com/flashingpumpkin/django-riak-sessions]] - Riak-based Session Backend for Django
-* [[Django Riak Engine|https://github.com/oubiwann/django-riak-engine]] - A Riak backend for Django
+* [[django-riak-sessions|https://github.com/flashingpumpkin/django-riak-sessions]] - 基于 Riak 的 Django 会话存储
+* [[Django Riak Engine|https://github.com/oubiwann/django-riak-engine]] - 在 Django 中使用 Riak 存储数据
 
 *Go*
 
-* [[goriakpbc|https://github.com/tpjg/goriakpbc]] - A golang riak client inspired by the Ruby riak-client from Basho and riakpbc from mrb
-* [[riakpbc|https://github.com/mrb/riakpbc]] - A Riak Protocol Buffer Client in Go
-* [[Shoebox|https://github.com/mrb/shoebox]] - A proof of concept Go project that uses [[riakpbc|https://github.com/mrb/riakpbc]]
-* [[riak.go|http://github.com/c141charlie/riak.go]] - A Riak Client for Go
+* [[goriakpbc|https://github.com/tpjg/goriakpbc]] - 使用 Go 开发的 Riak 客户端，受 Basho 开发的 riak-client 和 mrb 开发的 riakpbc 的启发
+* [[riakpbc|https://github.com/mrb/riakpbc]] - 使用 Go 语言开发的 Riak Protocol Buffer 客户端
+* [[Shoebox|https://github.com/mrb/shoebox]] - 使用 [[riakpbc|https://github.com/mrb/riakpbc]] 开发的 Go 语言项目
+* [[riak.go|http://github.com/c141charlie/riak.go]] - 为 Go 语言编写的 Riak 客户端
 
 *Grails*
 
@@ -202,110 +199,109 @@ All of these projects and libraries are at various stages of completeness and ma
 
 *Groovy*
 
-* [[spring-riak|https://github.com/jbrisbin/spring-riak]] - Riak support from Groovy and/or Java
+* [[spring-riak|https://github.com/jbrisbin/spring-riak]] - 为 Groovy 和 Java 提供 Riak 支持
 
 *Erlang*
 
-* [Uriak Pool](https://github.com/unisontech/uriak_pool) - Erlang connection pool library from the team at [[Unison|http://www.unison.com]]
-* [[Riak PBC Pool|https://github.com/snoopaloop/Riak-PBC-Pool]] - Riak Protocol Buffer Client pool application
-* [[Pooly|https://github.com/aberman/pooly]] - Riak Process Pool
-* [[riakpool|https://github.com/dweldon/riakpool]] - Application for maintaining a dynamic pool of Protocol Buffer client connections to a Riak database
-* [[pooler|https://github.com/seth/pooler]] - An OTP Process Pool Application
-* [[krc|https://github.com/klarna/krc]] - A simple wrapper around the official Riak client for Erlang
-* [[riakc_pool|https://github.com/brb/riakc_pool]] - A really simple Riak
-client process pool based on poolboy
+* [Uriak Pool](https://github.com/unisontech/uriak_pool) - [Unison|http://www.unison.com]] 团队开发的 Erlang 连接池代码库
+* [[Riak PBC Pool|https://github.com/snoopaloop/Riak-PBC-Pool]] - Riak Protocol Buffer 客户端池程序
+* [[Pooly|https://github.com/aberman/pooly]] - Riak 进程池
+* [[riakpool|https://github.com/dweldon/riakpool]] - 管理连接到 Riak 数据库上的 Protocol Buffer 客户端动态池
+* [[pooler|https://github.com/seth/pooler]] - OTP 进程池程序
+* [[krc|https://github.com/klarna/krc]] - 简单地包装了官方的 Erlang 客户端
+* [[riakc_pool|https://github.com/brb/riakc_pool]] - 基于 poolboy 超级简单地 Riak 客户端进程池
 
 *Haskell*
 
-* [[Riak Haskell Client|https://github.com/bos/riak-haskell-client]] - A fast Haskell client library from the team at MailRank.
+* [[Riak Haskell Client|https://github.com/bos/riak-haskell-client]] - MailRank 团队开发的超快的 Haskell 客户端代码库
 
 *Java*
 
-* [[Riak-Java-PB-Client|http://github.com/krestenkrab/riak-java-pb-client]] - Java Client Library for Riak based on the Protocol Buffers API
-* [[Asynchronous Riak Java Client|https://github.com/jbrisbin/riak-async-java-client]] - Asynchronous, NIO-based Protocol Buffers client for Riak
+* [[Riak-Java-PB-Client|http://github.com/krestenkrab/riak-java-pb-client]] - 基于 Protocol Buffers API 开发的 Java 客户端代码库
+* [[Asynchronous Riak Java Client|https://github.com/jbrisbin/riak-async-java-client]] - 基于 NIO 的 Protocol Buffers 异步客户端
 
 *Lisp Flavored Erlang*
 
-* [[Gutenberg|https://github.com/dysinger/gutenberg/]] - Riak MapReduce Examples Written in LFE
+* [[Gutenberg|https://github.com/dysinger/gutenberg/]] - 使用 LFE 编写的 Riak MapReduce 示例
 
 *.NET*
 
 * CorrugatedIron ([[project page|http://corrugatediron.org/]] | [[source|https://github.com/DistributedNonsense/CorrugatedIron]] | [[Nuget package|http://www.nuget.org/List/Packages/CorrugatedIron]])
-* [[Hebo|http://github.com/bubbafat/hebo]] - An experimental Riak client
-* [[Data.RiakClient|http://github.com/garethstokes/Data.RiakClient]] - A Riak client with Protocol Buffer support
+* [[Hebo|http://github.com/bubbafat/hebo]] - 实验性的 Riak 客户端
+* [[Data.RiakClient|http://github.com/garethstokes/Data.RiakClient]] - 支持 Protocol Buffer 的 Riak 客户端
 
 *Node.js*
 
-* [zukai](https://github.com/natural/zukai) - Riak ODM for Node.js from Troy Melhase
-* [riak-pb](https://github.com/CrowdProcess/riak-pb) - Riak Protocol Buffers Client for Node.js from the team at [CrowdProcess](http://crowdprocess.com)
-* [[node_riak|https://github.com/mranney/node_riak]] - Voxer's production Node.js client for Riak.
-* [[nodiak|https://npmjs.org/package/nodiak]] - Supports bulk get/save/delete, sibling auto-resolution, MapReduce chaining, Search, and 2i's.
-* [[resourceful-riak|https://github.com/admazely/resourceful-riak]] - A Riak engine to the [[resourceful|https://github.com/flatiron/resourceful/]] model framework from [[flatiron|https://github.com/flatiron/]].
-* [[Connect-Riak|https://github.com/frank06/connect-riak]] - Riak Session Store for Connect backed by [[Riak-js|http://riakjs.org/]]
-* [[Riak-js|http://riakjs.com]] - Node.js client for Riak with support for HTTP and Protocol Buffers
-* [[Riakjs-model|https://github.com/dandean/riakjs-model]] - a model abstraction around riak-js
-* [[Node-Riak|http://github.com/orlandov/node-riak]] - A wrapper around Node's HTTP facilities for communicating with Riak
-* [[Nori|https://github.com/sgonyea/nori]] - Experimental Riak HTTP Library for Node.js modeled after Ripple
-* [[OrionNodeRiak|http://github.com/mauritslamers/OrionNodeRiak]] - Node-based server and database-frontend for Sproutcore
-* [[Chinood|https://npmjs.org/package/chinood]] - Object data mapper for Riak built on Nodiak
-* [[SimpleRiak|https://npmjs.org/package/simpleriak]] - A very simple Riak HTTP client
+* [zukai](https://github.com/natural/zukai) - Troy Melhase 为 Node.js 编写的 Riak ODM
+* [riak-pb](https://github.com/CrowdProcess/riak-pb) - [CrowdProcess](http://crowdprocess.com) 团队为 Node.js 开发的 Riak Protocol Buffers 客户端
+* [[node_riak|https://github.com/mranney/node_riak]] - Voxer 在生产环境中使用的 Riak Node.js 客户端
+* [[nodiak|https://npmjs.org/package/nodiak]] - 支持批量读取、保存和删除数据，支持自动处理兄弟数据、MapReduce 链、Riak Search 和 2i
+* [[resourceful-riak|https://github.com/admazely/resourceful-riak]] - [[flatiron|https://github.com/flatiron/]] 开发的 [[resourceful|https://github.com/flatiron/resourceful/]] 模型框架引擎
+* [[Connect-Riak|https://github.com/frank06/connect-riak]] - Connect 的会话存储，后台使用 [[Riak-js|http://riakjs.org/]]
+* [[Riak-js|http://riakjs.com]] - Node.js 客户端，支持 HTTP 和 Protocol Buffers
+* [[Riakjs-model|https://github.com/dandean/riakjs-model]] - 基于 riak-js 的模型抽象工具
+* [[Node-Riak|http://github.com/orlandov/node-riak]] - 包装了 Node 的 HTTP 工具，用来和 Riak 通信
+* [[Nori|https://github.com/sgonyea/nori]] - 参照 Ripple 开发的实验性 Riak HTTP 代码库
+* [[OrionNodeRiak|http://github.com/mauritslamers/OrionNodeRiak]] - Sproutcore 使用的基于 Node 的服务器和数据库前台
+* [[Chinood|https://npmjs.org/package/chinood]] - 基于 Nodiak 的 Riak 对象映射程序
+* [[SimpleRiak|https://npmjs.org/package/simpleriak]] - 很简单的 Riak HTTP 客户端
 
 *OCaml*
 
-* [[Riak OCaml Client|http://metadave.github.com/riak-ocaml-client/]] - Riak OCaml Client
+* [[Riak OCaml Client|http://metadave.github.com/riak-ocaml-client/]] - Riak OCaml 客户端
 * [OCaml Riakc](https://github.com/orbitz/ocaml-riakc) - ocaml-riakc
 
 *Perl*
 
-* [[Net::Riak|http://search.cpan.org/~franckc/Net-Riak/]] - A Perl interface to Riak
-* [[AnyEvent-Riak adapter|http://github.com/franckcuny/anyevent-riak]] - Non-blocking Riak adapter using anyevent
-* [[riak-tiny|https://github.com/tempire/riak-tiny]] - Perl interface to Riak without Moose
-* [[Riak::Light|https://metacpan.org/module/Riak::Light]] - Fast and lightweight Perl client for Riak (PBC only)
+* [[Net::Riak|http://search.cpan.org/~franckc/Net-Riak/]] - Riak 的 Perl 语言接口
+* [[AnyEvent-Riak adapter|http://github.com/franckcuny/anyevent-riak]] - 使用 anyevent 的非阻塞 Riak 适配器
+* [[riak-tiny|https://github.com/tempire/riak-tiny]] - 不支持 Moose 的 Perl 语言接口
+* [[Riak::Light|https://metacpan.org/module/Riak::Light]] - 快速、轻量级的 Perl 客户端（只支持 PBC）
 
 *PHP*
 
-* [[Ripple-PHP|https://github.com/KevBurnsJr/ripple-php]] - A port of Ripple to PHP
-* [[riiak|https://bitbucket.org/intel352/riiak]] - A Riak PHP client library for the [[Yii Framework|http://www.yiiframework.com/]]
-* [[riak-php|https://github.com/marksteele/riak-php]] - A Riak PHP with support for Protocol Buffers
-* [[RiakBundle|https://github.com/remialvado/RiakBundle]] - [[Symfony|http://symfony.com]] Bundle designed to ease interaction with Riak
-* [[php_riak|https://github.com/TriKaspar/php_riak]] - A PHP Extension written in C, Both Riak client and PHP session module
+* [[Ripple-PHP|https://github.com/KevBurnsJr/ripple-php]] - 使用 PHP 开发的 Ripple 克隆
+* [[riiak|https://bitbucket.org/intel352/riiak]] - 为 [[Yii 框架|http://www.yiiframework.com/]] 开发的 Riak 客户端代码库
+* [[riak-php|https://github.com/marksteele/riak-php]] - 使用 PHP 开发的 Riak 代码库，支持 Protocol Buffers
+* [[RiakBundle|https://github.com/remialvado/RiakBundle]] - 可以简便的和 Riak 交互的 [[Symfony|http://symfony.com]]
+* [[php_riak|https://github.com/TriKaspar/php_riak]] - 使用 C 语言编写的 PHP 扩展，既是 Riak 客户端，也是 PHP 会话模块
 
 *Play*
 
-* [[Riak Module for The Play Framework|http://www.playframework.org/modules/riak-head/home]]
+* [[为 Play 框架开发的 Riak 模块|http://www.playframework.org/modules/riak-head/home]]
 
 *Python*
 
-* [[Riakasaurus|https://github.com/calston/riakasaurus]] - A Riak client library for Twisted (based on txriak)
-* [[RiakKit|http://shuhaowu.com/riakkit]] - A small Python ORM that sits on top of riak-python-client similar to mongokit and couchdbkit
-* [[riakalchemy|https://github.com/Linux2Go/riakalchemy]] - Object mapper for Riak written in Python
-* [[riak_crdt|https://github.com/ericmoritz/riak_crdt]] - A CRDT (Conflict-Free Replicated Data Type) loader for Riak using the [[crdt API|https://github.com/ericmoritz/crdt]]
-* [[txriak|https://launchpad.net/txriak]]- a Twisted module for communicating with Riak via the HTTP interface
-* [[txriakidx|https://github.com/williamsjj/txriakidx]] - Riak client for Twisted Python that implements transparent indexes
+* [[Riakasaurus|https://github.com/calston/riakasaurus]] - 为 Twisted 开发的 Riak 客户端代码库（基于 txriak）
+* [[RiakKit|http://shuhaowu.com/riakkit]] - 基于 riak-python-client 的小型 ORM，类似 mongokit 和 couchdbkit
+* [[riakalchemy|https://github.com/Linux2Go/riakalchemy]] - 使用 Python 编写的 Riak 对象映射程序
+* [[riak_crdt|https://github.com/ericmoritz/riak_crdt]] - 使用 [[crdt API|https://github.com/ericmoritz/crdt]] 开发的 CRDT（Conflict-Free Replicated Data Type）加载程序
+* [[txriak|https://launchpad.net/txriak]]- 通过 HTTP 接口和 Riak 通信的 Twisted 模块
+* [[txriakidx|https://github.com/williamsjj/txriakidx]] - 为 Twisted 开发的 Riak 客户端，试想了透明索引
 
 *Racket*
 
-* [[riak.rkt|https://github.com/shofetim/riak.rkt]] - Racket API to Riak
-* [[Racket Riak|https://github.com/dkvasnicka/racket-riak]] - Racket 1.3.x API to Riak
+* [[riak.rkt|https://github.com/shofetim/riak.rkt]] - 实现 Riak HTTP API 的 Racket 接口
+* [[Racket Riak|https://github.com/dkvasnicka/racket-riak]] - 使用 Racket 1.3.x 开发的 Raik 客户端
 
 *Ruby*
 
-* [[Shogun|https://github.com/krainboltgreene/shogun]] - A light weight, powerful Ruby web application framework with first class support for Riak.
-* [[Risky|https://github.com/aphyr/risky]] - A lightweight Ruby ORM for Riak
-* [[riak_sessions|http://github.com/igorgue/riak_sessions]] - Riak-backed session storage for Rack
-* [[Riaktor|http://github.com/benmyles/riaktor]] - Ruby client and object mapper for Riak
-* [[dm-riak-adapter|http://github.com/mikeric/dm-riak-adapter]] - DataMapper adapter for Riak
-* [[Riak PB Client|https://github.com/sgonyea/riak-pbclient]] - Riak Protocol Buffer Client in Ruby
-* [[Devise-Ripple|http://github.com/frank06/devise-ripple]] - An ORM strategy to use Devise with Riak
-* [[ripple-anaf|http://github.com/bkaney/ripple-anaf]] - Accepts nested attributes support for Ripple
-* [[Pabst|https://github.com/sgonyea/pabst]] - Cross-platform Ruby extension for Protocol Buffers written in both Objective-C and Objective-C++
+* [[Shogun|https://github.com/krainboltgreene/shogun]] - 一个轻量级但很强大的 Ruby Web 程序框架，很好地支持了 Riak
+* [[Risky|https://github.com/aphyr/risky]] - 使用 Ruby 编写的轻量级 Riak ORM
+* [[riak_sessions|http://github.com/igorgue/riak_sessions]] - 基于 Riak 的 Rack 会话存储
+* [[Riaktor|http://github.com/benmyles/riaktor]] - Ruby 客户端和对象映射程序
+* [[dm-riak-adapter|http://github.com/mikeric/dm-riak-adapter]] - 为 Riak 编写的 DataMapper 适配器
+* [[Riak PB Client|https://github.com/sgonyea/riak-pbclient]] - 使用 Ruby 编写的 Riak Protocol Buffer 客户端
+* [[Devise-Ripple|http://github.com/frank06/devise-ripple]] - 在 Riak 中使用 Devise 实现的 ORM 策略
+* [[ripple-anaf|http://github.com/bkaney/ripple-anaf]] - 让 Ripple 支持嵌套属性
+* [[Pabst|https://github.com/sgonyea/pabst]] - 使用 Objective-C 和 Objective-C++ 开发的跨平台扩展，让 Ruby 支持 Protocol Buffers
 
 *Scala*
 
-* [[Riakka|http://github.com/timperrett/riakka]] - Scala library for talking to Riak
-* [[Ryu|http://github.com/softprops/ryu]] - A Tornado Whirlwind Kick Scala client for the Riak raw HTTP interface
+* [[Riakka|http://github.com/timperrett/riakka]] - 和 Riak 交互的 Scala 代码库
+* [[Ryu|http://github.com/softprops/ryu]] - Tornado Whirlwind Kick Scala 客户端，支持纯 HTTP 接口
 
 *Smalltalk*
 
-* [[Phriak|http://www.squeaksource.com/Phriak/]] - a Riak client for Pharo Smalltalk based on Runar Jordan's EpigentRiakInterface
-* [[EpigentRiakInterface|http://www.squeaksource.com/EpigentRiakInterface/]] - A Pharo Smalltalk interface to Riak. (There is also a blog post with some additional info about the client [[here|http://blog.epigent.com/2011/03/riak-interface-for-pharo-smalltalk.html]].)
+* [[Phriak|http://www.squeaksource.com/Phriak/]] - 基于 Runar Jordan 的 EpigentRiakInterfacea 为 Pharo Smalltalk 开发的 Riak 客户端
+* [[EpigentRiakInterface|http://www.squeaksource.com/EpigentRiakInterface/]] - Pharo Smalltalk 的 Riak 客户端（[[有篇文章|http://blog.epigent.com/2011/03/riak-interface-for-pharo-smalltalk.html]]详细的介绍了这个客户端）
