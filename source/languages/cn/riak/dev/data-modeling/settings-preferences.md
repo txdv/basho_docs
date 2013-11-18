@@ -8,13 +8,12 @@ audience: intermediate
 keywords: [use-cases]
 ---
 
-*Typically one-to-one relationships*
+*这是最经典的一对一关联*
 
-## Simple Case
+## 简单用例
 
-For user account-related data that is simple, frequently read but rarely changed (such as a privacy setting or theme preference), consider storing it in the user object itself. Another common pattern is to create a companion User Settings type of object, also keyed off of the user id for easy one-read retrieval.
+对于简单的、经常读取但很少修改的用户相关数据，可以存储到用户对应的对象中。另一种常用的方法是创建“用户设置”对象类型，为了便于读取，键使用用户的 ID。
 
+## 复杂用例
 
-## Complex Case
-
- If you find your application frequently writing to the user account, or have dynamically growing user related data such as bookmarks, subscriptions or multiple notifications, then a more advanced data model is called for (see the section on social events/subscriptions)
+如果应用程序经常修改用户数据，或者要动态的添加用户相关的数据，例如书签、订阅、或提醒，可以使用更复杂的数据模型。

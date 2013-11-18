@@ -8,57 +8,57 @@ audience: beginner
 keywords: [developers, mapreduce]
 ---
 
-## Introduction
+## 简介
 
-MapReduce (M/R) is a technique for dividing work across a distributed system. This takes advantage of the parallel processing power of distributed systems, and also reduces network bandwidth as the algorithm is passed around to where the data lives, rather than a potentially huge dataset transferred to a client algorithm. Developers can use MapReduce for things like filtering documents by tags, counting words in documents, and extracting links to related data.
+MapReduce（M/R）这个技术可以把作业分配到整个分布式系统，充分利用分布式系统的并行处理功能，还能减少网络带宽用量，因为 M/R 是把计算发送到数据上，而不是把巨量数据加载到客户端。开发者可以使用 MapReduce 通过标签过滤文档、统计文档中的字数，或者把链接提取到相关数据中。
 
-In Riak, MapReduce is one method for non-key-based querying. MapReduce jobs can be submitted through the HTTP API or the Protocol Buffers API. **Riak MapReduce is intended for batch processing, not real-time querying.**
+在 Raik 中，MapReduce 是一种不使用键进行查询的方法。MapReduce 作业可以通过 HTTP API 或 Protocol Buffers API 提交。**Riak 中的 MapReduce 是用来进行批量处理的，而不是进行实时查询的。**
 
-## Features
+## 特性
 
-* Map phases execute in parallel with data locality
-* Reduce phases execute in parallel on the node where the job was submitted
-* Javascript MapReduce support
-* Erlang MapReduce support
+* Map 步骤使用本地数据并行执行
+* Reduce 步骤在提交查询作业的节点上并行执行
+* 支持 Javascript MapReduce 查询
+* 支持 Erlang MapReduce 查询
 
-## When to Use MapReduce
+## 什么时候使用 MapReduce
 
-* When you know the set of objects you want to MapReduce over (the bucket-key pairs)
-* When you want to return actual objects or pieces of the object – not just the keys, as do [[Search|Using Search]] and [[Secondary Indexes|Using Secondary Indexes]]
-* When you need utmost flexibility in querying your data. MapReduce gives you full access to your object and lets you pick it apart any way you want.
+* 知道要使用 MapReduce 处理的是哪些数据（“bucket/键”组合）
+* 真的要返回对象，而不只是键，与使用[[搜索|Using Search]]和[[二级索引|Using Secondary Indexes]]一样
+* 查询数据时需要极大的灵活性。MapReduce 能让你充分掌握对象，并根据需求选择需要的值。
 
-## When Not to Use MapReduce
+## 什么时候不要使用 MapReduce
 
-* When you want to query data of an entire bucket. MapReduce uses a list of keys, which can place a lot of demand on the cluster.
-* When you want latency to be as predictable as possible.
+* 要查询整个 bucket 的数据时。MapReduce 会使用一组键列表，使用集群的很多资源
+* 想要尽量预测迟延时
 
-## How it Works
+## MapReduce 是如何工作的
 
-The MapReduce framework helps developers divide a query into steps, divide the dataset into chunks, and then run those step/chunk pairs in separate physical hosts.
+MapReduce 框架帮助开发者把查询分成多步，把数据集合分成多个片段，然后在不同的物理主机上运行这些“步骤/片段”组合。
 
-There are two steps in a MapReduce query:
+MapReduce 查询分成两步：
 
-* **Map**: data collection phase. Map breaks up large chunks of work into smaller ones and then takes action on each chunk.
-* **Reduce**: data collation or processing phase. Reduce combines the many results from the map step into a single output _(this step is optional)_.
+* **Map**：收集数据阶段。在 Map 步骤中，大型数据片段会被分成更小的片段，然后在各片段上运算。
+* **Reduce**：数据校对或处理阶段。Reduce 步骤把 Map 步骤中的多个结果汇总到一个最终输出里（_这一步是可选的_）
 
 ![MapReduce Diagram](/images/MapReduce-diagram.png)
 
-Riak MapReduce queries have two components:
+Riak 的 MapReduce 查询有两部分组成：
 
-* A list of inputs
-* A list of phases
+* 输入列表
+* 步骤列表
 
-The elements of the input list are bucket-key pairs. The elements of the phases list are chunks of information related to a map, a reduce, or a link function.
+输入列表的元素是“bucket/键”组合。步骤列表的元素是 Map 函数、Reduce 函数或 Link 函数的相关信息。
 
-The client makes a request to Riak. The node the client contacts to make the request becomes the coordinating node for the MapReduce job. The MapReduce job consists of a list of phases-- either a map or a reduce. The map phase consists of a function and a list of objects the function will operate on, bucketed by the object's key. The coordinator uses the list to route the object keys and the function with a request for the vnode to run that function over those particular objects.
+客户端向 Riak 发起请求，接受请求的节点负责协调 MapReduce 作业。MapReduce 作业中包含很多步骤，Map 或 Reduce。Map 步骤中有一个函数和一组传入函数的对象，以 bucket 分组。协调查询的节点使用输入列表找到对象，函数则在这些对象上做运算。
 
-After running the map function, the results are sent back to the coordinating node. The coordinating node concatenates the list and then passes that information over to a reduce phase on the same coordinating node (assuming reduce is the next phase in the list).
+Map 函数执行完毕后，结果会返回给负责协调的节点。负责协调的几点会把结果组成一个列表，再传给在同一个节点上运行的 Reduce 步骤（假设下一个步骤是 Reduce）。
 
-## Examples
+## 示例
 
-In this example we will create four objects with the text "pizza" sometimes repeated. Javascript MapReduce will be used to count the occurrences of the word "pizza".
+在这个例子中，我们要创建四个对象，都包含文本“pizza”，然后使用 Javascript MapReduce 查询统计“pizza”出现的次数。
 
-### Data object input commands:
+### 存入数据的命令
 
 ```bash
 curl -XPUT http://localhost:8098/buckets/training/keys/foo -H 'Content-Type: text/plain' -d 'pizza data goes here'
@@ -67,7 +67,7 @@ curl -XPUT http://localhost:8098/buckets/training/keys/baz -H 'Content-Type: tex
 curl -XPUT http://localhost:8098/buckets/training/keys/bam -H 'Content-Type: text/plain' -d 'pizza pizza pizza'
 ```
 
-### MapReduce script and deployment:
+### MapReduce 查询脚本
 
 ```javascript
 curl -XPOST http://localhost:8098/mapred \
@@ -81,25 +81,24 @@ curl -XPOST http://localhost:8098/mapred \
     }"}}]}'
 ```
 
-### Output
+### 输出
 
-The output is the key of each  object, followed by the count of the word  "pizza" for that object.  It looks like:
+输出的结果中包含各对象的键，以及“pizza”在其中出现的次数，如下所示：
 
 ```text
 [["foo",1],["baz",0],["bar",4],["bam",3]]
 ```
 
-### Recap
+### 小结
 
-We run a Javascript MapReduce function against the `training` bucket, which takes each `riakObject` (a JavaScript representation of a key/value) and searches the text for the word "pizza". `val` is the result of the search, which includes zero or more regular expression matches. The function then returns the `key` of the `riakObject` along with the number of matches.
-
+我们在 `training` 这个 bucket 中执行 Javascript MapReduce 查询，输入各 `riakObject`（Javascript 中表示键值对的方式），搜索“pizza”这个单词。`val` 是搜索的结果，包含零个或多个匹配正则表达式的结果。然后返回 `riakObject` 的键和匹配的数量。
 
 <!-- ## NEED TO ADD
 * Errors
 * Tombstones
  -->
 
-## Further Reading
+## 扩展阅读
 
-* [[Advanced MapReduce]]: Details on Riak's implementation of MapReduce, different ways to run queries, examples, and configuration details
-* [[Using Key Filters]]: Pre-processing MapReduce inputs from a full bucket query by examining the key
+* [[MapReduce 高级用法|Advanced MapReduce]]：详细说明了 Riak 是如何实现 MapReduce 的，以及不同的查询方法，示例和设置
+* [[使用键过滤器|Using Key Filters]]：使用键查询整个 bucket，预处理 MapReduce 的输入数据

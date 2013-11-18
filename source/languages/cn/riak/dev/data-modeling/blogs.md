@@ -8,31 +8,32 @@ audience: intermediate
 keywords: [use-cases]
 ---
 
-## Simple Case
+## 简单用例
 
-The simplest way to model blog posts, articles or other content is by creating a bucket in Riak with some unique attribute for logical division of content - perhaps  "blogs" "articles" or something similar. Keys could be unique identifiers for posts - perhaps the article title, a combination of the title and time/date, or perhaps an integer that can be used as part of a URL string. You can store content anyway you want - HTML blobs, plain text, JSON or XML, or another document type. Keep in mind that data in Riak is opaque, so Riak won't "know" about the object unless it is indexed with Riak Search.
+为博客文章等内容建立的最简单模型是，创建一个 bucket，各种内容类型存储在不同的属性中，例如“blogs”、“articles”等。键可以作为文章的唯一标识符，可以使用文章标题、文章标题加日期，或者可以用在 URL 中的数字。内容可以以任何一种格式存储，HTML、纯文本、JSON、XML 等。但要记住，Riak 中的数据是不透明的，在通过 Riak Search 索引之前，Riak 对对象一无所知。
 
+## 复杂用例
 
-## Complex Case
+对需要查询和搜索支持的复杂内容建模需要应用程序的支持。例如，在视图中你可能想生成不同类型的内容：文章，评论，用户资料等。很多 Riak 开发者会把不同类型的内容存到不同的 bucket 中，例如除 posts 之外，再在 Riak 集群中创建 comments。文章的评论可以存储时使用的键可以和文章的一样，只要保证“bucket/键”组合是唯一的就行。当然也可以使用自己的 ID 存储评论。生成包含评论的视图需要应用程序分别调用 posts 和 comments 这两个 bucket 中的数据。
 
-Setting up a data model for content gets more complex based on the querying and search requirements of your application or its various aspects. For example, you may have different kinds of content you want to generate in a view - not just a post, but comments, users and profile information, etc. For many Riak developers, it will make sense to divide out content into different buckets - a bucket for comments, for example, that would be stored in the Riak cluster along with the posts bucket. Comments for a given post could be stored as a document with the same key as the content post - only the bucket/key combination must be unique. Or you could store each comment with its own ID. (more on how to associate different content together when stored in different buckets??) Loading the full view with comments would mean your application would need to call from the posts and comments bucket to assemble the view. Another common case that is slightly more complex is when you want to perform search and query operations on content beyond just retrieving key/value pairs. Riak Search, our full-text search engine that implements a SOLR-like API and query model, is a great use case for text content, and users like Clipboard have some great work available on how to optimize search performance. For lighter-weight querying, secondary indexes allow you to add additional metadata to objects for querying on exact match or range values. Using secondary indexes, you could tag posts with dates, timestamps, topic areas or others of interest. It's important to make sure that your dataset will be a use case with 2i, as it can be performance-prohibitive in clusters with over 512 partitions.
+另一种复杂的用例是，除了简单的获取键值对之外，还想进行搜索等查询操作。我们开发的全文本搜索引擎 Riak Search，具有和 Solr 类似的 API，非常适合对文本内容进行搜索。很多用户，比如 Clipboard，找到了一些优化搜索性能的好方法。对于比较轻量级的查询可以使用二级索引，在要查询的对象上添加额外的元数据就可以进行精确匹配和范围查询。使用二级索引，可以使用日期、时间戳、话题领域等给文章加上标签。但一定要保证数据集合可以使用 2i，因为在超过 512 个分区的集群中使用 2i 会严重影响性能。
 
-## Community Examples
+## 社区使用示例
 
 <table class="links">
   <tr>
-    <td><a href="http://blog.clipboard.com/2012/03/18/0-Milking-Performance-From-Riak-Search" class="vid_img" target="_blank"><img src="/images/milking-perf-from-riak.png" title="Milking Performance"></a>
+    <td><a href="http://blog.clipboard.com/2012/03/18/0-Milking-Performance-From-Riak-Search" class="vid_img" target="_blank"><img src="/images/milking-perf-from-riak.png" title="榨取性能"></a>
     </td>
-    <td>Clipboard on <a href="http://blog.clipboard.com/2012/03/18/0-Milking-Performance-From-Riak-Search" target="_blank">storing and searching data in Riak.</a>
+    <td>Clipboard 介绍<a href="http://blog.clipboard.com/2012/03/18/0-Milking-Performance-From-Riak-Search" target="_blank">如何在 Riak 中存储并搜索数据</a>
   </tr>
   <tr>
-    <td><a href="http://media.basho.com/pdf/Linkfluence-Case-Study-v2-1.pdf" class="vid_img" link target="_blank"><img src="/images/linkfluence-case-study.png" title="Milking Performance"></a>
+    <td><a href="http://media.basho.com/pdf/Linkfluence-Case-Study-v2-1.pdf" class="vid_img" link target="_blank"><img src="/images/linkfluence-case-study.png" title="榨取性能"></a>
     </td>
-    <td>Linkfluence case study on using Riak to <a href="http://media.basho.com/pdf/Linkfluence-Case-Study-v2-1.pdf" target="_blank">store social web content</a>.
+    <td>Linkfluence 对如何使用 Riak<a href="http://media.basho.com/pdf/Linkfluence-Case-Study-v2-1.pdf" target="_blank">存储社会化网络内容</a>的研究
   </tr>
   <tr>
-    <td><a href="http://basho.com/assets/Basho-Case-Study-ideeli.pdf" class="vid_img" link target="_blank"><img src="/images/ideeli-case-study.png" title="Milking Performance"></a>
+    <td><a href="http://basho.com/assets/Basho-Case-Study-ideeli.pdf" class="vid_img" link target="_blank"><img src="/images/ideeli-case-study.png" title="榨取性能"></a>
     </td>
-    <td>ideeli case study on <a href="http://basho.com/assets/Basho-Case-Study-ideeli.pdf" target="_blank">serving web pages with Riak</a>.
+    <td>ideeli 对如何使用 Riak<a href="http://basho.com/assets/Basho-Case-Study-ideeli.pdf" target="_blank">提供网页服务</a>的研究
   </tr>
 </table>

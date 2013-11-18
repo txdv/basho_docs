@@ -7,23 +7,23 @@ audience: beginner
 keywords: [developers, linkwalking]
 ---
 
-## What are Links?
+## 链接是什么？
 
-One of the ways that we are able to extend the fairly-limited data model provided by a key/value store is with the notion "links" and a type of query known as "link walking."
+键值对存储提供的数据模型相对有限，有很多种方法可以对其进行扩展，其中一种就是使用“链接”，以及一种称为“链接遍历”（link walking）的查询。
 
-Links are metadata that establish one-way relationships between objects in Riak. Once attached, links then enable you to run queries that "walk" relations from one object to another. With links, you create lightweight pointers between your data, for example, from 'projects' to 'milestones' to 'tasks', and then select data along that hierarchy using simple client API commands. (In a pinch, this can substitute as a lightweight graph database, as long as the number of links attached to a given key are kept reasonably low.) Links are an incredibly powerful feature of Riak and can transform an application if used appropriately by developers.
+Riak 中的链接是一种元数据，在对象之间建立单项关系。关系建立后就可以执行查询，从一个对象连到另一个对象。链接是一种对象间的轻量级指针，例如从“projects”指向“milestones”，再从“milestones”指向“tasks”，然后可以使用简单的 API 命令按照这种分级结果选择数据。（某些情况下，链接可以用作轻量级的图形数据库，只要能保证键上的链接数量很少。）链接是 Riak 提供的强大功能，如果合理使用可以让应用程序变得更强大。
 
-## Working with Links
+## 使用链接
 
-Links live in the metadata of an object and are attached to it via the "Link" header. Here is what the link header looks like:
+链接是对象的元数据，通过“Link”报头指定。下面就是一个“Link”报头：
 
 ```bash
 Link: </riak/people/dhh>; riaktag="friend"
 ```
 
-So what's actually happening here? In the angle brackets, we have the URL the link points to. The prefix "riak" is followed by the bucket name, "people," and the key, "dhh." Next comes the "riaktag." Contained in the riaktag field is an identifier that describes the relationship you are wishing to capture with your link. In this case the riaktag is "friend."
+这个报头是什么意思呢？尖括号中是链接指向的 IRL 地址。前缀“riak”后面跟着的是 bucket 名（“people”），而后是键名（“dhh”）。然后是“riaktag”，指定要捕获的链接关系。本例中“riaktag”是“friend”。
 
-Here is what a full PUT request through CURL with the link header would look like:
+下面的例子使用 CURL 进行 PUT 请求，其中就包含“Link”报头：
 
 ```
 $ curl -v -XPUT http://127.0.0.1:8091/riak/people/timoreilly \
@@ -32,21 +32,21 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/people/timoreilly \
   -d 'I am an excellent public speaker.'
 ```
 
-In this request we are attaching 'Link: &lt;/riak/people/dhh&gt;; riaktag="friend"' to the key "timoreilly" located in the "people" bucket.
+在这个例子中，我们把`Link: &lt;/riak/people/dhh&gt;; riaktag="friend"` 附加到“people”这个 bucket 的“timoreilly”键上。
 
-Try it. It's easy, right? You've just attached a link to an object in Riak!
+你可以动手试一下，很简单吧。你刚刚就把一个链接附加到了 Riak 对象上！
 
-<div class="info">To remove a link from an object, it's straightforward, too: read (GET) the object, remove the link information, and write it back into Riak.</div>
+<div class="info">把链接从对象上删除也很简单：先读取（GET 请求）对象，把链接删掉，然后再把对象写入 Riak。</div>
 
-To retrieve that object to see the attached link, simply to do the following:
+使用下面的命令取出对象，查看刚附加的链接：
 
 ```bash
 $ curl -v http://127.0.0.1:8091/riak/people/timoreilly
 ```
 
-Look for the "Link" field in the response headers. This will show you your link information.
+在响应报头中查找“Link”字段。这个字段显示的就是链接信息。
 
-Alright. We've stored the "timoreilly" object with a "friend" tag pointing to the "dhh" object. Now we need to store the "dhh" object to which "timoreilly" is linked:
+好的，我们已经存储了“timoreilly”对象，并把“friend”标签指向了对象“dhh”。现在我们要存储“dhh”对象：
 
 ```
 $ curl -v -XPUT http://127.0.0.1:8091/riak/people/dhh \
@@ -54,37 +54,37 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/people/dhh \
   -d 'I drive a Zonda.'
 ```
 
-Great. Now we have the "timoreilly" in the "people" bucket stored with a link that points to the "dhh" object that is also in the "people" bucket.
+很好，现在我们在“peopel”这个 bucket 中存储了“timoreilly”对象，并将其链接到同样存储在“people”中的“dhh”对象。
 
-How do we connect the dots? Link Walking, that's how.
+那怎么处理这种链接关系呢？使用链接遍历。
 
-## Link Walking
+## 链接遍历
 
-Once you have tagged objects in Riak with links, you can then traverse them with an operation called "Link Walking." You can walk any number of links with one request, and you can choose to have all the objects matching a single step returned with the end result.
+使用链接为 Riak 对象打上标签后，可以使用一种称为“链接遍历”的操作进行遍历。在一次请求中可以进行任何数量的链接遍历，还可以一步处理结果中的所有对象。
 
-To continue with the example from above, the "timoreilly" object is now pointer to the "dhh" object located in the "people" bucket. We can use a link walking query to follow the link from "timoreilly" to "dhh." Here is what that query would look like:
+继续使用上面的例子，现在“timoreilly”对象已经指向了“dhh”对象。我们可以使用链接遍历查询从“timoreilly”跟踪到“dhh”。使用的查询如下：
 
 ```bash
 $ curl -v http://127.0.0.1:8091/riak/people/timoreilly/people,friend,1
 ```
 
-You'll notice that at the end of that request we've tacked on "/people,friend,1" That is the link specification. It's composed of three parts:
+你会发现，在请求的末尾我们加上了“/people,friend,1”，这就是指定链接的方式，包含三部分：
 
-* Bucket - a bucket name to limit the links to (in the above request it's 'people')
-* Tag - the "riaktag" to limit the links ('friend' is the tag in the above request)
-* Keep - 0 or 1, whether to return results from this step or phase
+* Bucket 名 - 限制只在这个 bucket 中处理链接（上例中的“people”）
+* 标签名 - 要查询的“riaktag”（上例中的“friend”）
+* 是否保留（Keep） - 0 或 1，指明是否保留这一步的返回结果
 
-If all went well, the response body from the above request should include the record for the "dhh" object.
+如果一切正常，上述请求的响应主体中应该包含“dhh”对象。
 
-You can replace both the "bucket" and the "tag" fields in the link spec with an underscore. This will tell the query to match any bucket or tag name. For instance, the following request should return the same data as the fully-specified request above:
+链接格式中的“bucket”和标签都可以使用下划线，匹配所有 bucket 和标签。例如，下面的请求应该和上述请求返回相同的结果：
 
 ```bash
 $ curl -v http://127.0.0.1:8091/riak/people/timoreilly/_,friend,1
 ```
 
-Each step you walk is referred to as a phase, because under the hood a link walking request uses the same mechanism as MapReduce, where every step specified in the URL is translated into a single MapReduce phase. If you want to walk multiple steps you can use the Keep parameter to specify which steps your particularly interested in.
+遍历的每一步称为一个步骤，因为链接遍历的底层机制和 MapReduce 一样，请求 URL 中的每一步都会转换成一个 MapReduce 步骤。如果要执行多个变量步骤，可以使用 Keep 参数指明真正感兴趣的步骤。
 
-By default, Riak will only include the objects found by the last step. This could be interesting if you want e.g. to build a graph of how the original object ("timoreilly" in this case) relates to the ones found traversing the links. To see how this works out in practice, let's add another object to the mix, "davethomas", who is friends with "timoreilly".
+默认情况下，Riak 只会返回最后一步的结果。我们可以利用这个特点为对象建立关系图谱。为了演示处理的过程，我们再添加一个对象“davethomas”，作为“timoreilly”的朋友。
 
 ```
 $ curl -v -XPUT http://127.0.0.1:8091/riak/people/davethomas \
@@ -93,21 +93,21 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/people/davethomas \
   -d 'I publish books'
 ```
 
-Now we can walk from "davethomas" to "dhh" in one go, and you'll see the last parameter in action:
+现在我们就可以直接从“davethomas”找到“dhh”，使用下面的请求即可：
 
 ```bash
 $ curl -v localhost:8091/riak/people/davethomas/_,friend,_/_,friend,_/
 ```
 
-As a result you'll only get the "dhh" object. Leaving the last parameter for each step as "_" defaults to Riak not returning objects from intermittent steps (i.e. 0), and to 1 for the last step. So to get everything in between you set the last parameter to 1 for the steps you're interested in.
+最终结果只会返回“dhh”对象。最后一个参数设为“_”的话，Riak 就不会返回中间步骤的结果。如果要返回中间步骤的结果，想得到哪个步骤的结果，就把哪个 Keep 参数设为 1。
 
 ```bash
 $ curl -v localhost:8091/riak/people/davethomas/_,friend,1/_,friend,_/
 ```
 
-When you try this out yourself you'll notice that the output has gotten slightly more confusing, because it now consists of two parts with a bunch of objects contained in each.
+如果你自己执行了上面的请求，会发现结果有点看不懂，包含了两部分，每个都有很多对象。
 
-As a final sugar sprinkle on top, we can make "dhh" friends with "davethomas" directly, so we have a real graph and not just a single path.
+我们可以直接给“dhh”和“davethomas”建立朋友关系，这样就真的组成关系网了。
 
 ```
 $ curl -v -XPUT http://127.0.0.1:8091/riak/people/dhh \
@@ -116,69 +116,69 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/people/dhh \
   -d 'I drive a Zonda.'
 ```
 
-You can add more link phases to the request, or you can walk from "dhh" to "timoreilly" through "davethomas", or even from "davethomas" to "davethomas", by adding another step to Link Walking specification.
+请求中可以包含多个链接遍历，也可以通过“davethomas”从“dhh”遍历到“timoreilly”，甚至可以从“davethomas”遍历到“davethomas”，只需多添加一组请求参数就行。
 
 ```bash
 $ curl -v localhost:8091/riak/people/davethomas/_,friend,_/_,friend,_/_,friend,_/
 ```
 
-So, let's review what we just did:
+我们来回顾一下前面所做的事情：
 
-1. Stored an object with a link attached to it.
-2. Stored the object to which the link pointed.
-3. Performed a link walking query to traverse the link from one object to another, and across a whole set of objects.
+1. 存储一个对象，并且附加了一个链接
+2. 存储上一个对象指向的对象
+3. 执行链接遍历请求，从一个对象遍历到另一个对象
 
-This is some pretty powerful stuff! And we've only just scratched the surface of what links can do and what they can be used for.
+这确实是很强大的功能。我们仅仅介绍了些皮毛。
 
-## A Magnificent Link Walking Screen Cast
+## 链接遍历视频
 
-In this screencast, Basho Hacker Sean Cribbs will take you through link walking basics and then dive into more complex and advanced usage of links in Riak.
+在这个视频中，来自 Basho 的 Sean Cribbs 会为你介绍链接遍历的基本知识，以及更复杂更高级的用法。
 
 <div style="display:none" class="iframe-video" id="http://player.vimeo.com/video/14563219"></div>
 
-<p><a href="http://vimeo.com/14563219">Links and Link Walking in Riak</a> from <a href="http://vimeo.com/bashotech">Basho Technologies</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+<p><a href="http://vimeo.com/14563219">Riak 中的链接和链接遍历</a>，<a href="http://vimeo.com/bashotech">Basho Technologies</a> 制作，托管在 <a href="http://vimeo.com">Vimeo</a> 上。</p>
 
-## Link Walking Scripts
+## 链接遍历脚本
 
-In the above screencast, Sean makes use of several scripts to demonstrate some deeper relationships expressed with links in Riak. Here are these scripts:
+在上面的视频中，演示使用链接建立更深层次的关系时，Sean 使用了很多脚本，这些脚本的链接如下：
 
 <dl>
 <dt>[[load_people.sh|https://github.com/basho/basho_docs/raw/master/source/data/load_people.sh]]</dt>
 <dt>[[people_queries.sh|https://github.com/basho/basho_docs/raw/master/source/data/people_queries.sh]]</dt>
 </dl>
 
-If you watched the video, it's apparent how these scripts are used to demonstrate link walking. For those of you who didn't watch or who want to run and tweak the scripts themselves, check out this graphic:
+如果你看过这个视频，很显然你会知道如何使用这些脚本。如果没有看这个视频，或者想测试以下这些脚本，可以参照这个图片：
 ![Circle of Friends](/images/circle-of-friends.png)
 
-`load_people.sh` will automatically load data into your running three node Riak Cluster that pertains to the the above graphic and has the requisite links attached.
+`load_people.sh` 会自动把数据加载到包含三个节点的 Riak 集群中，并按照上图所示建立关系。
 
-`people_queries.sh` is a series of link walking queries that expresses the relationships that were preloaded with the `load_people.sh` script.
+`people_queries.sh` 中包含一系列查询，探索 `load_people.sh` 脚本建立的关系。
 
-To use `load_people.sh` download it to your `dev` directory and run
+要使用 `load_people.sh` 脚本，请下载这个文件，存放到 `dev` 目录中，然后执行下面的命令：
 
 ```bash
 $ chmod +x load_people.sh
 ```
 
-followed by
+然后再执行下面的命令：
 
 ```bash
 $ ./load_people.sh
 ```
 
-After the several lines of output finish, do the same for "people_queries.sh":
+等输出显示完毕后，对`people_queries.sh` 做相同的操作：
 
 ```bash
 $ chmod +x people_queries.sh
 ```
 
-followed by
+再执行：
 
 ```bash
 $ ./people_queries.sh
 ```
 
-You should then see:
+然后会看到如下输出：
 
 ```
 Press [[Enter]] after each query description to execute.
