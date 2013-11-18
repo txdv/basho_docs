@@ -8,15 +8,15 @@ audience: beginner
 keywords: [developers, mapreduce, keyfilters]
 ---
 
-## Transform functions
+## 转换函数
 
-Transform key-filter functions manipulate the key so that it can be turned into a format suitable for testing by the [[predicate functions|Using Key Filters#Predicate-functions]].  Each function description is followed by a sample usage in JSON notation.
+键过滤器的转换函数对键进行处理，把键转换成能被[[判定函数|Using Key Filters#Predicate-functions]]测试的格式。转换过滤器的描述信息后都跟着使用 JSON 编写的示例用法。
 
-When using these from Erlang, function names (and key values) are binaries.
+如果在 Erlang 中使用，函数名（和键）都使用二进制形式。
 
 ### `int_to_string`
 
-Turns an integer (previously extracted with `string_to_int`), into a string.
+把整数（通过 `string_to_int` 提取得到）转换成字符串。
 
 ```javascript
 [["int_to_string"]]
@@ -24,7 +24,7 @@ Turns an integer (previously extracted with `string_to_int`), into a string.
 
 ### `string_to_int`
 
-Turns a string into an integer.
+把字符转转换成整数。
 
 ```javascript
 [["string_to_int"]]
@@ -32,7 +32,7 @@ Turns a string into an integer.
 
 ### `float_to_string`
 
-Turns a floating point number (previously extracted with `string_to_float`), into a string.
+把浮点数（通过 `string_to_float` 提取得到）转换成字符串。
 
 ```javascript
 [["float_to_string"]]
@@ -40,7 +40,7 @@ Turns a floating point number (previously extracted with `string_to_float`), int
 
 ### `string_to_float`
 
-Turns a string into a floating point number.
+把字符串转换成浮点数。
 
 ```javascript
 [["string_to_float"]]
@@ -48,7 +48,7 @@ Turns a string into a floating point number.
 
 ### `to_upper`
 
-Changes all letters to uppercase.
+把所有字母都转换成大写。
 
 ```javascript
 [["to_upper"]]
@@ -56,7 +56,7 @@ Changes all letters to uppercase.
 
 ### `to_lower`
 
-Changes all letters to lowercase.
+把所有字母都转换成小写。
 
 ```javascript
 [["to_lower"]]
@@ -64,7 +64,7 @@ Changes all letters to lowercase.
 
 ### `tokenize`
 
-Splits the input on the string given as the first argument and returns the nth token specified by the second argument.
+拆分第一个参数中指定的字符串，返回第二个参数中指定的第 N 个记号。
 
 ```javascript
 [["tokenize", "/", 4]]
@@ -72,21 +72,24 @@ Splits the input on the string given as the first argument and returns the nth t
 
 ### `urldecode`
 
-URL-decodes the string.
+解码 URL 字符串。
 
 ```javascript
 [["urldecode"]]
 ```
 
-## Predicate functions
+## 判断函数
 
-Predicate key-filter functions perform a test on their inputs and return true or false. As such, they should be specified last in a sequence of key-filters and are often preceded by [[transform functions|Using Key Filters#Transform-functions]].
+键过滤器的判定函数在输入数据上进行测试，返回 `true` 或 `false`。所以判定函数应该是一系列键过滤器中的最后一个，而且经常放在[[转换函数|Using Key Filters#Transform-functions]]之后。
 
-<div class="note"><div class="title">Comparison predicates</div> Predicates like `greater_than`, `less_than_eq`, and `between` follow Erlang's precedence rules for comparisons. Generally this means that numbers will be compared by value (including appropriate coercions) and strings will be compared lexically.</div>
+<div class="note">
+	<div class="title">比较型判定函数</div>
+	`greater_than`、`less_than_eq` 和 `between` 这种判定函数按照 Erlang 的比较方式进行比较，也就是说数字就按照值本身进行比较（可以进行适当的强制类型转换），字符串按照字面值进行比较。
+</div>
 
 ### `greater_than`
 
-Tests that the input is greater than the argument.
+测试输入值是否大于参数指定的值。
 
 ```javascript
 [["greater_than", 50]]
@@ -94,7 +97,7 @@ Tests that the input is greater than the argument.
 
 ### `less_than`
 
-Tests that the input is less than the argument.
+测试输入值是否小于参数指定的值。
 
 ```javascript
 [["less_than", 10]]
@@ -102,7 +105,7 @@ Tests that the input is less than the argument.
 
 ### `greater_than_eq`
 
-Tests that the input is greater than or equal to the argument.
+测试输入值是否大于或等于参数指定的值。
 
 ```javascript
 [["greater_than_eq", 2000]]
@@ -110,7 +113,7 @@ Tests that the input is greater than or equal to the argument.
 
 ### `less_than_eq`
 
-Tests that the input is less than or equal to the argument.
+测试输入值是否小于或等于参数指定的值。
 
 ```javascript
 [["less_than_eq", -2]]
@@ -118,7 +121,7 @@ Tests that the input is less than or equal to the argument.
 
 ### `between`
 
-Tests that the input is between the first two arguments.  If the third argument is given, it is whether to treat the range as inclusive. If the third argument is omitted, the range is treated as inclusive.
+测试输入值是否在前两个参数指定的值之间。如果有第 3 个参数，指定范围是否包含边界的值。如果没有第 3 个值，则包含边界值。
 
 ```javascript
 [["between", 10, 20, false]]
@@ -126,7 +129,7 @@ Tests that the input is between the first two arguments.  If the third argument 
 
 ### `matches`
 
-Tests that the input matches the regular expression given in the argument.
+测试输入值是否匹配参数指定的正则表达式。
 
 ```javascript
 [["matches", "solutions"]]
@@ -134,7 +137,7 @@ Tests that the input matches the regular expression given in the argument.
 
 ### `neq`
 
-Tests that the input is not equal to the argument.
+测试输入值是否不等于参数指定的值。
 
 ```javascript
 [["neq", "foo"]]
@@ -142,7 +145,7 @@ Tests that the input is not equal to the argument.
 
 ### `eq`
 
-Tests that the input is equal to the argument.
+测试输入值是否等于参数指定的值。
 
 ```javascript
 [["eq", "basho"]]
@@ -150,7 +153,7 @@ Tests that the input is equal to the argument.
 
 ### `set_member`
 
-Tests that the input is contained in the set given as the arguments.
+测试输入值是否在参数指定的一系列值中。
 
 ```javascript
 [["set_member", "basho", "google", "yahoo"]]
@@ -158,7 +161,7 @@ Tests that the input is contained in the set given as the arguments.
 
 ### `similar_to`
 
-Tests that input is within the [[Levenshtein distance|http://en.wikipedia.org/wiki/Levenshtein_distance]] of the first argument given by the second argument.
+测试输入值到第一个参数的 [[Levenshtein 距离|http://en.wikipedia.org/wiki/Levenshtein_distance]]是否在第二个参数指定的次数之内。
 
 ```javascript
 [["similar_to", "newyork", 3]]
@@ -166,7 +169,7 @@ Tests that input is within the [[Levenshtein distance|http://en.wikipedia.org/wi
 
 ### `starts_with`
 
-Tests that the input begins with the argument (a string).
+测试输入值是否以参数指定的字符串开头。
 
 ```javascript
 [["starts_with", "closed"]]
@@ -174,7 +177,7 @@ Tests that the input begins with the argument (a string).
 
 ### `ends_with`
 
-Tests that the input ends with the argument (a string).
+测试输入值是否以参数指定的字符串结尾。
 
 ```javascript
 [["ends_with", "0603"]]
@@ -182,7 +185,7 @@ Tests that the input ends with the argument (a string).
 
 ### `and`
 
-Joins two or more key-filter operations with a logical AND operation.
+对多个键过滤器操作进行逻辑 AND 操作。
 
 ```javascript
 [["and", [["ends_with", "0603"]], [["starts_with", "basho"]]]]
@@ -190,7 +193,7 @@ Joins two or more key-filter operations with a logical AND operation.
 
 ### `or`
 
-Joins two or more key-filter operations with a logical OR operation.
+对多个键过滤器操作进行逻辑 OR 操作。
 
 ```javascript
 [["or", [["eq", "google"]], [["less_than", "g"]]]]
@@ -198,7 +201,7 @@ Joins two or more key-filter operations with a logical OR operation.
 
 ### `not`
 
-Negates the result of key-filter operations.
+取反键过滤器操作的结果。
 
 ```javascript
 [["not", [["matches", "solution"]]]]

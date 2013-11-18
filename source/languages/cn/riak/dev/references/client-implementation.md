@@ -8,82 +8,28 @@ audience: advanced
 keywords: [interface, client]
 ---
 
-This section details aspects of the Riak client interfaces and can be
-used as a guide for understanding how to interact with Riak and how to
-implement a compliant client library or application.  Below are some
-high-level recommendations for implementing well-behaved clients.
+本文详细介绍了 Riak 客户端接口，可以作为理解客户端和 Riak 交互方式的指南，也可以了解如何实现客户端代码库或应用程序。下面几部分介绍优秀客户端应该具有的特点。
 
-## Hide Transport Details
+## 隐藏传输细节
 
-Although Riak's two interfaces do not have complete feature-parity,
-client libraries should make an effort to hide implementation details
-of the protocols from applications, presenting a uniform interface.
-This will reduce the amount of code changes needed to select a
-different transport mechanism for operational reasons.
+虽然 Riak 提供的两种接口实现的功能不完全一样，但客户端应该尽量对应用程序隐藏接口的实现细节，提供唯一的接口。这样如果在操作中要在两种接口直接切换，就无需修改太多的代码。
 
-## Retry Requests
+## 请求重试
 
-As described in the [[Eventual Consistency]] section, there are many
-scenarios that can result in temporary inconsistency, which may cause
-the appearance of stale data or sibling objects.  To react
-appropriately to unexpected or unsuccessful results, clients should
-retry requests a small number of times before failing to the
-caller. For example, when fetching a key that might be inconsistent
-among its replicas, this gives [[read repair|Replication#Read-Repair]]
-a chance to update the stale copies. Retries also may give the client
-an opportunity to reconnect to the Riak node (or a different node in
-the cluster) when the original connection is lost for whatever reason.
-A number of operations in Riak are idempotent and thus can be retried
-without side-effects.
+我们在“[[最终一致性|Eventual Consistency]]”一文中说过，很多情况下返回的结果会出现临时的不一致，导致获取的数据过期或者是兄弟数据。为了应对这种情况，客户端在报告操作失败之前应该重新发送几次请求。例如，如果要读取的键对应的数据不同的副本出现不一致，那么多试几次就可以通过[[读取修复|Replication#Read-Repair]]更新过期的副本。如果客户端和 Riak 节点之间的链接莫名其妙的终端了，重新发送请求还可以尝试重新建立连接。Riak 中的很多操作都是幂等的，因此再次执行也不会产生副作用。
 
-## Sibling Resolution
+## 处理兄弟数据
 
-In order to give applications the opportunity to recover from
-conflicting or partitioned writes to a key, Riak can be configured to present the
-client multiple versions of the value, also known as
-[[siblings|Vector Clocks#Siblings]].  It then becomes the
-responsibility of the application to resolve those siblings in a way
-that is meaningful to the application domain.  Clients should provide
-a way to encapsulate resolution behavior such that it can be run
-automatically when sibling values are detected, potentially multiple
-times in the course of a fetch or storage operation.  Without sibling
-resolution,
-[[the number of stored versions will continually grow|Vector Clocks#Siblings]],
-resulting in degraded performance across the cluster in the form of
-extremely high per-operation latencies or apparent unresponsiveness.
+为了能让应用程序有机会处理有冲突的数据，或者部分写入的数据，可以对 Riak 做些设置，给客户端提供数据的多个版本，或者称为“[[兄弟数据|Vector Clocks#Siblings]]”。然后，应用程序根据需求处理所得的兄弟数据。客户端应该提供一种解决方案，检测到兄弟数据时自动执行，在某些读取或存储操作还有可能多次执行。如果不处理兄弟数据，存储的对象版本数量会持续增长，最终导致集群性能下降，出现较高的操作迟延或完全没反应。
 
-## Read-before-Write & Vector Clocks
+## 写前读取和向量时钟
 
-Riak will return an encoded [[vector clock|Vector Clocks]] with every
-"fetch" or "read" request that does not result in a "not found"
-response. This vector clock tells Riak
-how to resolve concurrent writes, essentially representing the "last
-seen" version of the object to which the client made modifications. In
-order to prevent
-[[sibling explosion|Vector Clocks#Sibling]], clients should
-always use this vector clock when updating an object.
-Therefore, it is essential that
-keys are fetched before being written (except in the case where Riak
-selects the key or there is _a priori_ knowledge that the key is new).
-Client libraries that make this automatic will reduce operational
-issues by limiting sibling explosion.  Clients may also choose to
-perform automatic [[Sibling Resolution|Client Implementation Guide#Sibling-Resolution]] on read.
+只要读取请求的返回结果不是“not found”，Riak 就会随着结果一起返回一个编码的“[[向量时钟|Vector Clocks]]”。向量时钟告诉 Riak 如何处理并发写入，提供客户端最后修改的对象版本。为了避免[[兄弟数据激增|Vector Clocks#Sibling]]，客户端在更新对象时一定要使用向量时钟。所以，在写入对象之前一定要先把对象读出来（除非 Riak 选择了键，或者知道键是新的）。客户端自动进行写前读取可以避免兄弟数据激增，从而减少问题的出现。客户端还可以选择实现在读取数据时自动[[处理兄弟数据|Client Implementation Guide#Sibling-Resolution]]。
 
-## Discourage Expensive Operations
+## 不建议执行耗资源的操作
 
-A number of operations (e.g. [[HTTP List Keys]]), while useful, are
-expensive to run in production. A well-behaved client should expose
-all functionality, but warn the developer when they choose to perform
-those expensive operations.
+很多操作虽然有用，但在生产环境中执行是很耗资源的，例如 [[HTTP 的列键操作|HTTP List Keys]]。优秀的客户端应该实现全部功能，但当执行耗资源的操作时要给出提醒。
 
-## Nagle's Algorithm
+## Nagle 算法
 
-In most cases &mdash; especially when using the [[PBC API]], which tends to
-use small messages &mdash; clients should set the `TCP_NODELAY` flag on
-opened socket connections to Riak, which disables
-[Nagle's Algorithm](http://en.wikipedia.org/wiki/Nagle%27s_algorithm). Latency
-profiles having a minimum of 40 milliseconds often indicate the
-presence of Nagle on either end of the connection.  If the client
-application has significant round-trip latency to the Riak cluster,
-disabling Nagle will have little effect, but for well-connected
-clients it can significantly reduce latency.
+大多数情况下，特别是使用消息比较小的 [[PBC API]] 时，客户端应该在和 Riak 的 socket 连接上指定 `TCP_NODELAY` 旗标，禁用 [Nagle 算法](http://en.wikipedia.org/wiki/Nagle%27s_algorithm)。如果测评中发现至少 40 毫秒的迟延，就说明连接的其中一端启用了 Nagle 算法。如果客户端程序和 Riak 集群之间有较高的环游迟延，禁用 Nagle 算法的效果不太，但对于连接良好的客户端就能很大程度的降低迟延。

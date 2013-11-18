@@ -8,52 +8,51 @@ audience: advanced
 keywords: [developers, reference, search]
 ---
 
-There are numerous ways to index a document in Riak Search.
+使用 Riak Search 有很多方法可以索引文档。
 
-## Indexing from the Command Line
+## 从命令行建立索引
 
-The easiest way to index documents stored on the filesystem is to use the "search-cmd" command line tool:
+对存储在文件系统中的文档建立索引最简单的方法是使用 `search-cmd` 命令行工具：
 
 ```bash
 bin/search-cmd index <INDEX> <PATH>
 ```
 
-Parameters:
+参数：
 
-* *&lt;INDEX&gt;* - The name of an index.
-* *&lt;PATH&gt;* - Relative or absolute path to the files or directories to recursively index. Wildcards are permitted.
+* *&lt;INDEX&gt;* - 索引名
+* *&lt;PATH&gt;* - 递归建立索引的文件或文件夹的相对路径或绝对路径。可以使用通配符
 
-This documents will be indexed into the default field defined by the Index's schema, using the base filename plus extension as the document ID.
+文档会使用模式中定义的默认字段建立索引，文档 ID 是文件名加上扩展名。
 
 ```bash
 bin/search-cmd index my_index files/to/index/*.txt
 ```
 
-## Deleting from the Command Line
+## 从命令行删除索引
 
-To remove previously indexed files from the command line, use the "search-cmd" command line tool.
+要从命令行把之前建立的索引删除，同样使用 `search-cmd` 命令行工具。
 
 ```bash
 bin/search-cmd delete <INDEX> <PATH>
 ```
 
-Parameters:
+参数：
 
-* *&lt;INDEX&gt;* - The name of an index.
-* *&lt;PATH&gt;* - Relative or absolute path to the files or directories to recursively delete. Wildcards are permitted.
+* *&lt;INDEX&gt;* - 索引名
+* *&lt;PATH&gt;* - 递归删除索引的文件或文件夹的相对路径或绝对路径。可以使用通配符
 
-For example:
+例如：
 
 ```bash
 bin/search-cmd delete my_index files/to/index/*.txt
 ```
 
-Any documents matching the base filename plus extension of the files found will be removed from the index. The actual contents of the files are ignored during this operation.
+所有匹配文件名和扩展名的文档都会从索引中删除。删除操作会忽略文件中的内容。
 
-## Indexing using the Erlang API
+## 使用 Erlang API 建立索引
 
-The following Erlang functions will index documents stored on the filesystem:
-
+下面的 Erlang 函数可以为存储在文件系统上的文档建立索引：
 
 ```erlang
 search:index_dir(Path).
@@ -61,38 +60,38 @@ search:index_dir(Path).
 search:index_dir(Index, Path).
 ```
 
-Parameters:
+参数：
 
-* *Index* - The name of the index.
-* *Path* - Relative or absolute path to the files or directories to recursively index. Wildcards are permitted.
+* *Index* - 索引名
+* *Path* - 递归建立索引的文件或文件夹的相对路径或绝对路径。可以使用通配符.
 
-The documents will be indexed into the default field defined by the Index's schema, using the base filename plus extension as the document ID.
+文档会使用模式中定义的默认字段建立索引，文档 ID 是文件名加上扩展名。
 
 ```erlang
 search:index_dir(<<"my_index">>, "files/to/index/*.txt").
 ```
 
-Alternatively, you can provide the fields of the document to index.
+还可以指定要建立索引的文档字段。
 
 ```bash
 search:index_doc(Index, DocId, Fields)
 ```
 
-Parameters:
+参数：
 
-* *&lt;INDEX>* - The name of the index.
-* *&lt;DocID>* - The document ID.
-* *&lt;Fields>* - A key/value list of fields to index.
+* *&lt;INDEX>* - 索引名
+* *&lt;DocID>* - 文档 ID
+* *&lt;Fields>* - 要建立索引的字段键值对列表
 
-For example:
+例如：
 
 ```erlang
 search:index_doc(<<"my_index">>, <<"my_doc">>, [{<<"title">>, <<"The Title">>}, {<<"content">>, <<"The Content">>}])
 ```
 
-## Deleting using the Erlang API
+## 使用 Erlang API 删除索引
 
-The following Erlang functions will remove documents from the index:
+下面的函数可以把文件从索引中删除：
 
 ```erlang
 search:delete_dir(Path).
@@ -100,33 +99,33 @@ search:delete_dir(Path).
 search:delete_dir(Index, Path).
 ```
 
-Parameters:
+参数：
 
-* *Index* - The name of the index. Defaults to `search`.
-* *Path* - Relative or absolute path to the files or directories to recursively delete. Wildcards are permitted.
+* *Index* - 索引名。默认值是 `search`
+* *Path* - 递归删除索引的文件或文件夹的相对路径或绝对路径。可以使用通配符
 
-For example:
+例如：
 
 ```erlang
 search:delete_dir(<<"my_index">>, "files/to/index/*.txt").
 ```
 
-Any documents matching the base filename plus extension of the files found will be removed from the index. The actual contents of the files are ignored during this operation.
+所有匹配文件名和扩展名的文档都会从索引中删除。删除操作会忽略文件中的内容。
 
-Alternatively, you can delete a document by it's id:
+还可以指定要删除索引的文档 ID。
 
 ```erlang
 search:delete_doc(<<"my_index">>, <<"my_doc">>).
 ```
 
-Parameters:
+参数：
 
-* *Index* - The name of the index.
-* *DocID* - The document ID of the document to delete.
+* *Index* - 索引名
+* *DocID* - 要删除索引的文档 ID
 
-## Indexing using the Solr Interface
+## 通过 Solr 接口建立索引
 
-Riak Search supports a Solr-compatible interface for indexing documents via HTTP. Documents must be formatted as simple Solr XML documents, for example:
+Riak Search 支持通过 HTTP 使用和 Solr 兼容的接口为文档建立索引。文档必须使用简单的 Solr XML 格式，例如：
 
 ```xml
 <add>
@@ -140,38 +139,37 @@ Riak Search supports a Solr-compatible interface for indexing documents via HTTP
 </add>
 ```
 
-Additionally, the Content-Type header must be set to 'text/xml'.
+或者把文档的 Content-Type 报头设为 text/xml。
 
-Riak Search currently requires that the field determining the document ID be named "id", and does not support any additional attributes on the "add", "doc", or "field" elements. (In other words, things like "overwrite", "commitWithin", and "boost" are not yet supported.)
+目前，在 Riak Search 中，指明文档 ID 的字段必须命名为“id”，而且“add”、“doc”和“field”元素都不支持属性。（也就是还不支持“overwrite”、“commitWithin”和“boost”等。）
 
-The Solr interface does NOT support the &lt;commit /&gt; nor &lt;optimize /&gt; commands. All data is committed automatically in the following stages:
+Solr 接口不支持  &lt;commit /&gt; 和 &lt;optimize /&gt; 命令。所有数据都按照下面的步骤自动提交：
 
-* Incoming Solr XML document is parsed. If XML is invalid, an error is returned.
-* Documents fields are analyzed and broken into terms. If there are any problems, an error is returned.
-* Documents terms are indexed in parallel. Their availability in future queries is determined by the storage backend.
+* 解析输入的 Solr XML 文档。如果不符合 XML 的句法，会返回错误。
+* 分析文档字段，生成关键字。如果出现问题，则返回错误。
+* 并行索引文档的关键字。这些关键字能否在后续的请求中使用取决于所用的存储后台。
 
-By default, the update endpoint is located at "http://hostname:8098/solr/update?index=INDEX".
+默认情况下，更新的 URL 地址是 http://hostname:8098/solr/update?index=INDEX。
 
-Alternatively, the index can be included in the URL, for example "http://hostname:8098/solr/INDEX/update".
+URL 中也可以包含索引，例如 http://hostname:8098/solr/INDEX/update。
 
-To add data to the system with Curl:
-
+使用 curl 向系统中添加数据：
 
 ```bash
 curl -X POST -H text/xml --data-binary @tests/books.xml http://localhost:8098/solr/books/update
 ```
 
-Alternatively, you can index Solr files on the command line:
+或者在命令行中索引 Solr 文件：
 
 ```bash
 bin/search-cmd solr my_index path/to/solrfile.xml
 ```
 
-## Deleting using the Solr Interface
+## 通过 Solr 接口删除索引
 
-Documents can also be deleted through the Solr interface via two methods, either by Document ID or by Query.
+文档可以通过 Solr 接口从索引中删除，方法有二：通过文档 ID，通过查询。
 
-To delete documents by document ID, post the following XML to the update endpoint:
+要想通过文档 ID 删除文档，要把下面的 XML 发送到更新所用的 URL：
 
 ```xml
 <delete>
@@ -181,7 +179,7 @@ To delete documents by document ID, post the following XML to the update endpoin
 </delete>
 ```
 
-To delete documents by Query, post the following XML to the update endpoint:
+要想通过查询删除文档，要把下面的 XML 发送到更新所用的 URL：
 
 ```xml
 <delete>
@@ -191,4 +189,4 @@ To delete documents by Query, post the following XML to the update endpoint:
 </delete>
 ```
 
-Any documents that match the provided queries will be deleted.
+所有符合查询条件的文档都会被删除。
