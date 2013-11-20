@@ -10,15 +10,15 @@ cn:
   navigation: 导航
   all_projects: 所有 Riak 项目
   docs_on_github: "These docs are available on GitHub. Please submit ideas and patches."
-  secondary_header: "These May Also Interest You"
+  secondary_header: "您可能会对下面的文章感兴趣"
   faqs_link: "[[FAQs|Riak FAQs]]"
   apis_link: "[[APIs|HTTP API]]"
   tutorial_nav: "教程导航"
-  previous: Prev
-  next: Next
+  previous: 前一页
+  next: 下一页
   toc_contents: 内容提要
   footer: "本文档基于 <a href=\"http://creativecommons.org/licenses/by/3.0/\" target=\"_blank\">Creative Commons Attribution 3.0 Unported License</a> 协议发布"
   riak_ee:
     info:
-      title: Riak Enterprise Only
-      body: "This documentation applies only to Riak Enterprise, Basho's commercial extension to [[Riak]]. To talk to us about using Riak Enterprise, <a href=\"http://info.basho.com/Wiki_Contact.html\">let us know</a>."
+      title: 只适用于 Riak 企业版
+      body: "这篇文档只适用于 Riak 企业版。企业版是 Basho 对 [[Riak]] 所做的商业扩展应用。如果您想使用 Riak 企业版，<a href=\"http://info.basho.com/Wiki_Contact.html\">请和我们联系</a>。"

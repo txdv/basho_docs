@@ -9,36 +9,41 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-[[MapReduce|Using MapReduce]] is a generic way to query Riak by specifying inputs and constructing a set of map, reduce, and link phases through which data will flow.
+[[MapReduce|Using MapReduce]] 是在 Riak 中查询的常规方式，先指定输入数据，然后按序经过一系列 Map、Reduce 和 Link 步骤的处理。
 
-## Request
+## 请求
 
 ```bash
 POST /mapred
 ```
 
-Important headers:
-* `Content-Type` - must always be `application/json`.  The format of the request body is described in detail on the [[MapReduce|Using MapReduce]] page.
+重要的报头：
 
-Optional query parameters:
-* `chunked` - when set to `true`, results will be returned as they are received in `multipart/mixed` format using chunked-encoding.
+* `Content-Type` - 必须是 `application/json`。请求主体的格式在“[[使用 MapReduce|Using MapReduce]]”一文中有详细说明。
 
-_+This request must include an entity (body), which is the JSON form of the MapReduce query.+_
+可选的查询参数：
 
-## Response
+* `chunked` - 如果设为 `true`，返回的结果就像分段的 `multipart/mixed` 格式一样
 
-Normal status codes:
+_+这个请求必须包含主体，是使用 JSON 格式表示的 MapReduce 查询。+_
+
+## 响应
+
+正常的状态码：
+
 * `200 OK`
 
-Typical error codes:
-* `400 Bad Request` - if an invalid job is submitted.
-* `500 Internal Server Error` - if there was an error in processing a map or reduce function
-* `503 Service Unavailable` - if the job timed out before it could complete
+常见的错误码：
 
-Important headers:
-* `Content-Type` - `application/json` when `chunked` is not true, otherwise `multipart/mixed` with `application/json` sections.
+* `400 Bad Request` - 如果提交的是不合法的作业
+* `500 Internal Server Error` - 如果处理 Map 函数或 Reduce 函数过程中发生了错误
+* `503 Service Unavailable` - 作业完成前请求超时了
 
-## Example
+重要的报头：
+
+* `Content-Type` - 如果 `chunked` 不是 `true`，为 `application/json`，否则就是包含 `application/json` 分区的 `multipart/mixed`
+
+## 示例
 
 ```bash
 $ curl -v -d '{"inputs":"test", "query":[{"link":{"bucket":"test"}},{"map":{"language":"javascript","name":"Riak.mapValuesJson"}}]}' -H "Content-Type: application/json" http://127.0.0.1:8098/mapred

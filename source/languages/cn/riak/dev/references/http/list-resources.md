@@ -9,55 +9,53 @@ keywords: [api, http]
 group_by: "Server Operations"
 ---
 
-List available HTTP resources for the Riak node. This can be used by clients to
-automatically recognize the location of the resources for specific operations.
+列出 Riak 节点中可用的 HTTP 资源。客户端可以使用这个请求自动识别特定操作对应的资源地址。
 
-The standard resources are:
+标准的资源有：
 
-* `riak_kv_wm_buckets` - [[Bucket Operations|HTTP API#Bucket-Operations]]
-* `riak_kv_wm_index` - [[HTTP Secondary Indexes]]
-* `riak_kv_wm_link_walker` - [[HTTP Link Walking]]
-* `riak_kv_wm_mapred` - [[HTTP MapReduce]]
-* `riak_kv_wm_object`- [[Object/Key Operations|HTTP API#Object-Key-Operations]]
+* `riak_kv_wm_buckets` - [[Bucket 相关操作|HTTP API#Bucket-Operations]]
+* `riak_kv_wm_index` - [[通过 HTTP 执行二级索引查询|HTTP Secondary Indexes]]
+* `riak_kv_wm_link_walker` - [[通过 HTTP 进行链接遍历|HTTP Link Walking]]
+* `riak_kv_wm_mapred` - [[通过 HTTP 执行 MapReduce 查询|HTTP MapReduce]]
+* `riak_kv_wm_object`- [[对象/键相关操作|HTTP API#Object-Key-Operations]]
 * `riak_kv_wm_ping` - [[HTTP Ping]]
-* `riak_kv_wm_props` - [[HTTP Set Bucket Properties]]
-* `riak_kv_wm_stats` - [[HTTP Status]]
+* `riak_kv_wm_props` - [[通过 HTTP 设置 bucket 的属性|HTTP Set Bucket Properties]]
+* `riak_kv_wm_stats` - [[HTTP 状态|HTTP Status]]
 
-If Search is enabled, the following resources will also be included:
+如果启用了 Riak Search，还会包含下面的资源：
 
-* `riak_solr_searcher_wm` - [[Solr search|Using Search#Querying]]
-* `riak_solr_indexer_wm` - [[Solr indexing|Advanced Search#Indexing-using-the-Solr-Interface]]
+* `riak_solr_searcher_wm` - [[通过 Solr 接口搜索|Using Search#Querying]]
+* `riak_solr_indexer_wm` - [[通过 Solr 接口索引|Advanced Search#Indexing-using-the-Solr-Interface]]
 
 {{#1.0.0-}}
 
-If Luwak is enabled, the following resource will also be included:
+如果启用了 Luwak，还会包含下面的资源：
 
-* `luwak_wm_file` - [[Luwak Operations|HTTP API#Luwak Operations (Large Objects)]]
+* `luwak_wm_file` - [[Luwak 操作|HTTP API#Luwak Operations (Large Objects)]]
 
 {{/1.0.0-}}
 
-## Request
+## 请求
 
 ```bash
 GET /
 ```
 
-Headers:
+报头：
 
-* `Accept` - `application/json` or `text/html`
+* `Accept` - `application/json` 或 `text/html`
 
-## Response
+## 响应
 
-Normal status codes:
+正常的响应码：
 
 * `200 OK`
 
-Important headers:
+重要的报头：
 
-* `Link` - all resources that are described in the response body, but in Link
-form
+* `Link` - 所有资源都在响应主体中描述，但使用的是链接形式
 
-## Example
+## 示例
 
 ```bash
 # Request JSON response

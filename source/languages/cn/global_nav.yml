@@ -1,5 +1,5 @@
 riak:
-  - title: "Start Here"
+  - title: "从这里开始"
     class: "start"
     sub:
       - "[[Start Here|Riak]]"
@@ -7,9 +7,9 @@ riak:
       - "[[Download Riak|Downloads]]"
       - "[[Five Minute Install]]"
 
-  - title: "Riak for Developers"
+  - title: "Riak 开发者手册"
     sub:
-      - title: "A Taste of Riak"
+      - title: "初试 Riak"
         sub:
           - "[[Prerequisites|Taste of Riak: Prerequisites]]"
           - "[[Erlang|Taste of Riak: Erlang]]"
@@ -20,7 +20,7 @@ riak:
           - "[[OCaml|Taste of Riak: OCaml]]"
           - "[[Clojure|Taste of Riak: Clojure]]"
           - "[[Csharp|Taste of Riak: C-Sharp]]"
-      - title: "Querying Riak"
+      - title: "Riak 查询"
         sub:
           - "[[The Basics]]"
           - "[[Client Libraries]]"
@@ -30,22 +30,22 @@ riak:
           - "[[Key Filters|Using Key Filters]]"
           - "[[Link Walking]]"
           - "[[Commit Hooks|Using Commit Hooks]]"
-      - title: "Data Modeling"
+      - title: "数据模型"
         sub:
           - "[[Overview|Use Cases]]"
-          - title: "High Read/Write"
+          - title: "高读写性能"
             sub:
               - "[[Session Storage]]"
               - "[[Serving Ads|Serving Advertisements]]"
               - "[[Log Data]]"
               - "[[Sensor Data]]"
-          - title: "Relationships"
+          - title: "关联"
             sub:
               - "[[User Accounts]]"
               - "[[User Settings & Prefs|User Settings/Preferences]]"
               - "[[User Events & Timelines|User Subscriptions/Events/Timelines]]"
               - "[[Articles & Blog Posts|Blog Posts, Articles and Other Content]]"
-      - title: "Advanced"
+      - title: "高级用法"
         sub:
           - "[[MapReduce|Advanced MapReduce]]"
           - "[[Secondary Indexes|Advanced Secondary Indexes]]"
@@ -53,7 +53,7 @@ riak:
           - "[[Search Schema|Advanced Search Schema]]"
           - "[[Commit Hooks|Advanced Commit Hooks]]"
           - "[[CAP Controls]]"
-          - title: "References"
+          - title: "参考手册"
             sub:
               # - "[[Bucket References]]"
               - "[[Search Indexing|Search Indexing Reference]]"
@@ -61,11 +61,11 @@ riak:
               - "[[Implementing a Client|Client Implementation Guide]]"
               - "[[Implementing a Backend|Backend API]]"
 
-  - title: "Riak for Operators"
+  - title: "Riak 操作者手册"
     sub:
-      - title: "Building a Cluster"
+      - title: "搭建集群"
         sub:
-          - title: "Installation"
+          - title: "安装"
             sub:
               - "[[Installing and Upgrading]]"
               - "[[Installing Erlang]]"
@@ -80,7 +80,7 @@ riak:
               - "[[AWS Marketplace|Installing on AWS Marketplace]]"
               - "[[From Source|Installing Riak from Source]]"
               - "[[Post Installation]]"
-          - title: "Planning"
+          - title: "规划"
             sub:
               - "[[Start Planning|Planning for a Riak System]]"
               - "[[Cluster Capacity|Cluster Capacity Planning]]"
@@ -90,56 +90,56 @@ riak:
           - "[[Basic Configuration]]"
           - "[[Basic Cluster Setup]]"
           - "[[Benchmarking|Basho Bench]]"
-      - title: "Tuning"
+      - title: "调整"
         sub:
           - "[[Open Files Limit]]"
           - "[[File System Tuning]]"
           - "[[Linux Performance Tuning]]"
           - "[[AWS Performance Tuning]]"
-      - title: "Running a Cluster"
+      - title: "运行集群"
         sub:
           - "[[Backing up Riak]]"
           - "[[Statistics and Monitoring]]"
-          - title: "Node Operations"
+          - title: "节点操作"
             sub:
               - "[[Adding/Removing|Adding and Removing Nodes]]"
               - "[[Renaming Nodes]]"
               - "[[Replacing Nodes|Replacing a Node]]"
               - "[[Inspecting Nodes|Inspecting a Node]]"
-          - title: "Command Line Tools"
+          - title: "命令行工具"
             sub:
               - "[[riak|riak Command Line]]"
               - "[[riak-admin|riak-admin Command Line]]"
               - "[[search-cmd|search Command Line]]"
-          - title: "Repair and Recovery"
+          - title: "修复和恢复"
             sub:
               - "[[Failure and Recovery]]"
               - "[[Recovering a Failed Node]]"
               - "[[Repairing Indexes]]"
               - "[[Common Errors]]"
           - "[[Rolling Upgrades]]"
-      - title: "Advanced"
+      - title: "高级用法"
         sub:
           - "[[Riak Control]]"
           - "[[Installing Custom Code]]"
           - "[[Security and Firewalls]]"
-          - title: "Configurations"
+          - title: "设置"
             sub:
               - "[[Configuration Files]]"
               - "[[MapReduce|Riak MapReduce Settings]]"
               - "[[Search|Riak Search Settings]]"
               - "[[Secondary Indexes|Configuring Secondary Indexes]]"
               - "[[Load Balancing & Proxy|Load Balancing and Proxy Configuration]]"
-          - title: "Backends"
+          - title: "后台"
             sub:
               - "[[Bitcask]]"
               - "[[LevelDB]]"
               - "[[Memory]]"
               - "[[Multi]]"
 
-  - title: "Theory & Concepts"
+  - title: "理论和概念"
     sub:
-      - title: "Concepts"
+      - title: "概念"
         sub:
           - "[[Concepts Overview|Concepts]]"
           - "[[Buckets]]"
@@ -149,7 +149,7 @@ riak:
           - "[[Links]]"
           - "[[Replication]]"
           - "[[Vector Clocks]]"
-      - title: "Riak Compared to"
+      - title: "Riak 和其他数据库比较"
         sub:
           - "[[Cassandra|Riak Compared to Cassandra]]"
           - "[[Couchbase|Riak Compared to Couchbase]]"
@@ -160,7 +160,7 @@ riak:
           - "[[DynamoDB|Riak Compared to DynamoDB]]"
       - "[[Riak Glossary]]"
 
-  - title: "APIs"
+  - title: "API"
     sub:
       - "[[HTTP API]]"
       - "[[Protocol Buffers|PBC API]]"

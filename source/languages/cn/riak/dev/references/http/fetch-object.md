@@ -9,91 +9,69 @@ keywords: [api, http]
 group_by: "Object/Key Operations"
 ---
 
-Reads an object from the specified bucket / key.
+读取指定“bucket/键”组合对应的对象。
 
-## Request
+## 请求
 
 ```bash
 GET /riak/bucket/key            # Old format
 GET /buckets/bucket/keys/key    # New format
 ```
 
-Important headers:
+重要的报头：
 
-* `Accept` - When `multipart/mixed` is the preferred content-type, objects with
-siblings will return all siblings in single request. See [[Get all siblings in
-one request|HTTP Fetch Object#Get all siblings in one request]] example. See
-also RFC 2616 - [[Accept header definition|http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1]].
+* `Accept` - 如果 content-type 是 `multipart/mixed`，请求会返回对象的所有兄弟数据。示例参见下文。推荐阅读 RFC 2616 - [[Accept header definition|http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1]]。
 
-Optional headers:
+可选的报头：
 
-* `If-None-Match` and `If-Modified-Since` invoke conditional request semantics,
-matching on the `ETag` and `Last-Modified` of the object, respectively.  If the
-object fails one of the tests (that is, if the ETag is equal or the object is
-unmodified since the supplied timestamp), Riak will return a `304 Not Modified`
-response. See also RFC 2616 - [[304 Not Modified|http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5]].
+* `If-None-Match` 和 `If-Modified-Since` 分别检查对象的 `ETag` 和 `Last-Modified`，进行条件请求。如果这两个测试中有一个失败了（ETag 相同，或者对象在提供的时间戳之前没有改动），Riak 就会返回 `304 Not Modified` 响应。参见 RFC 2616 - [[304 Not Modified|http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5]]。
 
-Optional query parameters:
+可选的请求参数：
 
-* `r` - (read quorum) how many replicas need to agree when retrieving the
-object ([[default is defined by the bucket|HTTP Set Bucket Properties]])
-* `pr` - how many primary replicas need to be online when doing the read
-([[default is defined by the bucket|HTTP Set Bucket Properties]])
-* `basic_quorum` - whether to return early in some failure cases (eg. when r=1
-and you get 2 errors and a success `basic_quorum=true` would return an error)
-([[default is defined by the bucket|HTTP Set Bucket Properties]])
-* `notfound_ok` - whether to treat notfounds as successful reads for the
-purposes of R ([[default is defined by the bucket|HTTP Set Bucket Properties]])
-* `vtag` - when accessing an object with siblings, which sibling to retrieve.
-Scroll down to the [[Manually requesting siblings|HTTP Fetch Object#Manually requesting siblings]] example for more information.
+* `r` - （读取法定值）获取对象时要得到多少个副本（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
+* `pr` - 执行读取操作时要有多少个主节点副本在线（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
+* `basic_quorum` - 在某些失败情况下是否要提前返回失败响应（例如，r=1，出现 2 个错误，如果 `basic_quorum=true`，就会返回错误）（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
+* `notfound_ok` - 是否把未找到认为是成功的读取（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
+* `vtag` - 当访问对象的兄弟数据时，要获取哪个兄弟数据
 
-## Response
+更多信息请看下面的[[手动请求兄弟数据|HTTP Fetch Object#Manually requesting siblings]]示例。
 
-Normal response codes:
+## 响应
+
+正常的响应码：
 
 * `200 OK`
 * `300 Multiple Choices`
-* `304 Not Modified` (when using conditional request semantics)
+* `304 Not Modified`（条件请求时）
 
-Typical error codes:
+常见的错误码：
 
-* `400 Bad Request` - e.g. when r parameter is invalid (> N)
-* `404 Not Found` - the object could not be found on enough partitions
-* `503 Service Unavailable` - the request timed out internally
+* `400 Bad Request` - 例如 r 值不可用（> N）
+* `404 Not Found` - 无法在足够多的分区上找到对象
+* `503 Service Unavailable` - 请求超时
 
-Important headers:
+重要的响应报头：
 
-* `Content-Type` - the media type/format
-* `X-Riak-Vclock` - the opaque vector clock for the object
-* `X-Riak-Meta-*` - any user-defined metadata defined when storing the object
-* `ETag` - the entity tag for the object, useful for conditional GET operations
-and validation-based caching
-* `Last-Modified` - a timestamp for when the object was last written, in HTTP
-datetime format
-* `Link` - user- and system-defined links to other resources. [[Read more about
-Links.|Links]]
+* `Content-Type` - 媒介类型/格式
+* `X-Riak-Vclock` - 对象的向量时钟
+* `X-Riak-Meta-*` - 存储对象时用户定义的元数据
+* `ETag` - 对象的实体标签，用于条件 GET 请求和基于验证的缓存
+* `Last-Modified` - 对象上一次改动的时间戳，使用 HTTP 日期时间格式
+* `Link` - 用户和系统定义的指向其他资源的链接。参见“[[链接|Links]]”一文
 
-The body of the response will be the contents of the object except when siblings
-are present.
+响应的主体是对象的内容，如果对象有兄弟数据，还包含兄弟数据。
 
-<div class="note"><div class="title">Siblings</div>
-<p>When `allow_mult` is set to true in the bucket properties, concurrent updates
-are allowed to create "sibling" objects, meaning that the object has any number
-of different values that are related to one another by the vector clock.  This
-allows your application to use its own conflict resolution technique.</p>
+<div class="note">
+<div class="title">兄弟数据</div>
 
-<p>An object with multiple sibling values will result in a `300 Multiple
-Choices` response.  If the `Accept` header prefers `multipart/mixed`, all
-siblings will be returned in a single request as sections of the
-`multipart/mixed` response body.  Otherwise, a list of "vtags" will be given in
-a simple text format. You can request individual siblings by adding the `vtag`
-query parameter. Scroll down to the 'manually requesting siblings' example below for more information.</p>
+<p>如果 bucket 的 `allow_mult` 属性设为 `true`，则可以并发更新，生成兄弟对象，即很多值通过向量时钟相互关联。应用程序要负责处理对象版本冲突。</p>
 
-<p>To resolve the conflict, store the resolved version with the `X-Riak-Vclock`
-given in the response.</p>
+<p>如果对象有多个兄弟数据，会返回 `300 Multiple Choices` 响应。如果 `Accept` 报头倾向于选择 `multipart/mixed` 类型的数据，所有的兄弟数据都会返回。否则，会以纯文本格式列出一组 vtags。请求中可以指定 `vtag` 参数查询单个兄弟数据。更多信息请参照下面的[[手动请求兄弟数据|HTTP Fetch Object#Manually requesting siblings]]示例。</p>
+
+<p>要解决冲突，可以把解决好的版本使用响应中的 `X-Riak-Vclock` 存储。</p>
 </div>
 
-## Simple Example
+## 简单示例
 
 ```bash
 $ curl -v http://127.0.0.1:8098/riak/test/doc2
@@ -121,10 +99,9 @@ $ curl -v http://127.0.0.1:8098/riak/test/doc2
 {"foo":"bar"}
 ```
 
+## 兄弟数据示例
 
-## Siblings examples
-
-### Manually requesting siblings
+### 手动请求兄弟数据
 
 ```bash
 $ curl -v http://127.0.0.1:8098/riak/test/doc
@@ -177,7 +154,7 @@ $ curl -v http://127.0.0.1:8098/riak/test/doc?vtag=16vic4eU9ny46o4KPiDz1f
 {"bar":"baz"}
 ```
 
-### Get all siblings in one request
+### 一次请求获取所有兄弟数据
 
 ```bash
 $ curl -v http://127.0.0.1:8098/riak/test/doc -H "Accept: multipart/mixed"

@@ -9,14 +9,11 @@ keywords: [api, http]
 group_by: "Datatypes"
 ---
 
-Riak counters are a CRDT (convergent replicated data type) that (eventually)
-converge to the correct total. You merely increment the counter with some
-integer, and any potential conflicts will be automatically resolved by Riak.
+Riak 计数器是 CRDT 数据类型，最终会得到一个准确的值。基本无需人工干预，所有潜在的冲突 Riak 都会自动解决。
 
-## Setup
+## 设置
 
-Riak counters can only be used if the bucket has the `allow_mult` property
-set to `true`.
+只有 bucket 的 `allow_mult` 属性设为 `true` 时才能使用 Riak 计数器。
 
 ```
 curl -XPUT localhost:8098/buckets/BUCKET/props \
@@ -24,37 +21,35 @@ curl -XPUT localhost:8098/buckets/BUCKET/props \
   -d "{\"props\" : {\"allow_mult\": true}}"
 ```
 
-If you attempt to use counters without setting the above, you'll get this
-message:
+如果没有做上述设置而尝试使用计数器，会得到如下消息：
 
 ```
 Counters require bucket property 'allow_mult=true'
 ```
 
-## Request
+## 请求
 
-To insert just POST an integer value using the `/counters` resource. This will
-increment that keyed value by the given amount.
+要插入值请向 `/counters` 资源发送 POST 请求，把指定键对应的值修改为发送的数值。
 
 ```
 POST /buckets/BUCKET/counters/KEY
 ```
 
-To recieve the current value is a GET using `/counters`
+获取当前的值，请向 `/counters` 发送 GET 请求
 
 ```
 GET /buckets/BUCKET/counters/KEY
 ```
 
-## Response
+## 响应
 
-The regular POST/PUT ([[HTTP Store Object]]) and GET ([[HTTP Fetch Object]]) responses apply here.
+常规的 POST/PUT（[[通过 HTTP 接口存储对象|HTTP Store Object]]）和 GET（[[通过 HTTP 接口获取对象|HTTP Fetch Object]]）请求的响应在这同样适用。
 
-Caveats: Counters have no support for Secondary Indexes (2i), Links or Custom HTTP Metadata.
+注意：计数器不支持二级索引，链接和自定义 HTTP 元数据。
 
-## Example
+## 示例
 
-The body must be an integer (positive or negative).
+响应主体必须是一个整数（正数或负数）。
 
 ```
 curl -XPOST http://localhost:8098/buckets/my_bucket/counters/my_key -d "1"

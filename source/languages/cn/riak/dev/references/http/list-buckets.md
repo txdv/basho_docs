@@ -9,36 +9,37 @@ keywords: [api, http]
 group_by: "Bucket Operations"
 ---
 
-Lists all known buckets (ones that have keys stored in them).
+列出全部有效的 bucket（其中存有键）。
 
-<div class="note"><div class="title">Not for production use</div>
-<p>Similar to the list keys operation, this requires traversing all keys stored
-in the cluster and should not be used in production.</p>
+<div class="note">
+<div class="title">不要在生产环境中操作</div>
+<p>和列键操作类似，这个查询会遍历集群中存储的所有键，不应该在生产环境中操作。</p>
 </div>
 
-## Request
+## 请求
 
 ```bash
 GET /riak?buckets=true       # Old format
 GET /buckets?buckets=true    # New format
 ```
 
-Required query parameter:
+必须提供的请求参数：
 
-* **buckets=true** - required to invoke the list-buckets functionality
+* **buckets=true** - 列出 bucket 请求必须指定
 
-## Response
+## 响应
 
-Normal status codes:
+正常的状态码：
+
 * 200 OK
 
-Important headers:
+重要的报头：
+
 * Content-Type - application/json
 
-The JSON object in the response will contain a single entry, "buckets", which
-will be an array of bucket names.
+响应中的 JSON 对象只有一个元素：bucket，其值是一个 bucket 名字组成的数组。
 
-## Example
+## 示例
 
 ```bash
 $ curl -i http://localhost:8098/riak?buckets=true

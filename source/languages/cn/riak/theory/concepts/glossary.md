@@ -10,7 +10,7 @@ keywords: [appendix, concepts]
 
 下面列出了一些术语，以及在 Riak 中的含义，还附带了一些链接指向详细的文档。
 
-你还可以阅读“[[概念Concepts]]”一文大致了解这些术语。
+你还可以阅读“[[概念|Concepts]]”一文大致了解这些术语。
 
 ## Active Anti-Entropy (AAE)
 

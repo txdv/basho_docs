@@ -9,11 +9,9 @@ keywords: [api, http]
 group_by: "Object/Key Operations"
 ---
 
-Stores an object under the specified bucket / key. Storing an object comes in
-two forms, depending on whether you want to use a key of your choosing, or let
-Riak assign a key to a new object.
+在指定的“bucket/键”组合中存储对象。存储对象有两种方式：使用自己指定的键，或者使用由 Riak 分配的键。
 
-## Request
+## 请求
 
 ```bash
 POST /riak/bucket               # Riak-defined key, old format
@@ -22,70 +20,50 @@ PUT /riak/bucket/key            # User-defined key, old format
 PUT /buckets/bucket/keys/key    # User-defined key, new format
 ```
 
-For the sake of compatibility with older clients, `POST` is also acceptable in
-the form where the key is specified.
+为了兼容老的客户端，当使用指定的键存储对象时，也可以使用 `POST` 请求。
 
-Important headers:
+重要的报头：
 
-* `Content-Type` must be set for the stored object. Set what you expect to
-receive back when next requesting it.
-* `X-Riak-Vclock` if the object already exists, the vector clock attached to the
-object when read.
-* `X-Riak-Meta-*` - any additional metadata headers that should be stored with
-the object.
-* `X-Riak-Index-*` - index entries under which this object should be indexed.
-[[Read more about Secondary Indexing.|HTTP Secondary Indexes]]
-* `Link` - user and system-defined links to other resources. [[Read more about
-Links.|Links]]
+* `Content-Type` - 必须为存储的对象指定，其值是取出时希望得到的类型
+* `X-Riak-Vclock` - 如果对象已经存在，读取对象时附加其上的向量时钟
+* `X-Riak-Meta-*` - 其他要附加在存储对象上的元数据报头
+* `X-Riak-Index-*` - 该对象的索引应该放在哪个索引条目下。更多信息参加“[[通过 HTTP 执行二级索引查询|HTTP Secondary Indexes]]”一文
+* `Link` - 用户和系统定义的链接。更多信息参加“[[链接|Links]]”一文
 
-Optional headers (only valid on `PUT`):
+可选的报头（只能在 `PUT` 请求中使用）：
 
-* `If-None-Match`, `If-Match`, `If-Modified-Since`, and `If-Unmodified-Since`
-invoke conditional request semantics, matching on the `ETag` and `Last-Modified`
-of the existing object.  These can be used to prevent overwriting a modified
-object.  If the test fails, you will receive a `412 Precondition Failed`
-response. This does not prevent concurrent writes; it is possible for the
-condition to evaluate to true for multiple requests if the requests occur at the
-same time.
+* `If-None-Match`、`If-Match`、`If-Modified-Since` 和 `If-Unmodified-Since` 会和对象的 `ETag` 和 `Last-Modified` 比较，触发条件请求。这几个报头可以避免覆盖修改后的对象。如果比较失败，会收到 `412 Precondition Failed` 响应。但不能避免并发写入，如果请求在同一时间发出，多个请求的条件比较可能会返回 `true`。
 
-Optional query parameters:
+可选的请求参数：
 
-* `w` (write quorum) how many replicas to write to before returning a successful
-response (default is defined by the bucket level)
-* `dw` (durable write quorum) how many replicas to commit to durable storage
-before returning a successful response (default is defined at the bucket level)
-* `pw` how many primary replicas must be online to attempt a write (default is
-defined at the bucket level)
-* `returnbody=[true|false]` whether to return the contents of the stored object.
+* `w` - （写入法定值）返回成功响应之前要写入多少个副本（默认值在 bucket 层面设置）
+* `dw` - （持久写入法定值）返回成功响应之前要向持久性存储中写入多少个副本（默认值在 bucket 层面设置）
+* `pw` - 写入时要有多少个主副本在线（默认值在 bucket 层面设置）
+* `returnbody=[true|false]` - 是否返回保存的对象内容
 
-*<ins>This request must include a body (entity).</ins>*
+*<ins>请求必须包含主体。</ins>*
 
-## Response
+## 响应
 
-Normal status codes:
+正常的状态码：
 
-* `201 Created` (when submitting without a key)
+* `201 Created`（未指定键）
 * `200 OK`
 * `204 No Content`
 * `300 Multiple Choices`
 
-Typical error codes:
+常见的错误码：
 
-* `400 Bad Request` - e.g. when r, w, or dw parameters are invalid (> N)
-* `412 Precondition Failed` if one of the conditional request headers failed to
-match (see above)
+* `400 Bad Request` - 例如，r、w 和 dw 参数的值不合法（> N）
+* `412 Precondition Failed` - 任何一个条件请求报头匹配失败（见上）
 
-Important headers:
+重要的报头：
 
-* `Location` a relative URL to the newly-created object (when submitting without
-a key)
+* `Location` - 指向新创建对象的相对 URL 地址（不指定键存储对象时）
 
-If `returnbody=true`, any of the response headers expected from [[HTTP Fetch
-Object|HTTP-Fetch-Object]] may be present. Like when fetching the object, `300 Multiple Choices`
-may be returned if siblings existed or were created as part of the operation,
-and the response can be dealt with similarly.
+如果 `returnbody=true`，[[通过 HTTP 获取对象|HTTP-Fetch-Object]]时得到的响应报头都可能会出现。例如，如果有兄弟数据，或者作为某项操作的一部分，可能会返回 `300 Multiple Choices`，响应可以按照类似方式处理。
 
-## Example: Storing Without Key
+## 示例：不指定键存储对象
 
 ```bash
 $ curl -v -d 'this is a test' -H "Content-Type: text/plain" http://127.0.0.1:8098/riak/test
@@ -111,7 +89,7 @@ $ curl -v -d 'this is a test' -H "Content-Type: text/plain" http://127.0.0.1:809
 * Closing connection #0
 ```
 
-## Example: Storing With Key
+## 示例：指定键存储对象
 
 ```bash
 $ curl -v -XPUT -d '{"bar":"baz"}' -H "Content-Type: application/json" -H "X-Riak-Vclock: a85hYGBgzGDKBVIszMk55zKYEhnzWBlKIniO8mUBAA==" http://127.0.0.1:8098/riak/test/doc?returnbody=true

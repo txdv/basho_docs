@@ -9,30 +9,33 @@ keywords: [api, http]
 group_by: "Server Operations"
 ---
 
-Reports about the performance and configuration of the Riak node to which it was requested. You must have the `{riak_kv_stat,true}` configuration setting in app.config for this endpoint to be active. This is equivalent to the [[riak-admin status|Command-Line Tools#status]] command.
+报告所请求节点的性能和设置。要想激活这个请求 URL，必须在 app.config 文件中设置 `{riak_kv_stat,true}`。这个请求的效果和使用 [[riak-admin status|Command-Line Tools#status]] 命令得到的结果一样。
 
-## Request
+## 请求
 
 ```bash
 GET /stats
 ```
 
-Important headers:
+重要的报头：
 
-* `Accept` - determines whether the response will be formatted in `application/json` or `text/plain`.
+* `Accept` - 响应主体应该使用 `application/json` 还是 `text/plain` 格式
 
-## Response
+## 响应
 
-Normal status codes:
+正常的状态码：
+
 * `200 OK`
 
-Typical error codes:
-* `404 Not Found` - if `riak_kv_stat` is not enabled
+常见的错误码：
 
-Important headers:
-* `Content-Type` - `application/json` or `text/plain` (JSON with added line-breaks)
+* `404 Not Found` - `riak_kv_stat` 未启用
 
-## Example
+重要的报头：
+
+* `Content-Type` - `application/json` 或 `text/plain`（加入换行的 JSON 格式）
+
+## 示例
 
 ```bash
 $ curl -v http://127.0.0.1:8098/stats -H "Accept: text/plain"
@@ -122,146 +125,143 @@ $ curl -v http://127.0.0.1:8098/stats -H "Accept: text/plain"
 * Closing connection #0
 ```
 
-## Output Explanation
+## 返回结果说明
 
-The output of `/stats` contains a number of configuration and performance details. An explanation of these details follows.
+对 `/stats` 的请求会返回很多设置和性能细节。详细说明如下。
 
+## CPU 和内存
 
-## CPU and Memory
+CPU 统计信息直接取自 Erlang 的 cpu\_sup 模块，其文档是 [[ErlDocs: cpu_sup|http://erldocs.com/R14B04/os_mon/cpu_sup.html]]。
 
-CPU statistics are taken directly from Erlang's cpu\_sup module.  Documentation for which can be found at [[ErlDocs: cpu_sup|http://erldocs.com/R14B04/os_mon/cpu_sup.html]].
+* `cpu_nprocs`：操作系统的进程数量
+* `cpu_avg1`：前一分钟活跃的进程平均数（等于 top(1) 命令的结果除以 256）
+* `cpu_avg5`：前五分钟活跃的进程平均数（等于 top(1) 命令的结果除以 256）
+* `cpu_avg15`：前十五分钟活跃的进程平均数（等于 top(1) 命令的结果除以 256）
 
-* `cpu_nprocs`: Number of operating system processes
-* `cpu_avg1`: The average number of active processes for the last 1 minute (equivalent to top(1) command's load average when divided by 256()
-* `cpu_avg5`: The average number of active processes for the last 5 minutes (equivalent to top(1) command's load average when divided by 256()
-* `cpu_avg15`: The average number of active processes for the last 15 minutes (equivalent to top(1) command's load average when divided by 256()
+内存的统计信息直接取自 Erlang 虚拟机，其文档是 [[ErlDocs: Memory|http://erldocs.com/R14B04/erts/erlang.html?i=0&search=erlang:memory#memory/0]]。
 
+* `memory_total`：分配的内存总量（进程使用量和系统使用量之和）
+* `memory_processes`：为 Erlang 进程分配的内存量
+* `memory_processes_used`：Erlang 进程使用的内存量
+* `memory_system`：不直接和 Erlang 进程有关的内存分配量
+* `memory_atom`：当前为原子存储分配的内存量
+* `memory_atom_used`：当前原子存储使用的内存量
+* `memory_binary`：二进制文件使用的内存量
+* `memory_code`：为 Erlang 代码分配的内存量
+* `memory_ets`：为 Erlang 关键字（Erlang Term Storage）存储分配的内存量
+* `mem_total`：系统可用的内存总量
+* `mem_allocated`：为当前代码分配的内存量
 
-Memory statistics are taken directly from the Erlang virtual machine. Documentation for which can be found at [[ErlDocs: Memory|http://erldocs.com/R14B04/erts/erlang.html?i=0&search=erlang:memory#memory/0]].
+## 节点，集群和系统
 
-* `memory_total`: Total allocated memory (sum of processes and system)
-* `memory_processes`: Total amount of memory allocated for Erlang processes
-* `memory_processes_used`: Total amount of memory used by Erlang processes
-* `memory_system`: Total allocated memory that is not directly related to an Erlang process
-* `memory_atom`: Total amount of memory currently allocated for atom storage
-* `memory_atom_used`: Total amount of memory currently used for atom storage
-* `memory_binary`: Total amount of memory used for binaries
-* `memory_code`: Total amount of memory allocated for Erlang code
-* `memory_ets`: Total memory allocated for Erlang Term Storage
-* `mem_total`: Total available system memory
-* `mem_allocated`: Total memory allocated for this node
+* `nodename`：生成这个状态信息的节点名
+* `connected_nodes`：列出连接到这个节点上的节点
+* `read_repairs`：上一分钟该节点协调处理的读取修复数量
+* `read_repairs_total`：该节点启动以来负责协调处理的读取修复数量
+* `coord_redirs_total`：该节点启动以来协调时转发的请求次数
+* `ring_members`：列出属于该环成员的节点
+* `ring_num_partitions`：环上分区的数量
+* `ring_ownership`：列出环中的所有节点，以及相应地分区管理关系
+* `ring_creation_size`：该节点负责的分区数量
+* `ignored_gossip_total`：该节点启动以来忽略的广播消息数量
+* `handoff_timeouts`：该节点遇到的移交超时次数
+* `precommit_fail`：pre-commit 钩子失败的次数
+* `postcommit_fail`：post-commit 钩子失败的次数
+* `sys_driver_version`：运行时系统所用的 Erlang 驱动版本号，以字符串形式表示
+* `sys_global_heaps_size`：当前共享的全局堆大小
+* `sys_heap_type`：在用的堆大小（包括私有堆，共享堆和混合堆），以字符串形式表示
+* `sys_logical_processors`：系统中可用的逻辑处理器数量
+* `sys_otp_release`：该节点上使用的 Erlang OTP 发布版本号
+* `sys_process_count`：该节点上运行的进程数量
+* `sys_smp_support`：布尔值，表示“对称多处理”（symmetric multi-processing, SMP）技术是否可用
+* `sys_system_version`：详细的 Erlang 版本信息
+* `sys_system_architecture`：节点的操作系统和硬件架构
+* `sys_threads_enabled`：布尔值，表示是否启用了线程
+* `sys_thread_pool_size`：异步线程池中的线程数
+* `sys_wordsize`：Erlang 关键词的数量，以字节为单位，例如，在 32 位系统中结果是 4，在 64 为系统中结果是 8
+* `storage_backend`：使用的存储后台名称
+* `pbc_connects_total`：自节点启动以来的 Protocol Buffers 连接数
+* `pbc_connects`：前一分钟内的 Protocol Buffers 连接数
+* `pbc_active`：活跃的 Protocol Buffers 连接数
+* `ssl_version`：使用的 SSL 版本
+* `public_key_version`：使用的公匙版本
+* `runtime_tools_version`：使用的运行时工具版本
+* `basho_stats_version`：使用的 Basho 状态程序版本
+* `riak_search_version`：使用的 Riak Search 版本
+* `riak_kv_version`：使用的 Riak KV 版本
+* `bitcask_version`：使用的 Bitcask 后台版本
+* `luke_version`：使用的 Luke 版本
+* `erlang_js_version`：使用的 Erlang JS 版本
+* `mochiweb_version`：使用的 MochiWeb 版本
+* `inets_version`：使用的 Inets 程序版本
+* `riak_pipe_version`：使用的 Riak Pipe 版本
+* `merge_index_version`：使用的 Merge Index 版本
+* `cluster_info_version`：使用的 Cluster Information 版本
+* `basho_metrics_version`：使用的 Basho Metrics 版本
+* `riak_control_version`：使用的 Riak Control 版本
+* `riak_core_version`：使用的 Riak Core 版本
+* `lager_version`：使用的 Lager 版本
+* `riak_sysmon_version`：使用的 Riak System Monitor 版本
+* `webmachine_version`：使用的 Webmachine 版本
+* `crypto_version`：使用的 Cryptography 版本
+* `os_mon_version`：使用的 Operating System Monitor 版本
+* `sasl_version`：使用的 SASL 程序版本
+* `stdlib_version`：使用的标准库版本
+* `kernel_version`: 使用的 kernel 版本
 
+### 节点和虚拟节点计数器
 
-## Node, Cluster & System
+* `vnode_gets`：前一分钟运行在该节点上的虚拟节点负责协调处理的 GET 请求数量
+* `vnode_puts`：前一分钟运行在该节点上的虚拟节点负责协调处理的 PUT 请求数量
+* `vnode_gets_total`：自节点启动以来，运行在该节点上的虚拟节点负责协调处理的 GET 请求数量
+* `vnode_puts_total`：自节点启动以来，运行在该节点上的虚拟节点负责协调处理的 PUT 请求数量
+* `node_gets`：前一分钟运行在该节点上的虚拟节点负责协调的本地和非本地 GET 请求数量
+* `node_puts`：前一分钟运行在该节点上的虚拟节点负责协调的本地和非本地 PUT 请求数量
+* `node_gets_total`：自节点启动以来，运行在该节点上的虚拟节点负责协调的本地和非本地 GET 请求数量
+* `node_puts_total`: 自节点启动以来，运行在该节点上的虚拟节点负责协调的本地和非本地 PUT 请求数量
 
-* `nodename`: The name of the node that produced the stats output
-* `connected_nodes`: List of nodes connected to this node
-* `read_repairs`: Number of read repair operations this this node has coordinated in the last minute
-* `read_repairs_total`: Number of read repair operations this this node has coordinated since node was started
-* `coord_redirs_total`: Number of requests this node has redirected to other nodes for coordination since node was started
-* `ring_members`: List of nodes which are members of the ring
-* `ring_num_partitions`: Number of partitions in the ring
-* `ring_ownership`: List of all nodes in the ring and their associated partition ownership
-* `ring_creation_size`: Number of partitions this node is configured to own
-* `ignored_gossip_total`: Total number of ignored gossip messages since node was started
-* `handoff_timeouts`: Number of handoff timeouts encountered by this node
-* `precommit_fail`: Number of pre commit hook failures
-* `postcommit_fail`: Number of post commit hook failures
-* `sys_driver_version`: String representing the Erlang driver version in use by the runtime system
-* `sys_global_heaps_size`: Current size of the shared global heap
-* `sys_heap_type`: String representing the heap type in use (one of private, shared, hybrid)
-* `sys_logical_processors`: Number of logical processors available on the system
-* `sys_otp_release`: Erlang OTP release version in use on the node
-* `sys_process_count`: Number of processes existing on this node
-* `sys_smp_support`: Boolean value representing whether symmetric multi-processing (SMP) is available
-* `sys_system_version`: Detailed Erlang version information
-* `sys_system_architecture`: The node operating system and hardware architecture
-* `sys_threads_enabled`: Boolean value representing whether threads are enabled
-* `sys_thread_pool_size`: Number of threads in the asynchronous thread pool
-* `sys_wordsize`: Size of Erlang term words in bytes as an integer, for examples, on 32-bit architectures 4 is returned and on 64-bit architectures 8 is returned
-* `storage_backend`: Name of the active storage backend
-* `pbc_connects_total`: Number of protocol buffers connections since node was started
-* `pbc_connects`: Number of protocol buffers connections in the last minute
-* `pbc_active`: Number of active protocol buffers connections
-* `ssl_version`: Version of secure sockets layer (SSL) application in use
-* `public_key_version`: Version of public key application in use
-* `runtime_tools_version`: Version of runtime tools application in use
-* `basho_stats_version`: Version of Basho stats application in use
-* `riak_search_version`: Version of Riak Search application in use
-* `riak_kv_version`: Version of Riak KV application in use
-* `bitcask_version`: Version of Bitcask backend application in use
-* `luke_version`: Version of Luke application in use
-* `erlang_js_version`: Version of Erlang JS application in use
-* `mochiweb_version`: Version of MochiWeb application in use
-* `inets_version`: Version of Inets application in use
-* `riak_pipe_version`: Version of Riak Pipe application in use
-* `merge_index_version`: Version of Merge Index application in use
-* `cluster_info_version`: Version of Cluster Information application in use
-* `basho_metrics_version`: Version of Basho Metrics application in use
-* `riak_control_version`: Version of Riak Control application in use
-* `riak_core_version`: Version of Riak Core application in use
-* `lager_version`: Version of Lager application in use
-* `riak_sysmon_version`: Version of Riak System Monitor application in use
-* `webmachine_version`: Version of Webmachine application in use
-* `crypto_version`: Version of Cryptography application in use
-* `os_mon_version`: Version of Operating System Monitor application in use
-* `sasl_version`: Version of SASL application in use
-* `stdlib_version`: Version of Standard Library application in use
-* `kernel_version`: Version of Kernel application in use
+### 微秒级计时器
 
-### Node & VNode Counters
+* `node_get_fsm_time_mean`：节点收到 GET 请求和做出相应相距时间的平均值
+* `node_get_fsm_time_median`：节点收到 GET 请求和做出相应相距时间的中值
+* `node_get_fsm_time_95`：节点收到 GET 请求和做出相应相距时间的 95 百分位值
+* `node_get_fsm_time_99`：节点收到 GET 请求和做出相应相距时间的 99 百分位值
+* `node_get_fsm_time_100`：节点收到 GET 请求和做出相应相距时间的 100 百分位值
+* `node_put_fsm_time_mean`：节点收到 PUT 请求和做出相应相距时间的平均值
+* `node_put_fsm_time_median`：节点收到 PUT 请求和做出相应相距时间的中值
+* `node_put_fsm_time_95`：节点收到 PUT 请求和做出相应相距时间的 95 百分位值
+* `node_put_fsm_time_99`：节点收到 PUT 请求和做出相应相距时间的 99 百分位值
+* `node_put_fsm_time_100`：节点收到 PUT 请求和做出相应相距时间的 100 百分位值
 
-* `vnode_gets`: Number of GET operations coordinated by vnodes on this node within the last minute
-* `vnode_puts`: Number of PUT operations coordinated by vnodes on this node within the last minute
-* `vnode_gets_total`: Number of GET operations coordinated by vnodes on this node since node was started
-* `vnode_puts_total`: Number of PUT operations coordinated by vnodes on this node since node was started
-* `node_gets`: Combined number of local and non-local GET operations coordinated by this node in the last minute
-* `node_puts`: Combined number of local and non-local PUT operations coordinated by this node in the last minute
-* `node_gets_total`: Combined number of local and non-local GET operations coordinated by this node since node was started
-* `node_puts_total`: Combined number of local and non-local PUT operations coordinated by this node since node was started
+### 对象，索引和兄弟数据指标
 
-### Microsecond Timers
-
-* `node_get_fsm_time_mean`: Mean time between reception of client GET request and subsequent response to client
-* `node_get_fsm_time_median`: Median time between reception of client GET request and subsequent response to client
-* `node_get_fsm_time_95`: 95th percentile time between reception of client GET request and subsequent response to client
-* `node_get_fsm_time_99` 99th percentile time between reception of client GET request and subsequent response to client
-* `node_get_fsm_time_100` 100th percentile time between reception of client GET request and subsequent response to client
-* `node_put_fsm_time_mean`: Mean time between reception of client PUT request and subsequent response to client
-* `node_put_fsm_time_median`: Median time between reception of client PUT request and subsequent response to client
-* `node_put_fsm_time_95`: 95th percentile time between reception of client PUT request and subsequent response to client
-* `node_put_fsm_time_99`: 99th percentile time between reception of client PUT request and subsequent response to client
-* `node_put_fsm_time_100`: 100th percentile time between reception of client PUT request and subsequent response to client
-
-### Object, Index & Sibling Metrics
-
-* `node_get_fsm_objsize_mean`: Mean object size encountered by this node within the last minute
-* `node_get_fsm_objsize_median`: Median object size encountered by this node within the last minute
-* `node_get_fsm_objsize_95`: 95th percentile object size encountered by this node within the last minute
-* `node_get_fsm_objsize_99`: 99th percentile object size encountered by this node within the last minute
-* `node_get_fsm_objsize_100` 100th percentile object size encountered by this node within the last minute
-* `vnode_index_reads`: Number of vnode index read operations performed in the last minute
-* `vnode_index_writes`: Number of vnode index write operations performed in the last minute
-* `vnode_index_deletes`: Number of vnode index delete operations performed in the last minute
-* `vnode_index_reads_total`: Number of vnode index read operations performed since the node was started
-* `vnode_index_writes_total`: Number of vnode index write operations performed since the node was started
-* `vnode_index_deletes_total`: Number of vnode index delete operations performed since the node was started
-* `node_get_fsm_siblings_mean`: Mean number of siblings encountered during all GET operations by this node within the last minute
-* `node_get_fsm_siblings_median`: Median number of siblings encountered during all GET operations by this node within the last minute
-* `node_get_fsm_siblings_95`: 95th percentile of siblings encountered during all GET operations by this node within the last minute
-* `node_get_fsm_siblings_99`: 99th percentile of siblings encountered during all GET operations by this node within the last minute
-* `node_get_fsm_siblings_100`: 100th percentile of siblings encountered during all GET operations by this node within the last minute
+* `node_get_fsm_objsize_mean`：该节点前一分钟处理的对象大小平均值
+* `node_get_fsm_objsize_median`：该节点前一分钟处理的对象大小中值
+* `node_get_fsm_objsize_95`：该节点前一分钟处理的对象大小的 95 百分位值
+* `node_get_fsm_objsize_99`：该节点前一分钟处理的对象大小的 99 百分位值
+* `node_get_fsm_objsize_100`：该节点前一分钟处理的对象大小的 100 百分位值
+* `vnode_index_reads`：前一分钟虚拟节点读取索引操作的次数
+* `vnode_index_writes`：前一分钟虚拟节点写入索引操作的次数
+* `vnode_index_deletes`：前一分钟虚拟节点删除索引操作的次数
+* `vnode_index_reads_total`：自节点启动以来，虚拟节点读取索引操作的次数
+* `vnode_index_writes_total`：自节点启动以来，虚拟节点写入索引操作的次数
+* `vnode_index_deletes_total`：自节点启动以来，虚拟节点删除索引操作的次数
+* `node_get_fsm_siblings_mean`：该节点前一分钟在所有 GET 请求中出现兄弟数据的次数平均值
+* `node_get_fsm_siblings_median`：该节点前一分钟在所有 GET 请求中出现兄弟数据的次数中值
+* `node_get_fsm_siblings_95`：该节点前一分钟在所有 GET 请求中出现兄弟数据的次数 95 百分位值
+* `node_get_fsm_siblings_99`：该节点前一分钟在所有 GET 请求中出现兄弟数据的次数 99 百分位值
+* `node_get_fsm_siblings_100`：该节点前一分钟在所有 GET 请求中出现兄弟数据的次数 100 百分位值
 
 {{#1.2.0+}}
 
-### Pipeline Metrics
+### Pipeline 指标
 
-The following metrics from from riak_pipe are generated during MapReduce operations.
+下面出自 riak_pipe 的指标在执行 MapReduce 查询时产生。
 
-* `pipeline_active` The number of pipelines active in the last 60 seconds
-* `pipeline_create_count` The total number of pipelines created since the node was started
-* `pipeline_create_error_count` The total number of pipeline creation errors since the node was started
-* `pipeline_create_one` The number of pipelines created in the last 60 seconds
-* `pipeline_create_error_one` The number of pipeline creation errors in the last 60 seconds
+* `pipeline_active`：前一分钟活跃的 Pipeline 数量
+* `pipeline_create_count`：自节点启动以来创建的 Pipeline 总数
+* `pipeline_create_error_count`：自节点启动以来，创建 Pipeline 时发生的错误次数
+* `pipeline_create_one`：前一分钟创建的 Pipeline 数量
+* `pipeline_create_error_one`：前一分钟创建 Pipeline 时发生错误的次数
 
 {{/1.2.0+}}
