@@ -332,6 +332,8 @@ riakcs:
       - "[[Overview|Riak CS Multi Data Center Overview]]"
       - "[[Configuration|Configuring Riak CS Multi Data Center]]"
 
+riakcore: []
+
 java:
   - title: "Shortcuts"
     class: "active shortcuts"
