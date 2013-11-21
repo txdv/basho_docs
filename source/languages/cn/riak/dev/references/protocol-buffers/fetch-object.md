@@ -9,10 +9,9 @@ keywords: [api, protocol-buffer]
 group_by: "Object/Key Operations"
 ---
 
-Fetch an object from Riak
+从 Riak 中获取对象。
 
-## Request
-
+## 请求
 
 ```bash
 message RpbGetReq {
@@ -28,34 +27,17 @@ message RpbGetReq {
 }
 ```
 
+可选的参数：
 
-Optional Parameters
+* **r** -（读取法定值） 获取对象时要得到多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
+* **pr** -（主读取法定值）获取对象时要得到多少个主节点副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
+* **basic_quorum** - 出现错误时是否要提前返回结果（例如，r=1，出现 2 个错误，如果 `basic_quorum=true`，就会返回错误）（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
+* **notfound_ok** - 是否把未找到认为是成功的读取（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
+* **if_modified** - 如果提供了向量时钟，设定这个参数后只有当向量时钟不匹配时才会返回结果
+* **head** - 返回结果中不包含对象的值，不用获取大量的值就能读取元数据
+* **deletedvclock** - 删除死数据的向量时钟
 
-* **r** - (read quorum) how many replicas need to agree when
-retrieving the object; possible values include a special number to
-denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **pr** - (primary read quorum) how many primary replicas need to be
-available when retrieving the object; possible values include a
-special number to denote 'one' (4294967295-1), 'quorum'
-(4294967295-2), 'all' (4294967295-3), 'default' (4294967295-4), or any
-integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **basic_quorum** - whether to return early in some failure cases (eg. when r=1
-and you get 2 errors and a success basic_quorum=true would return an error)
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **notfound_ok** - whether to treat notfounds as successful reads for the
-purposes of R ([[default is defined per the bucket|PBC API#Set Bucket
-Properties]])
-* **if_modified** - when a vclock is supplied as this option only return the
-object if the vclocks don't match
-* **head** - return the object with the value(s) set as empty - allows you to
-get the metadata without a potentially large value
-* **deletedvclock** - return the tombstone's vclock, if applicable
-
-## Response
-
+## 响应
 
 ```bash
 message RpbGetResp {
@@ -65,19 +47,13 @@ message RpbGetResp {
 }
 ```
 
+响应值：
 
-Values
+* **content** - 对象的值和元数据。如果有兄弟数据的话就要多个条目。如果没有找到键，内容为空。
+* **vclock** - 向量时钟必须包含在 *RpbPutReq* 中来处理兄弟数据
+* **unchanged** - 如果 GET 请求中设定了 `if_modified`，而且对象没有改动，那么返回结果中的 `unchanged` 就会设为 `true`
 
-* **content** - value+metadata entries for the object. If there are siblings
-there will be more than one entry. If the key is not found, content will be
-empty.
-* **vclock** - vclock Opaque vector clock that must be included in *RpbPutReq*
-to resolve the siblings.
-* **unchanged** - if if_modified was specified in the get request but the object
-has not been modified, this will be set to true
-
-The content entries hold the object value and any metadata
-
+`content` 中包含对象的值和所有的元数据。
 
 ```bash
 // Content message included in get/put responses
@@ -96,12 +72,8 @@ message RpbContent {
 }
 ```
 
-
-Each object can contain user-supplied metadata (X-Riak-Meta-\* in the HTTP
-interface) consisting of a key/value pair. (e.g. key=X-Riak-Meta-ACL
-value=users:r,administrators:f would allow an application to store access
-control information for it to enforce (*not* Riak)).
-
+每个对象中都可以包含用户定义的元数据（在 HTTP 接口中以 `X-Riak-Meta-\*` 的形式表示），以“键值对”的形式存在。（例如，`key=X-Riak-Meta-ACL
+value=users:r,administrators:f` 可以让应用程序存储访问控制信息）
 
 ```bash
 // Key/value pair - used for user metadata
@@ -111,10 +83,7 @@ message RpbPair {
 }
 ```
 
-
-Links store references to related bucket/keys and can be accessed through link
-walking in map/reduce.
-
+链接存储指向其他“bucket/键”组合的引用，可以在 MapReduce 中通过链接遍历访问。
 
 ```bash
 // Link metadata
@@ -125,19 +94,14 @@ message RpbLink {
 }
 ```
 
-
-
-<div class="note"><div class="title">Missing keys</div>
-<p>Remember - if a key is not stored in Riak an RpbGetResp without content and
-vclock fields will be returned. This should be mapped to whatever convention the
-client language uses to return not found, e.g. the erlang client returns an atom
-<code>{error, notfound}</code></p>
+<div class="note">
+<div class="title">键不存在</div>
+<p>注意，如果 Riak 中不存在查询的键，会返回不包含内容和向量时钟的 RpbGetResp 响应。客户端可以把这个响应转换成所用变成语言中对应未找到的表示方法，例如 Erlang 客户端可以返回 <code>{error, notfound}</code>。</p>
 </div>
 
+## 示例
 
-## Example
-
-Request
+请求：
 
 ```bash
 Hex      00 00 00 07 09 0A 01 62 12 01 6B
@@ -148,8 +112,7 @@ bucket: "b"
 key: "k"
 ```
 
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 4A 0A 0A 26 0A 02 76 32 2A 16 33 53 44

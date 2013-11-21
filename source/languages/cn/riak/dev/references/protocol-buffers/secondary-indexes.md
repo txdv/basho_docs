@@ -9,10 +9,9 @@ keywords: [api, protocol-buffer]
 group_by: "Query Operations"
 ---
 
-Request a set of keys that match a secondary index query.
+获取符合二级索引查询条件的键。
 
-## Request
-
+## 请求
 
 ```bash
 message RpbIndexReq {
@@ -33,37 +32,33 @@ message RpbIndexReq {
 }
 ```
 
+必须提供的参数：
 
-Required Parameters
+* **bucket** - 要查询索引所在的 bucket
+* **index** - 要使用的索引名
+* **qtype** - IndexQueryType，0（等于）或者 1（范围）
 
-* **bucket** - the bucket the index is for
-* **index** - specify the index to use
-* **qtype** - an IndexQueryType of either 0 (eq) or 1 (range)
+索引查询有两种查询方式：
 
-Index queries are one of two types
+* **eq** - 精确匹配指定的 `key`
+* **range** - l落在一个范围内（`range_min` 和 `range_max` 之间）
 
-* **eq** - Exactly match the query for the given `key`
-* **range** - Match over a min and max range (`range_min`, `range_max`)
+分页：
 
-Pagination
+* **max_results** - 返回结果的数量
+* **continuation** - 在分页响应中结合 `max_results` 使用，请求下一页的结果
 
-* **max_results** - Number of results to return
-* **continuation** - Value returned in paginated response to use in conjunction with `max_results` to request the next page of results
+可选的参数：
 
-Optional Parameters
+* **key** - 要精确匹配的键。只在 `qtype` 设为 0 时使用
+* **range_min** - 范围查询的下限。只在 `qtype` 设为 1 时使用
+* **range_max** - 范围查询的上限。只在 `qtype` 设为 1 时使用
+* **return_terms** - 在响应中包含匹配的索引值（只用于范围查询）
+* **stream** - 用流的方式返回响应，而不是等到收集了 `max_results` 指定的数量或者完整的结果后再返回
 
-* **key** - the exact value to match by. only used if qtype is eq
-* **range_min** - the minimum value for a range query to match. only used if qtype is range
-* **range_max** - the maximum value for a range query to match. only used if qtype is range
-* **return_terms** - Include matched index values in response (range queries only)
-* **stream** - Stream responses back to the client instead of waiting for `max_results` or the full result set to be tabulated
+## 响应
 
-
-## Response
-
-The results of a Secondary Index query are returned as a repeating list of
-0 or more keys that match the given request parameters.
-
+二级索引查询的返回结果是一系列重复的 0 或者符合查询条件的键。
 
 ```bash
 message RpbIndexResp {
@@ -74,18 +69,18 @@ message RpbIndexResp {
 }
 ```
 
-Values
+响应值：
 
-* **keys** - a list of keys that match the index request
-* **results** - If `return_terms` is specified with range queries, used to return matched index values
-* **continuation** - For paginated responses
-* **done** - For streaming: the current stream is done (either `max_results` reached or no more results)
+* **keys** - 符合索引请求查询条件的一系列键
+* **results** - 如果范围查询指定了 `return_terms`，返回匹配的索引值
+* **continuation** - 用于分页的响应
+* **done** - 用于使用流的方式返回结果：当前的流处理已经结束（已经达到了 `max_results` 指定的数量，或者后续没有结果了）
 
-## Example
+## 示例
 
-Request
+请求：
 
-Here we look for any exact matches of "chicken" on an "animal_bin" index for a bucket named "farm".
+我们在“farm”这个 bucket 中使用“animal_bin”索引精确查询匹配“chicken”的键。
 
 ```bash
 RpbIndexReq protoc decode:
@@ -101,7 +96,7 @@ Erlang  <<0,0,0,30,25,10,10,4,102,97,114,109,18,10,97,110,105,
           101,110>>
 ```
 
-Response
+响应：
 
 ```bash
 Hex     00 00 00 0F 1A 0A 03 68 65 6E 0A 07 72 6F 6F 73 74 65 72

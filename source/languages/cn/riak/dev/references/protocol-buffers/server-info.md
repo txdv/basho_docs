@@ -9,12 +9,11 @@ keywords: [api, protocol-buffer]
 group_by: "Server Operations"
 ---
 
-## Request
+## 请求
 
-Just the RpbGetServerInfoReq message code. No request message defined.
+只有 RpbGetServerInfoReq 消息码。没有请求消息。
 
-## Response
-
+## 响应
 
 ```bash
 message RpbGetServerInfoResp {
@@ -23,9 +22,9 @@ message RpbGetServerInfoResp {
 }
 ```
 
-## Example
+## 示例
 
-Request
+请求：
 
 ```bash
 Hex      00 00 00 01 07
@@ -34,8 +33,7 @@ Erlang <<0,0,0,1,7>>
 RpbGetServerInfoReq - only message code defined
 ```
 
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 17 08 0A 0E 72 69 61 6B 40 31 32 37 2E

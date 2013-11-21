@@ -9,15 +9,14 @@ keywords: [api, protocol-buffer]
 group_by: "Bucket Operations"
 ---
 
-List all of the keys in a bucket. This is a streaming call, with multiple response messages sent for each request.
+列出 bucket 中的所有键。这个请求使用流处理，每个请求有多个响应。
 
-<div class="note"><div class="title">Not for production use</div>
-<p>This operation requires traversing all keys stored in the cluster and should
-not be used in production.</p>
+<div class="note">
+<div class="title">不要在生产环境中使用</div>
+<p>这个操作会遍历集群中所有的键，不应该在生产环境中使用。</p>
 </div>
 
-## Request
-
+## 请求
 
 ```bash
 message RpbListKeysReq {
@@ -25,12 +24,11 @@ message RpbListKeysReq {
 }
 ```
 
+可选的参数：
 
-Optional Parameters
+* **bucket** - 键所在的 bucket
 
-* **bucket** - bucket to get keys from
-
-## Response
+## 响应
 
 
 ```bash
@@ -40,15 +38,14 @@ message RpbListKeysResp {
 }
 ```
 
+响应值：
 
-Values
+* **keys** - bucket 中的键
+* **done** - 在最后一个响应中为 `true`
 
-* **keys** - batch of keys in the bucket.
-* **done** - set true on the last response packet
+## 示例
 
-## Example
-
-Request
+请求：
 
 ```bash
 Hex      00 00 00 0B 11 0A 08 6C 69 73 74 6B 65 79 73
@@ -56,11 +53,9 @@ Erlang <<0,0,0,11,17,10,8,108,105,115,116,107,101,121,115>>
 
 RpbListKeysReq protoc decode:
 bucket: "listkeys"
-
 ```
 
-
-Response Pkt 1
+响应 1：
 
 ```bash
 Hex      00 00 00 04 12 0A 01 34
@@ -68,11 +63,9 @@ Erlang <<0,0,0,4,18,10,1,52>>
 
 RpbListKeysResp protoc decode:
 keys: "4"
-
 ```
 
-
-Response Pkt 2
+响应 2：
 
 ```bash
 Hex      00 00 00 08 12 0A 02 31 30 0A 01 33
@@ -83,8 +76,7 @@ keys: "10"
 keys: "3"
 ```
 
-
-Response Pkt 3
+响应 3：
 
 ```bash
 Hex      00 00 00 03 12 10 01
@@ -92,5 +84,4 @@ Erlang <<0,0,0,3,18,16,1>>
 
 RpbListKeysResp protoc decode:
 done: true
-
 ```

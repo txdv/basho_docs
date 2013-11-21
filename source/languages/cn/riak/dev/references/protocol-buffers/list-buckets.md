@@ -9,22 +9,20 @@ keywords: [api, protocol-buffer]
 group_by: "Bucket Operations"
 ---
 
-List all of the bucket names available
+列出全部有效的 bucket。
 
 <div class="note">
-<div class="title">Caution</div>
+<div class="title">警告</div>
 
-This call can be expensive for the server - do not use in performance sensitive code
+这个请求可能会大量消耗服务器的资源，别在对性能敏感的代码中使用。
 
 </div>
 
+## 请求
 
-## Request
+只需提供消息码。
 
-Only the message code is required.
-
-## Response
-
+## 响应
 
 ```bash
 message RpbListBucketsResp {
@@ -32,14 +30,13 @@ message RpbListBucketsResp {
 }
 ```
 
+响应值：
 
-Values
+* **buckets** - 服务器上的 bucket
 
-* **buckets** - buckets on the server
+## 示例
 
-## Example
-
-Request
+请求：
 
 ```bash
 Hex      00 00 00 01 0F
@@ -48,8 +45,7 @@ Erlang <<0,0,0,1,15>>
 RpbListBucketsReq - only message code defined
 ```
 
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 2A 10 0A 02 62 31 0A 02 62 35 0A 02 62
@@ -69,5 +65,4 @@ buckets: "b9"
 buckets: "b2"
 buckets: "b6"
 buckets: "b7"
-
 ```
