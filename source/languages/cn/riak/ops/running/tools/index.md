@@ -1,5 +1,5 @@
 ---
-title: Command Line Tools
+title: 命令行工具
 project: riak
 version: 1.4.2+
 document: reference
@@ -14,60 +14,60 @@ keywords: [command-line]
 
 ## riak
 
-`[[riak|riak Command Line]]` 是控制 Riak 节点进程的主要脚本。包含以下子命令：
+`[[riak|riak 命令]]` 是控制 Riak 节点进程的主要脚本。包含以下子命令：
 
-* [[start|riak Command Line#start]]
-* [[stop|riak Command Line#stop]]
-* [[restart|riak Command Line#restart]]
-* [[reboot|riak Command Line#reboot]]
-* [[ping|riak Command Line#ping]]
-* [[console|riak Command Line#console]]
-* [[attach|riak Command Line#attach]]
-* [[chkconfig|riak Command Line#chkconfig]]
+* [[start|riak 命令#start]]
+* [[stop|riak 命令#stop]]
+* [[restart|riak 命令#restart]]
+* [[reboot|riak 命令#reboot]]
+* [[ping|riak 命令#ping]]
+* [[console|riak 命令#console]]
+* [[attach|riak 命令#attach]]
+* [[chkconfig|riak 命令#chkconfig]]
 
 ## riak-admin
 
-`[[riak-admin|riak-admin Command Line]]` 用来处理和节点运行状态无关的操作，包括节点的
+`[[riak-admin|riak-admin 命令]]` 用来处理和节点运行状态无关的操作，包括节点的
 成员，备份和基本状态。大多数命令都要求节点处于运行状态。包含下列子命令：
 
-* [[cluster|riak-admin Command Line#cluster]]
-  * [[cluster join|riak-admin Command Line#cluster join]]
-  * [[cluster leave|riak-admin Command Line#cluster leave]]
-  * [[cluster force-remove|riak-admin Command Line#cluster force-remove]]
-  * [[cluster replace|riak-admin Command Line#cluster replace]]
-  * [[cluster force-replace|riak-admin Command Line#cluster force-replace]]
-* [[join|riak-admin Command Line#join]]
-* [[leave|riak-admin Command Line#leave]]
-* [[backup|riak-admin Command Line#backup]]
-* [[restore|riak-admin Command Line#restore]]
-* [[test|riak-admin Command Line#test]]
-* [[status|riak-admin Command Line#status]]
-* [[reip|riak-admin Command Line#reip]]
-* [[js-reload|riak-admin Command Line#js-reload]]
-* [[wait-for-service|riak-admin Command Line#wait-for-service]]
-* [[services|riak-admin Command Line#services]]
-* [[ringready|riak-admin Command Line#ringready]]
-* [[transfers|riak-admin Command Line#transfers]]
-* [[force-remove|riak-admin Command Line#force-remove]]
-* [[down|riak-admin Command Line#down]]
-* [[cluster-info|riak-admin Command Line#cluster-info]]
-* [[member-status|riak-admin Command Line#member-status]]
-* [[ring-status|riak-admin Command Line#ring-status]]
-* [[vnode-status|riak-admin Command Line#vnode-status]]
+* [[cluster|riak-admin 命令#cluster]]
+  * [[cluster join|riak-admin 命令#cluster join]]
+  * [[cluster leave|riak-admin 命令#cluster leave]]
+  * [[cluster force-remove|riak-admin 命令#cluster force-remove]]
+  * [[cluster replace|riak-admin 命令#cluster replace]]
+  * [[cluster force-replace|riak-admin 命令#cluster force-replace]]
+* [[join|riak-admin 命令#join]]
+* [[leave|riak-admin 命令#leave]]
+* [[backup|riak-admin 命令#backup]]
+* [[restore|riak-admin 命令#restore]]
+* [[test|riak-admin 命令#test]]
+* [[status|riak-admin 命令#status]]
+* [[reip|riak-admin 命令#reip]]
+* [[js-reload|riak-admin 命令#js-reload]]
+* [[wait-for-service|riak-admin 命令#wait-for-service]]
+* [[services|riak-admin 命令#services]]
+* [[ringready|riak-admin 命令#ringready]]
+* [[transfers|riak-admin 命令#transfers]]
+* [[force-remove|riak-admin 命令#force-remove]]
+* [[down|riak-admin 命令#down]]
+* [[cluster-info|riak-admin 命令#cluster-info]]
+* [[member-status|riak-admin 命令#member-status]]
+* [[ring-status|riak-admin 命令#ring-status]]
+* [[vnode-status|riak-admin 命令#vnode-status]]
 
 ## search-cmd
 
-`[[search-cmd|search Command Line]]` 用了和 Riak 提供的搜索功能交互。包含下列子命令：
+`[[search-cmd|search 命令]]` 用了和 Riak 提供的搜索功能交互。包含下列子命令：
 
-* [[set-schema|search Command Line#set-schema]]
-* [[show-schema|search Command Line#show-schema]]
-* [[clear-schema-cache|search Command Line#clear-schema-cache]]
-* [[search|search Command Line#search]]
-* [[search-doc|search Command Line#search-doc]]
-* [[explain|search Command Line#explain]]
-* [[index|search Command Line#index]]
-* [[delete|search Command Line#delete]]
-* [[solr|search Command Line#solr]]
-* [[install|search Command Line#install]]
-* [[uninstall|search Command Line#uninstall]]
-* [[test|search Command Line#test]]
+* [[set-schema|search 命令#set-schema]]
+* [[show-schema|search 命令#show-schema]]
+* [[clear-schema-cache|search 命令#clear-schema-cache]]
+* [[search|search 命令#search]]
+* [[search-doc|search 命令#search-doc]]
+* [[explain|search 命令#explain]]
+* [[index|search 命令#index]]
+* [[delete|search 命令#delete]]
+* [[solr|search 命令#solr]]
+* [[install|search 命令#install]]
+* [[uninstall|search 命令#uninstall]]
+* [[test|search 命令#test]]

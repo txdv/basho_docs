@@ -1,5 +1,5 @@
 ---
-title: Use Cases
+title: 使用示例
 project: riak
 version: 1.4.2+
 document: cookbook

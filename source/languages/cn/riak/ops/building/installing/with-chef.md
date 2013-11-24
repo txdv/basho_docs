@@ -1,5 +1,5 @@
 ---
-title: Installing Riak with Chef
+title: 通过 Chef 安装 Riak
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -8,58 +8,35 @@ audience: intermediate
 keywords: [operator, installing, chef]
 ---
 
-If you manage your infrastructure with [Chef](http://www.opscode.com/chef/),
-the open source configuration management framework, you'll be happy to know
-that we maintain a [cookbook](http://community.opscode.com/cookbooks/riak) to
-install Riak with Chef.
+如果使用开源的设置管理框架 [Chef](http://www.opscode.com/chef/)，可以使用我们维护的 [cookbook](http://community.opscode.com/cookbooks/riak)，通过 Chef 安装 Riak。
 
-## Getting Started
+## 开始安装
 
-The Riak cookbook can be used just by adding `recipe[riak]` to the runlist for
-a node. The default settings will cause Riak to be installed and configured
-via Basho maintained package repositories.
+要想使用 Riak cookbook，请把 `recipe[riak]` 加入节点的运行列表中。默认的设置后从 Basho 维护的安装包仓库安装并设置 Riak。
 
-### Package Installation
+### 通过安装包安装
 
-There are three options for installation: `source`, `package`, and
-`enterprise_package`. `package` is the default (installs Riak open source),
-and is the recommended option for Red Hat and Debian based operating systems.
-For source installations of Riak, Erlang/OTP R15B01 and above is recommended.
+安装有三种可选方式：`source`，`package` 和 `enterprise_package`。默认使用的是 `package`（安装 Riak 开源版）。在基于 Red Hat 和 Debian 的操作系统中推荐使用这种方式安装。如果要从源码安装 Riak，推荐使用 Erlang/OTP R15B01 及以上版本。
 
-### Source Installation
+### 从源码安装
 
-The `source` recipe can be used to install Riak from source. The source
-installation requires the `git`, `build-essential`, and `erlang` cookbooks.
+通过 `source` 方式可以从源码安装 Riak。这种方式需要 `git`、`build-essential` 和`erlang` cookbook 的支持。
 
-### Enterprise Installation
+### 安装企业版
 
-To install Riak Enterprise, populate
-`node['riak']['package']['enterprise_key']` with a Basho provided key for the
-release.
+要安装 Riak 企业版，需要为 `node['riak']['package']['enterprise_key']` 指定一个 Basho 提供的序列号。
 
-Riak Enterprise installations managed through the cookbook must be installed
-via a package.
+如果通过 cookbook 安装 Riak 企业版，必须使用安装包的形式安装。
 
-### Basic Configuration
+### 基本设置
 
-All the configuration options exist within the `node['riak']['config']`
-namespace. In cases where an Erlang data type is necessary, use the
-appropriate methods from the
-[erlang_template_helper](https://github.com/basho/erlang_template_helper).
+所有的设置都位于 `node['riak']['config']` 命名空间之下。如果需要使用 Erlang 数据类型，请使用 [erlang_template_helper](https://github.com/basho/erlang_template_helper) 中列出的适当方法。
 
-#### Networking
+#### 网络
 
-Riak clients communicate with the nodes in the cluster through either the HTTP
-or Protocol Buffers interfaces, both of which can be used simultaneously.
-Configuration for each interface includes the IP address and TCP port on which
-to listen for client connections. The default for the HTTP interface is
-`localhost:8098` and for Protocol Buffers `0.0.0.0:8087` (meaning client
-connections to any address on the server, TCP port 8087, are accepted).
+Riak 客户端通过 HTTP 或 Protocol Buffers 接口和集群中的节点通信，而且可以同时使用这两种接口。每个接口都要设置监听的 IP 地址和 TCP 端口。HTTP 接口的默认设置是 `localhost:8098`，Protocol Buffers 接口的默认设置是 `0.0.0.0:8087`（客户端可以连接到服务器上的任意地址，TCP 端口都是 8087）。
 
-As the default HTTP configuration is inaccessible to other nodes, it must be
-changed if you want clients to use the HTTP interface. That said, it is not
-recommended to allow clients direct connection with some type of load
-balancing solution between Riak and client traffic.
+默认的 HTTP 接口设置不能在其他节点上使用，所以如果要使用 HTTP 接口必须修改默认的设置。也就是时候，不推荐允许客户端直接连接位于 Riak 和客户端之间的某种负载平衡处理程序。
 
 ```ruby
 default['riak']['config']['riak_core']['http'] = [[node['ipaddress'].to_erl_string, 8098].to_erl_tuple]
@@ -67,14 +44,13 @@ default['riak']['config']['riak_api']['pb_ip'] = node['ipaddress'].to_erl_string
 default['riak']['config']['riak_api']['pb_port'] = 8087
 ```
 
-Intra-cluster handoff occurs over a dedicated port, which defaults to `8099`.
+集群内部的移交要有专用的端口，默认为 `8099`。
 
 ```ruby
 default['riak']['config']['riak_core']['handoff_port'] = 8099
 ```
 
-Finally, by default, options are included in the configuration to define the
-set of ports used for Erlang inter-node communication.
+设置中还要针对节点之间通讯的端口设置。
 
 ```ruby
 default['riak']['config']['kernel']['inet_dist_listen_min'] = 6000
@@ -83,11 +59,9 @@ default['riak']['config']['kernel']['inet_dist_listen_max'] = 7999
 
 #### Erlang
 
-A number of Erlang parameters may be configured through the cookbook. The node
-`-name` and `-setcookie` are most important for creating multi-node clusters.
+在 cookbook 中还可以设置一些 Erlang 参数。对于搭建多节点的集群来说，最重要的设置是节点的 `-name` 和 `-setcookie`。
 
-The rest of the parameters are primarily for performance tuning, with kernel
-polling and SMP enabled by default. A few examples follow:
+其余的参数基本上针对的是性能调整，默认会启用 kernel 轮询和 SMP。示例设置如下：
 
 ```ruby
 default['riak']['args']['-name'] = "riak@#{node['fqdn']}"
@@ -102,21 +76,15 @@ default['riak']['args']['-env']['ERL_MAX_ETS_TABLES'] = 8192
 default['riak']['args']['-smp'] = "enable"
 ```
 
-#### Storage Backends
+#### 存储后台
 
-Riak requires specification of a storage backend along with various backend
-storage options specific to each backend. While Riak supports specification of
-different backends for different buckets, the Chef cookbook does not yet allow
-such configurations.
+使用 Riak 时必须挑选一个存储后台，每个后台都由很多设置项目。Riak 支持为不同的 bucket 设置使用不同的后台，但这在 Chef 中暂时无法实现。
 
-The most common backends are [[Bitcask]], [[LevelDB]], and the [[multi
-backend|multi]]. The typical configuration options and their defaults are
-given below.
+最长使用的后台是 [[Bitcask]]、[[LevelDB]] 和 [[多种后台|Multi]]。各种后台的常见设置和默认值如下。
 
 ##### Bitcask
 
-Settings for the default Bitcask backend. See the [[Bitcask]] documentation
-for more information.
+默认使用的 Bitcask 后台的设置。更多信息请阅读 [[Bitcask]] 的文档。
 
 ```ruby
 default['riak']['config']['bitcask']['io_mode'] = "erlang"
@@ -125,8 +93,7 @@ default['riak']['config']['bitcask']['data_root'] = "/var/lib/riak/bitcask".to_e
 
 ##### LevelDB
 
-Settings for the LevelDB backend. See the [[LevelDB]] documentation for more
-information.
+LevelDB 后台的设置。更多信息请阅读 [[LevelDB]] 的文档。
 
 ```ruby
 default['riak']['config']['eleveldb']['data_root'] = "/var/lib/riak/leveldb".to_erl_string
@@ -134,8 +101,7 @@ default['riak']['config']['eleveldb']['data_root'] = "/var/lib/riak/leveldb".to_
 
 ### Lager
 
-[Lager](https://github.com/basho/lager) is the logging framework used within
-Riak. It can also be used with Erlang/OTP.
+[Lager](https://github.com/basho/lager) 是 Riak 使用的日志框架。也可以结合 Erlang/OTP 使用。
 
 ```ruby
 error_log = ["/var/log/riak/error.log".to_erl_string,"error",10485760,"$D0".to_erl_string,5].to_erl_tuple
@@ -152,8 +118,7 @@ default['riak']['config']['lager']['error_logger_redirect'] = true
 
 ### Sysmon
 
-Sysmon monitors Riak garbage collection process and logs relevant information
-to the status of garbage collection.
+Sysmon 监控 Riak 的垃圾回收过程，会把相关的信息写入日志。
 
 ```ruby
 default['riak']['config']['riak_sysmon']['process_limit'] = 30
@@ -164,9 +129,9 @@ default['riak']['config']['riak_sysmon']['busy_port'] = true
 default['riak']['config']['riak_sysmon']['busy_dist_port'] = true
 ```
 
-### Index Merge
+### 索引合并
 
-Settings pertaining to Secondary Index and Riak Search indices.
+与二级索引和 Riak Search 索引有关的设置。
 
 ```ruby
 default['riak']['config']['merge_index']['data_root'] = "/var/lib/riak/merge_index".to_erl_string
@@ -174,9 +139,8 @@ default['riak']['config']['merge_index']['buffer_rollover_size'] = 1048576
 default['riak']['config']['merge_index']['max_compact_segments'] = 20
 ```
 
-## Additional Resources
+## 扩展阅读
 
-More information related to cluster configuration and building development
-environments is available in our documentation.
+这份文档中还有更多关于集群设置和搭建开发环境的文章。
 
-* [[Five Minute Install]]
+* [[花五分钟安装]]

@@ -1,5 +1,5 @@
 ---
-title: Rolling Upgrades
+title: 滚动升级
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -11,14 +11,12 @@ keywords: [upgrading]
 {{#1.4.0+}}
 <div class="note">
 <div class="title">升级到 Riak 1.4+ 的注意事项</div>
-<p>因为 Riak 1.0 和 1.4 两个版本之间有差异，因此无法直接升级，需要先升级
-到 Riak 1.3.2，再升级到 Riak 1.4.0+。</p>
+<p>因为 Riak 1.0 和 1.4 两个版本之间有差异，因此无法直接升级，需要先升级到 Riak 1.3.2，再升级到 Riak 1.4.0+。</p>
 <p>运过运行了 riak_control，在滚动升级的过程中应该禁用。</p>
 </div>
 {{/1.4.0+}}
 
-Riak 节点现在可以相互之间协商，决定支持的操作模式。这一功能运行运行着不同版本
-的 Riak 集群无需做特殊的设置就可以正常操作，还可以简化滚动升级的过程。
+Riak 节点现在可以相互之间协商，决定支持的操作模式。这一功能运行运行着不同版本的 Riak 集群无需做特殊的设置就可以正常操作，还可以简化滚动升级的过程。
 
 在以前的 Riak 版本中，滚动升级时必须要禁用新功能，当所有节点都升级完后才能启用。
 
@@ -26,14 +24,9 @@ Riak 节点现在可以相互之间协商，决定支持的操作模式。这一
 
 <div class="note">
 <div class="title">升级到 Riak 1.0 的注意事项</div>
-<p>按照下面针对不同操作系统的说明，应该可以从 Riak 0.13+ 升级到 Riak 1.0。
-但升级时还是要考虑几件事。Rial 1.0 添加了一些新功能，滚动升级时需要额外的操作。
-这些新功能有 Riak Pipe，MapReduce 用到的新数据处理代码库，以及为支持
-异步 keylisting 而升级的后台 API。如果升级后没有启用这些功能，Riak 会使用旧有
-功能。这些功能**只有**集群中所有的节点都升级到 1.0 后才能启用。</p>
+<p>按照下面针对不同操作系统的说明，应该可以从 Riak 0.13+ 升级到 Riak 1.0。但升级时还是要考虑几件事。Rial 1.0 添加了一些新功能，滚动升级时需要额外的操作。这些新功能有 Riak Pipe，MapReduce 用到的新数据处理代码库，以及为支持异步 keylisting 而升级的后台 API。如果升级后没有启用这些功能，Riak 会使用旧有功能。这些功能**只有**集群中所有的节点都升级到 1.0 后才能启用。</p>
 
-<p>在升级到 1.0 之前，请在所有使用 1.0.0 之前版本的节点中执行下面的命令，确保
-转移命令能正常汇报。如果还没进入 Riak 控制台，请执行 `riak attach` 命令。</p>
+<p>在升级到 1.0 之前，请在所有使用 1.0.0 之前版本的节点中执行下面的命令，确保转移命令能正常汇报。如果还没进入 Riak 控制台，请执行 `riak attach` 命令。</p>
 
 ```erlang
 > riak_core_node_watcher:service_up(riak_pipe, self()).
@@ -101,10 +94,7 @@ riak-admin transfers
 {{#1.3.1+}}
 <div class="info">
 <div class="title">关于二级索引的注意事项</div>
-如果使用 Riak 的二级索引，而且从 Riak 1.3.1 之前的版本升级，需要
-执行 [[riak-admin reformat-indexes|riak-admin Command Line#reformat-indexes]] 命令
-重新格式化索引。关于重新格式化索引的详细信息请阅读
-[发布说明](https://github.com/basho/riak/blob/master/RELEASE-NOTES.md)。
+如果使用 Riak 的二级索引，而且从 Riak 1.3.1 之前的版本升级，需要执行 [[riak-admin reformat-indexes|riak-admin 命令#reformat-indexes]] 命令重新格式化索引。关于重新格式化索引的详细信息请阅读[发布说明](https://github.com/basho/riak/blob/master/RELEASE-NOTES.md)。
 </div>
 {{/1.3.1+}}
 
@@ -114,8 +104,7 @@ riak-admin transfers
 只有从 Riak 1.0 之前的版本升级到 1.0，才需要执行下面两步。
 </div>
 
-9\. 所有节点都升级完成后，把下面的代码加入每个节点 `/etc/riak` 目录
-下的 `app.config` 文件中。首先，把下面的代码加入 `riak_kv` 区：
+9\. 所有节点都升级完成后，把下面的代码加入每个节点 `/etc/riak` 目录下的 `app.config` 文件中。首先，把下面的代码加入 `riak_kv` 区：
 
 ```erlang
 {legacy_keylisting, false},
@@ -129,8 +118,7 @@ riak-admin transfers
 {platform_data_dir, "/var/lib/riak"}
 ```
 
-10\. 在集群中所有节点上按次序执行 `riak stop` 和 `riak start` 命令。
-或者在每个节点中执行 `riak attach` 命令，然后在执行下面的命令：
+10\. 在集群中所有节点上按次序执行 `riak stop` 和 `riak start` 命令。或者在每个节点中执行 `riak attach` 命令，然后在执行下面的命令：
 
 ```erlang
 > application:set_env(riak_kv, legacy_keylisting, false).
@@ -149,7 +137,6 @@ riak-admin transfers
 ```bash
 riak stop
 ```
-
 
 2\. 备份 Riak 的 etc 和数据文件夹等
 
@@ -196,10 +183,7 @@ riak-admin transfers
 {{#1.3.1+}}
 <div class="info">
 <div class="title">关于二级索引的注意事项</div>
-如果使用 Riak 的二级索引，而且从 Riak 1.3.1 之前的版本升级，需要
-执行 [[riak-admin reformat-indexes|riak-admin Command Line#reformat-indexes]] 命令
-重新格式化索引。关于重新格式化索引的详细信息请阅读
-[发布说明](https://github.com/basho/riak/blob/master/RELEASE-NOTES.md)。
+如果使用 Riak 的二级索引，而且从 Riak 1.3.1 之前的版本升级，需要执行 [[riak-admin reformat-indexes|riak-admin 命令#reformat-indexes]] 命令重新格式化索引。关于重新格式化索引的详细信息请阅读[发布说明](https://github.com/basho/riak/blob/master/RELEASE-NOTES.md)。
 </div>
 {{/1.3.1+}}
 
@@ -208,8 +192,8 @@ riak-admin transfers
 只有从 Riak 1.0 之前的版本升级到 1.0，才需要执行下面两步。
 </div>
 
-9\. 所有节点都升级完成后，把下面的代码加入每个节点 `/etc/riak` 目录
-下的 `app.config` 文件中。首先，把下面的代码加入 `riak_kv` 区：
+9\. 所有节点都升级完成后，把下面的代码加入每个节点 `/etc/riak` 目录下的 `app.config` 文件中。首先，把下面的代码加入 `riak_kv` 区：
+
 ```erlang
 {legacy_keylisting, false},
 {mapred_system, pipe},
@@ -222,8 +206,7 @@ riak-admin transfers
 {platform_data_dir, "/var/lib/riak"}
 ```
 
-10\. 在集群中所有节点上按次序执行 `riak stop` 和 `riak start` 命令。
-或者在每个节点中执行 `riak attach` 命令，然后在执行下面的命令：
+10\. 在集群中所有节点上按次序执行 `riak stop` 和 `riak start` 命令。或者在每个节点中执行 `riak attach` 命令，然后在执行下面的命令：
 
 ```erlang
 > application:set_env(riak_kv, legacy_keylisting, false).
@@ -244,8 +227,7 @@ riak stop
 ```
 
 <div class="note">
-如果使用“服务管理工具”（SMF）管理 Riak，那么就不能使用 `riak stop`，而
-要用 `svcadm`：
+如果使用“服务管理工具”（SMF）管理 Riak，那么就不能使用 `riak stop`，而要用 `svcadm`：
 <br /><br />
 ```bash
 sudo svcadm disable riak
@@ -316,10 +298,7 @@ riak-admin transfers
 {{#1.3.1+}}
 <div class="info">
 <div class="title">关于二级索引的注意事项</div>
-如果使用 Riak 的二级索引，而且从 Riak 1.3.1 之前的版本升级，需要
-执行 [[riak-admin reformat-indexes|riak-admin Command Line#reformat-indexes]] 命令
-重新格式化索引。关于重新格式化索引的详细信息请阅读
-[发布说明](https://github.com/basho/riak/blob/master/RELEASE-NOTES.md)。
+如果使用 Riak 的二级索引，而且从 Riak 1.3.1 之前的版本升级，需要执行 [[riak-admin reformat-indexes|riak-admin 命令#reformat-indexes]] 命令重新格式化索引。关于重新格式化索引的详细信息请阅读[发布说明](https://github.com/basho/riak/blob/master/RELEASE-NOTES.md)。
 </div>
 {{/1.3.1+}}
 
@@ -328,8 +307,7 @@ riak-admin transfers
 只有从 Riak 1.0 之前的版本升级到 1.0，才需要执行下面两步。
 </div>
 
-10\. 所有节点都升级完成后，把下面的代码加入每个节点 `/etc/riak` 目录
-下的 `app.config` 文件中。首先，把下面的代码加入 `riak_kv` 区：
+10\. 所有节点都升级完成后，把下面的代码加入每个节点 `/etc/riak` 目录下的 `app.config` 文件中。首先，把下面的代码加入 `riak_kv` 区：
 
 ```erlang
 {legacy_keylisting, false},
@@ -343,8 +321,7 @@ riak-admin transfers
 {platform_data_dir, "/opt/riak/data"}
 ```
 
-11.\ 在集群中所有节点上按次序执行 `riak stop` 和 `riak start` 命令。
-或者在每个节点中执行 `riak attach` 命令，然后在执行下面的命令：
+11.\ 在集群中所有节点上按次序执行 `riak stop` 和 `riak start` 命令。或者在每个节点中执行 `riak attach` 命令，然后在执行下面的命令：
 
 ```erlang
 > application:set_env(riak_kv, legacy_keylisting, false).
@@ -356,8 +333,7 @@ riak-admin transfers
 
 ## Basho 补丁
 
-升级后，应该确保 `basho-patches` 文件夹中的所有自定义补丁可以在升级后的版本中
-正常使用。如果发现无法正常使用的补丁，必须在部署到生产环境前将其删除。
+升级后，应该确保 `basho-patches` 文件夹中的所有自定义补丁可以在升级后的版本中正常使用。如果发现无法正常使用的补丁，必须在部署到生产环境前将其删除。
 
 下表列出了在所支持的操作系统中 `basho-patches` 文件夹的位置：
 
@@ -399,8 +375,7 @@ riak-admin transfers
 {{#1.3.0+}}
 ## Riaknostic
 
-升级后最好检查以下基本的设置和 Riak 节点的健康状况，这一过程可以
-使用 Riak 内置的诊断工具 *Riaknostic* 完成。
+升级后最好检查以下基本的设置和 Riak 节点的健康状况，这一过程可以使用 Riak 内置的诊断工具 *Riaknostic* 完成。
 
 确保节点上运行着 Riak，然后执行下面的命令：
 

@@ -1,5 +1,5 @@
 ---
-title: Client Libraries
+title: 客户端代码库
 project: riak
 version: 1.4.2+
 document: reference
@@ -226,7 +226,7 @@ Riak 社区的开发很活跃，代码库和驱动的数量不断增长。下面
 
 *.NET*
 
-* CorrugatedIron ([[project page|http://corrugatediron.org/]] | [[source|https://github.com/DistributedNonsense/CorrugatedIron]] | [[Nuget package|http://www.nuget.org/List/Packages/CorrugatedIron]])
+* CorrugatedIron ([[project page|http://corrugatediron.org/]] | [[源码|https://github.com/DistributedNonsense/CorrugatedIron]] | [[Nuget 安装包|http://www.nuget.org/List/Packages/CorrugatedIron]])
 * [[Hebo|http://github.com/bubbafat/hebo]] - 实验性的 Riak 客户端
 * [[Data.RiakClient|http://github.com/garethstokes/Data.RiakClient]] - 支持 Protocol Buffer 的 Riak 客户端
 

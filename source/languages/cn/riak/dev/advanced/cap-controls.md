@@ -1,16 +1,16 @@
 ---
-title: CAP Controls
+title: CAP 控制
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [developers, cap]
 interest: [
-"[[Installing and Upgrading]]",
-"[[Concepts]]",
-"[[Planning for a Riak System]]",
-"[[Cluster Capacity Planning]]",
-"[[Use Cases]]"
+"[[安装和升级]]",
+"[[概念]]",
+"[[Riak 系统规划]]",
+"[[集群容量规划]]",
+"[[使用示例]]"
 ]
 ---
 

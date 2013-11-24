@@ -1,5 +1,5 @@
 ---
-title: HTTP Link Walking
+title: 通过 HTTP 进行链接遍历
 project: riak
 version: 1.4.2+
 document: api
@@ -9,7 +9,7 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-链接遍历根据附属在对象上的链接从指定的“bucket/键”组合开始查找并返回对象。链接遍历是特殊的 [[MapReduce 查询|Using MapReduce]]，如果直接使用 MapReduce 要复杂的多。关于链接的更多内容请阅读“[[链接|Links]]” 一文。
+链接遍历根据附属在对象上的链接从指定的“bucket/键”组合开始查找并返回对象。链接遍历是特殊的 [[MapReduce 查询|使用 MapReduce]]，如果直接使用 MapReduce 要复杂的多。关于链接的更多内容请阅读“[[链接]]” 一文。
 
 ## 请求
 
@@ -48,7 +48,7 @@ GET /buckets/bucket/keys/key/[bucket],[tag],[keep]    # 新格式
 
 <div class="note">
 <div class="title">理解响应主体</div>
-<p>响应主体的类型都是 <code>multipart/mixed</code>，每个片段代表链接遍历查询中的一步。每一步的结果也会使用 <code>multipart/mixed</code> 格式编码，每个片段代表找到的一个对象。如果没找到对象，或者这一步的 `keep` 设为 `0`，那么就不会有对应这一步的片段。各步结果中的对象都有 <code>Location</code> 报头，用来识别所属的 bucket 和对应的键。其实，可以直接把每个对象片段看成是[[获取单个对象|HTTP Fetch Object]]得到的完整响应，只是没有状态码而已。</p>
+<p>响应主体的类型都是 <code>multipart/mixed</code>，每个片段代表链接遍历查询中的一步。每一步的结果也会使用 <code>multipart/mixed</code> 格式编码，每个片段代表找到的一个对象。如果没找到对象，或者这一步的 `keep` 设为 `0`，那么就不会有对应这一步的片段。各步结果中的对象都有 <code>Location</code> 报头，用来识别所属的 bucket 和对应的键。其实，可以直接把每个对象片段看成是[[获取单个对象|通过 HTTP 获取对象]]得到的完整响应，只是没有状态码而已。</p>
 </div>
 
 ## 示例

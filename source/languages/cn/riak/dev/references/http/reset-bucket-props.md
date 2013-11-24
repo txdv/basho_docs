@@ -1,5 +1,5 @@
 ---
-title: HTTP Reset Bucket Properties
+title: 通过 HTTP 还原 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api

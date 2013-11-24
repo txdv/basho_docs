@@ -1,5 +1,5 @@
 ---
-title: Search Indexing Reference
+title: Riak Search 索引参考手册
 project: riak
 version: 1.4.2+
 document: reference

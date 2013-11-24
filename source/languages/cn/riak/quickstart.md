@@ -1,5 +1,5 @@
 ---
-title: Five Minute Install
+title: 花五分钟安装
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -12,20 +12,20 @@ keywords: [developers, 2i]
 
 ## 安装 Riak
 
-Basho 提供的 Riak 安装包（可以在 [[Downloads]] 获取）内嵌了 Erlang 运行时，不过本页的教程是通过源码安装的，所以如果还没安装 Erlang，请先 [[install erlang|Installing Erlang]]。从源码安装 Riak 需要 Erlang R15B01 的支持。
+Basho 提供的 Riak 安装包（可以在[[下载]]页面获取）内嵌了 Erlang 运行时，不过本页的教程是通过源码安装的，所以如果还没安装 Erlang，请先[[安装 Erlang]]。从源码安装 Riak 需要 Erlang R15B01 的支持。
 
 ### 获取源码
 
 下面列出的链接包含了针对各平台的说明，告诉你如何下载并从源码安装 Riak。
 
-  * [[Debian and Ubuntu|Installing on Debian and Ubuntu#Installing-From-Source]]
-  * [[RHEL and CentOS|Installing on RHEL and CentOS#Installing-From-Source]]
+  * [[Debian 和 Ubuntu|Installing on Debian and Ubuntu#Installing-From-Source]]
+  * [[RHEL 和 CentOS|Installing on RHEL and CentOS#Installing-From-Source]]
   * [[Mac OS X|Installing on Mac OS X#Installing-From-Source]]
   * [[FreeBSD|Installing on FreeBSD#Installing-From-Source]]
   * [[SUSE|Installing on SUSE]]
   * [[Windows Azure|Installing on Windows Azure]]
   * [[AWS Marketplace|Installing on AWS Marketplace]]
-  * [[Unlisted Operating System|Installing Riak from Source]]
+  * [[其他操作系统|从源码编译安装 Riak]]
 
 ### 编译 Riak
 
@@ -76,7 +76,7 @@ $ dev1/bin/riak start
 <div class="note">
 <div class="title">ulimit 提示</div>
 
-执行上述命令后会看到一个提示信息，告知需要增加文件句柄限制（ulimit）。各平台的具体做法说明请参照 [[Open Files Limit]]。
+执行上述命令后会看到一个提示信息，告知需要增加文件句柄限制（ulimit）。各平台的具体做法说明请参照“[[打开文件限制]]”一文。
 
 </div>
 
@@ -162,7 +162,7 @@ $ dev2/bin/riak-admin cluster commit
 <div class="info">
 <div class="title">关于 riak-admin</div>
 
-riak-admin 是 Riak 的管理工具。除了启动、停止节点之外所有操作都应该使用这个工具，例如加入或剔除集群，备份数据，以及集群的常规操作。详细说明请阅读 [[riak-admin|riak-admin Command Line]]。
+riak-admin 是 Riak 的管理工具。除了启动、停止节点之外所有操作都应该使用这个工具，例如加入或剔除集群，备份数据，以及集群的常规操作。详细说明请阅读 “[[riak-admin 命令]]”一文。
 
 </div>
 
@@ -208,7 +208,7 @@ $ curl -XPUT http://127.0.0.1:10018/riak/images/1.jpg \
 现在包含 5 个节点的 Riak 集群已经搭建好了。恭喜你！
 
 <div class="note">
-<div class="title">HTTP interface ports</div>
+<div class="title">HTTP 接口的端口</div>
 
 上面的设置把节点的 HTTP 端口指定为 `10018`、`10028`、`10038` 和 `10048`，分别对应 dev1、dev2、dev3、dev4 和 dev5。如果只有一个节点，默认监听的端口是 8089。如果使用了默认提供的使用其他语言编写的客户端一定要注意这一点。
 

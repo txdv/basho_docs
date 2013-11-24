@@ -1,5 +1,5 @@
 ---
-title: PBC Fetch Object
+title: 通过 PBC 获取对象
 project: riak
 version: 1.4.2+
 document: api
@@ -29,10 +29,10 @@ message RpbGetReq {
 
 可选的参数：
 
-* **r** -（读取法定值） 获取对象时要得到多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
-* **pr** -（主读取法定值）获取对象时要得到多少个主节点副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
-* **basic_quorum** - 出现错误时是否要提前返回结果（例如，r=1，出现 2 个错误，如果 `basic_quorum=true`，就会返回错误）（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
-* **notfound_ok** - 是否把未找到认为是成功的读取（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
+* **r** -（读取法定值） 获取对象时要得到多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **pr** -（主读取法定值）获取对象时要得到多少个主节点副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **basic_quorum** - 出现错误时是否要提前返回结果（例如，r=1，出现 2 个错误，如果 `basic_quorum=true`，就会返回错误）（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **notfound_ok** - 是否把未找到认为是成功的读取（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
 * **if_modified** - 如果提供了向量时钟，设定这个参数后只有当向量时钟不匹配时才会返回结果
 * **head** - 返回结果中不包含对象的值，不用获取大量的值就能读取元数据
 * **deletedvclock** - 删除死数据的向量时钟

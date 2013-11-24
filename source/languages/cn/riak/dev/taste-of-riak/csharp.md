@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: C Sharp"
+title: "初试 Riak：C-Sharp 篇"
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,7 +8,7 @@ audience: beginner
 keywords: [developers, client, csharp]
 ---
 
-如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
+如果你还没有创建 Riak 节点并启动，请先阅读“[[事先准备|初试 Riak：事先准备]]”一文。
 
 要使用本文介绍的 Riak 开发方法，必须先正确安装 .NET 框架或 Mono。
 

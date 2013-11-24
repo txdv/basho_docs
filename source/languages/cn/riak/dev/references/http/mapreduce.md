@@ -1,5 +1,5 @@
 ---
-title: HTTP MapReduce
+title: 通过 HTTP 执行 MapReduce 查询
 project: riak
 version: 1.4.2+
 document: api
@@ -9,7 +9,7 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-[[MapReduce|Using MapReduce]] 是在 Riak 中查询的常规方式，先指定输入数据，然后按序经过一系列 Map、Reduce 和 Link 步骤的处理。
+[[MapReduce|使用 MapReduce]] 是在 Riak 中查询的常规方式，先指定输入数据，然后按序经过一系列 Map、Reduce 和 Link 步骤的处理。
 
 ## 请求
 
@@ -19,7 +19,7 @@ POST /mapred
 
 重要的报头：
 
-* `Content-Type` - 必须是 `application/json`。请求主体的格式在“[[使用 MapReduce|Using MapReduce]]”一文中有详细说明。
+* `Content-Type` - 必须是 `application/json`。请求主体的格式在“[[使用 MapReduce]]”一文中有详细说明。
 
 可选的查询参数：
 

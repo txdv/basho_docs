@@ -1,5 +1,5 @@
 ---
-title: HTTP Counters
+title: HTTP 计数器
 project: riak
 version: 1.4.2+
 document: api
@@ -43,7 +43,7 @@ GET /buckets/BUCKET/counters/KEY
 
 ## 响应
 
-常规的 POST/PUT（[[通过 HTTP 接口存储对象|HTTP Store Object]]）和 GET（[[通过 HTTP 接口获取对象|HTTP Fetch Object]]）请求的响应在这同样适用。
+常规的 POST/PUT（[[通过 HTTP 存储对象]]）和 GET（[[通过 HTTP 获取对象]]）请求的响应在这同样适用。
 
 注意：计数器不支持二级索引，链接和自定义 HTTP 元数据。
 

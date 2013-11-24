@@ -1,5 +1,5 @@
 ---
-title: PBC Secondary Indexes
+title: 通过 PBC 执行二级索引查询
 project: riak
 version: 1.4.2+
 document: api

@@ -1,19 +1,19 @@
 ---
-title: Installing on Debian and Ubuntu
+title: 在 Debian 和 Ubuntu 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, debian, ubuntu, linux]
-prev: "[[Installing Erlang]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on RHEL and CentOS]]"
+prev: "[[安装 Erlang]]"
+up:   "[[安装和升级]]"
+next: "[[在 RHEL 和 CentOS 中安装]]"
 download:
   key: debian
   name: "Debian or Ubuntu"
 ---
 
-在基于 Debian 或 Ubuntu 的系统中可以使用二进制安装包安装 Riak，也可以 [[compiling Riak from source code|Installing Riak from Source]]。下面介绍的安装方法在 **Debian 6.05** and **Ubuntu 12.04** 上测试可行。
+在基于 Debian 或 Ubuntu 的系统中可以使用二进制安装包安装 Riak，也可以[[编译源码安装|从源码安装 Riak]]。下面介绍的安装方法在 **Debian 6.05** and **Ubuntu 12.04** 上测试可行。
 
 ## 使用 Apt-Get 安装
 
@@ -148,7 +148,7 @@ sudo apt-get install build-essential libc6-dev-i386 git
 
 Riak 需要 [Erlang](http://www.erlang.org/) R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-如果还没安装 Erlang，在继续阅读之前请先安装之。（详细方法请阅读 [[Installing Erlang]]）
+如果还没安装 Erlang，在继续阅读之前请先安装之。（详细方法请阅读“[[安装 Erlang]]”一文）
 
 安装 Erlang 后，就可以下载、安装 Riak 了：
 
@@ -165,5 +165,5 @@ make rel
 
 现在 Riak 已经安装好了，请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

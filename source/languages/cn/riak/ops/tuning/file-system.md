@@ -1,5 +1,5 @@
 ---
-title: File System Tuning
+title: 文件系统调整
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -20,9 +20,6 @@ IO 调度方法有很多种。常用的有：
 * FIFO
 * NOOP
 
-CFQ 虽然是常规调度方法，但不能提供数据库在生产环境中所需的吞吐量。对 Riak 来说，
-如果使用 HBA 进行 iSCST 部署，或者使用基于 RAID 的硬件，最好的选择是 NOOP。
-如果使用 SSD 存储设备，最好使用 Deadline 方法。
+CFQ 虽然是常规调度方法，但不能提供数据库在生产环境中所需的吞吐量。对 Riak 来说，如果使用 HBA 进行 iSCST 部署，或者使用基于 RAID 的硬件，最好的选择是 NOOP。如果使用 SSD 存储设备，最好使用 Deadline 方法。
 
-系统和工作量的配合有很多种，请查看所用操作系统的文档，查看可以使用的 IO 调度方法，
-以及必须要实现的方法。
+系统和工作量的配合有很多种，请查看所用操作系统的文档，查看可以使用的 IO 调度方法，以及必须要实现的方法。

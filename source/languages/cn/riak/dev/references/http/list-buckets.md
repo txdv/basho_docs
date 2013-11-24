@@ -1,5 +1,5 @@
 ---
-title: HTTP List Buckets
+title: 通过 HTTP 列出 bucket
 project: riak
 version: 1.4.2+
 document: api

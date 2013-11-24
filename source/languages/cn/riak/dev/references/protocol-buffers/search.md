@@ -1,5 +1,5 @@
 ---
-title: PBC Search
+title: 通过 PCB 执行 Riak Search 查询
 project: riak
 version: 1.4.2+
 document: api

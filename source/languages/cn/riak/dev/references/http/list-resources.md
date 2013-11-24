@@ -1,5 +1,5 @@
 ---
-title: HTTP List Resources
+title: 通过 HTTP 列出资源
 project: riak
 version: 1.4.2+
 document: api
@@ -14,18 +14,18 @@ group_by: "Server Operations"
 标准的资源有：
 
 * `riak_kv_wm_buckets` - [[Bucket 相关操作|HTTP API#Bucket-Operations]]
-* `riak_kv_wm_index` - [[通过 HTTP 执行二级索引查询|HTTP Secondary Indexes]]
-* `riak_kv_wm_link_walker` - [[通过 HTTP 进行链接遍历|HTTP Link Walking]]
-* `riak_kv_wm_mapred` - [[通过 HTTP 执行 MapReduce 查询|HTTP MapReduce]]
+* `riak_kv_wm_index` - [[通过 HTTP 执行二级索引查询]]
+* `riak_kv_wm_link_walker` - [[通过 HTTP 进行链接遍历]]
+* `riak_kv_wm_mapred` - [[通过 HTTP 执行 MapReduce 查询]]
 * `riak_kv_wm_object`- [[对象/键相关操作|HTTP API#Object-Key-Operations]]
 * `riak_kv_wm_ping` - [[HTTP Ping]]
-* `riak_kv_wm_props` - [[通过 HTTP 设置 bucket 的属性|HTTP Set Bucket Properties]]
-* `riak_kv_wm_stats` - [[HTTP 状态|HTTP Status]]
+* `riak_kv_wm_props` - [[通过 HTTP 设置 bucket 的属性]]
+* `riak_kv_wm_stats` - [[HTTP 状态]]
 
 如果启用了 Riak Search，还会包含下面的资源：
 
-* `riak_solr_searcher_wm` - [[通过 Solr 接口搜索|Using Search#Querying]]
-* `riak_solr_indexer_wm` - [[通过 Solr 接口索引|Advanced Search#Indexing-using-the-Solr-Interface]]
+* `riak_solr_searcher_wm` - [[通过 Solr 接口搜索|使用 Riak Search#Querying]]
+* `riak_solr_indexer_wm` - [[通过 Solr 接口索引|Riak Search 高级用法#Indexing-using-the-Solr-Interface]]
 
 {{#1.0.0-}}
 

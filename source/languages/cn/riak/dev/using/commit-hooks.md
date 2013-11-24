@@ -1,5 +1,5 @@
 ---
-title: Using Commit Hooks
+title: 使用 Commit 钩子
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -29,9 +29,9 @@ pre-commit 钩子可以使用具名 JavaScript 函数或 Erlang 函数编写。�
 Javascript：`{"name": "Foo.beforeWrite"}`
 Erlang：`{"mod": "foo", "fun": "beforeWrite"}`
 
-post-commit 钩子只能使用 Erlang 编写，详细内容请阅读“[[commit 钩子高级用法|Advanced Commit Hooks]]”。之所以制定这个限制是因为 JavaScript 不能调用 Erlang 代码，因此也就不能做什么有用的工作。当我们增强了 Erlang/JavaScript 集成程度后，会再重新审视这个限制。post-commit 钩子使用的函数引用句法和 pre-commit 一样。
+post-commit 钩子只能使用 Erlang 编写，详细内容参加 [[Commit 钩子高级用法]]。之所以制定这个限制是因为 JavaScript 不能调用 Erlang 代码，因此也就不能做什么有用的工作。当我们增强了 Erlang/JavaScript 集成程度后，会再重新审视这个限制。post-commit 钩子使用的函数引用句法和 pre-commit 一样。
 
-定义 JavaScript 具名函数的步骤请参阅“[[高级 MapReduce 用法|Advanced MapReduce]]”。
+定义 JavaScript 具名函数的步骤请参阅 [[MapReduce 高级用法]]。
 
 ## Pre-Commit 钩子
 

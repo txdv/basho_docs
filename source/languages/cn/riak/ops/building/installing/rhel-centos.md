@@ -1,13 +1,13 @@
 ---
-title: Installing on RHEL and CentOS
+title: 在 RHEL 和 CentOS 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, rhel, centos, linux]
-prev: "[[Installing on Debian and Ubuntu]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on Mac OS X]]"
+prev: "[[在 Debian 和 Ubuntu 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[在 Mac OS X 中安装]]"
 download:
   key: rhel
   name: "Red Hat or CentOS"
@@ -83,7 +83,7 @@ sudo rpm -Uvh riak-{{V.V.V}}-2.el6.x86_64.rpm
 
 Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-如果还没有安装 Erlang，请参照 [[Installing Erlang]]。不用担心，很简单！
+如果还没有安装 Erlang，请参照“[[安装 Erlang]]”一文。不用担心，很简单！
 
 编译源码需要安装以下包：
 
@@ -113,5 +113,5 @@ make rel
 
 请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

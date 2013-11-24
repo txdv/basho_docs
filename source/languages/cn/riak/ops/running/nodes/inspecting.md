@@ -1,5 +1,5 @@
 ---
-title: Inspecting a Node
+title: 检查节点
 project: riak
 version: 1.4.2+
 document: appendix
@@ -8,16 +8,14 @@ audience: intermediate
 keywords: [operator, status, riaknostic]
 ---
 
-检查 Riak 节点收集性能指标或为了发现潜在问题时，有很多工具可以使用，其中有些是 Riak 内建的，
-有些是 Riak 社区开发的。
+检查 Riak 节点收集性能指标或为了发现潜在问题时，有很多工具可以使用，其中有些是 Riak 内建的，有些是 Riak 社区开发的。
 
 本文简单介绍了如何使用这些工具检查 Riak 节点。
 
 ## riak-admin status
 
 
-`riak-admin status` 是 `riak-admin` 命令的子命令，每个 Riak 都有。`status` 命令可以
-显示节点当前运行状态相关的数据。`riak-admin status` 命令的输出结果分类介绍如下。
+`riak-admin status` 是 `riak-admin` 命令的子命令，每个 Riak 都有。`status` 命令可以显示节点当前运行状态相关的数据。`riak-admin status` 命令的输出结果分类介绍如下。
 
 注意，某些计数器至少需要 5 个事务（transaction）才能收集到统计数据。
 
@@ -45,9 +43,7 @@ keywords: [operator, status, riaknostic]
 
 ### FSM\_Time
 
-FSM\_Time 计数器表明遍历 GET 或 PUT FSM 代码所需的时间，单位为毫秒。由此可以看出节点的
-一般健康状况。对应用程序来说，FSM\_Time 很好地说明了迟延时间。FSM\_Time 计数器可以显示
-均值、中值、95 百分位值、100 百分位值（最大值）。这些也属于“一分钟”状态。
+FSM\_Time 计数器表明遍历 GET 或 PUT FSM 代码所需的时间，单位为毫秒。由此可以看出节点的一般健康状况。对应用程序来说，FSM\_Time 很好地说明了迟延时间。FSM\_Time 计数器可以显示均值、中值、95 百分位值、100 百分位值（最大值）。这些也属于“一分钟”状态。
 
 例如：
 
@@ -77,9 +73,7 @@ GET\_FSM\_Sibling 表明在 GET 请求中节点中兄弟数据的数量。这也
 
 ### GET\_FSM\_Objsize
 
-GET\_FSM\_Objsize 是流经某节点 GET\_FSM 的对象大小。对象的大小是该对象 bucket 名、键、
-序列化向量时钟、值和每个兄弟数据的序列化元数据长度之和。
-GET\_FSM\_Objsize 和 GET\_FSM\_Siblings 之间的联系很紧密。这些也是“一分钟”状态。
+GET\_FSM\_Objsize 是流经某节点 GET\_FSM 的对象大小。对象的大小是该对象 bucket 名、键、序列化向量时钟、值和每个兄弟数据的序列化元数据长度之和。GET\_FSM\_Objsize 和 GET\_FSM\_Siblings 之间的联系很紧密。这些也是“一分钟”状态。
 
 例如：
 
@@ -105,16 +99,14 @@ GET\_FSM\_Objsize 和 GET\_FSM\_Siblings 之间的联系很紧密。这些也是
 
 ### CPU 和内存
 
-CPU 的统计数据直接从 Erlang 的 cpu\_sup 模块获取，详细说明请
-阅读 [Erlang 文档](http://erldocs.com/R14B04/os_mon/cpu_sup.html)
+CPU 的统计数据直接从 Erlang 的 cpu\_sup 模块获取，详细说明请阅读 [Erlang 文档](http://erldocs.com/R14B04/os_mon/cpu_sup.html)
 
 -   **cpu\_nprocs**: 操作系统的进程数量
 -   **cpu\_avg1**: 前一分钟运行的进程数均值（等价于 top(1) 命令的平均负载除以 256）
 -   **cpu\_avg5**: 前五分钟运行的进程数均值（等价于 top(1) 命令的平均负载除以 256）
 -   **cpu\_avg15**: 前十五分钟运行的进程数均值（等价于 top(1) 命令的平均负载除以 256）
 
-内存使用统计数据直接从 Erlang 的虚拟机获取，详细说明请
-阅读 [Erlang 文档](http://erldocs.com/R14B04/erts/erlang.html?i=0&search=erlang:memory#memory/0)。
+内存使用统计数据直接从 Erlang 的虚拟机获取，详细说明请阅读 [Erlang 文档](http://erldocs.com/R14B04/erts/erlang.html?i=0&search=erlang:memory#memory/0)。
 
 -   **memory\_total**: 分配的内存总量（进程和系统之和）
 -   **memory\_processes**: 为 Erlang 进程分配的内存总量
@@ -218,36 +210,29 @@ Riak 也会提供一些关于节点的其他信息。
 - **riak_search_vnodeq_total**: 自节点启动以来 Riak 搜索系统收到的所有虚拟节点消息队列中未处理的消息数量最大值
 - **riak_search_vnodes_running**: 目前在 Riak 搜索系统中运行的虚拟节点数量
 
-注意，在理想状态下，除了 `riak_search_vnodes_running`，其他信息的值可能很小（例如 0-10）。
-如果值很大可能就是出问题了。
+注意，在理想状态下，除了 `riak_search_vnodes_running`，其他信息的值可能很小（例如 0-10）。如果值很大可能就是出问题了。
 {{/1.2.0+}}
 
 ## Riaknostic
 
-[Riaknostic](http://riaknostic.basho.com) 是一个小型的诊断工具，在节点中运行，
-能发现常规问题，并给出解决方法。这些检查项目来源于 Basho 客户服务团队的经验，以及邮件列表、
-IRC 和其他在线媒体上的公开讨论。
+[Riaknostic](http://riaknostic.basho.com) 是一个小型的诊断工具，在节点中运行，能发现常规问题，并给出解决方法。这些检查项目来源于 Basho 客户服务团队的经验，以及邮件列表、IRC 和其他在线媒体上的公开讨论。
 
 {{#1.3.0-}}
-Riaknostic 是一个开源项目，由 Basho Technologies 和社区成员开发。其代码
-可到 [GitHub 仓库](https://github.com/basho/riaknostic)获取。
+Riaknostic 是一个开源项目，由 Basho Technologies 和社区成员开发。其代码可到 [GitHub 仓库](https://github.com/basho/riaknostic)获取。
 
-Riaknostic 使用起来很简单，安装和使用说明可以到 Riaknostic 的网站查看。下载安装后，
-Riaknostic 向 `riak-admin` 添加了 `diag` 子命令。
+Riaknostic 使用起来很简单，安装和使用说明可以到 Riaknostic 的网站查看。下载安装后，Riaknostic 向 `riak-admin` 添加了 `diag` 子命令。
 
-`riak-admin diag` 会输出节点的所有问题及推荐的解决方法。Riaknostic 特别适合用来诊查
-设置相关的问题，节点或集群遇到问题时强烈建议先使用它来检查问题。
+`riak-admin diag` 会输出节点的所有问题及推荐的解决方法。Riaknostic 特别适合用来诊查设置相关的问题，节点或集群遇到问题时强烈建议先使用它来检查问题。
 {{/1.3.0-}}
 
 {{#1.3.0+}}
 从 Riak 1.3 开始，Riaknostic 是默认安装的。
 
-Riaknostic 包含在 Riak 中，可以使用 `riak-admin diag` 命令运行。Riaknostic 是一个开源项目，由 Basho Technologies 和社区成员开发。其代码
-可到 [GitHub 仓库](https://github.com/basho/riaknostic)获取。
+Riaknostic 包含在 Riak 中，可以使用 `riak-admin diag` 命令运行。Riaknostic 是一个开源项目，由 Basho Technologies 和社区成员开发。其代码可到 [GitHub 仓库](https://github.com/basho/riaknostic)获取。
 {{/1.3.0+}}
 
 ## 相关资源
 
 -   [设置和管理：命令行工具：riak-admin](http://docs.basho.com/riak/1.2.0/references/riak-admin Command Line/)
 -   [Riaknostic](http://riaknostic.basho.com/)
--   [[HTTP API status|HTTP Status]]
+-   [[HTTP API 状态|HTTP 状态]]

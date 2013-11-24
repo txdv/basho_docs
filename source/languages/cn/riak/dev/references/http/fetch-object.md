@@ -1,5 +1,5 @@
 ---
-title: HTTP Fetch Object
+title: 通过 HTTP 获取对象
 project: riak
 version: 1.4.2+
 document: api
@@ -28,13 +28,13 @@ GET /buckets/bucket/keys/key    # New format
 
 可选的请求参数：
 
-* `r` - （读取法定值）获取对象时要得到多少个副本（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
-* `pr` - 执行读取操作时要有多少个主节点副本在线（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
-* `basic_quorum` - 在某些失败情况下是否要提前返回失败响应（例如，r=1，出现 2 个错误，如果 `basic_quorum=true`，就会返回错误）（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
-* `notfound_ok` - 是否把未找到认为是成功的读取（[[默认值在 bucket 层面设定|HTTP Set Bucket Properties]]）
+* `r` - （读取法定值）获取对象时要得到多少个副本（[[默认值在 bucket 层面设定|通过 HTTP 设置 bucket 的属性]]）
+* `pr` - 执行读取操作时要有多少个主节点副本在线（[[默认值在 bucket 层面设定|通过 HTTP 设置 bucket 的属性]]）
+* `basic_quorum` - 在某些失败情况下是否要提前返回失败响应（例如，r=1，出现 2 个错误，如果 `basic_quorum=true`，就会返回错误）（[[默认值在 bucket 层面设定|通过 HTTP 设置 bucket 的属性]]）
+* `notfound_ok` - 是否把未找到认为是成功的读取（[[默认值在 bucket 层面设定|通过 HTTP 设置 bucket 的属性]]）
 * `vtag` - 当访问对象的兄弟数据时，要获取哪个兄弟数据
 
-更多信息请看下面的[[手动请求兄弟数据|HTTP Fetch Object#Manually requesting siblings]]示例。
+更多信息请看下面的[[手动请求兄弟数据|通过 HTTP 获取对象#Manually-requesting-siblings]]示例。
 
 ## 响应
 
@@ -57,7 +57,7 @@ GET /buckets/bucket/keys/key    # New format
 * `X-Riak-Meta-*` - 存储对象时用户定义的元数据
 * `ETag` - 对象的实体标签，用于条件 GET 请求和基于验证的缓存
 * `Last-Modified` - 对象上一次改动的时间戳，使用 HTTP 日期时间格式
-* `Link` - 用户和系统定义的指向其他资源的链接。参见“[[链接|Links]]”一文
+* `Link` - 用户和系统定义的指向其他资源的链接。参见“[[链接]]”一文
 
 响应的主体是对象的内容，如果对象有兄弟数据，还包含兄弟数据。
 
@@ -66,7 +66,7 @@ GET /buckets/bucket/keys/key    # New format
 
 <p>如果 bucket 的 `allow_mult` 属性设为 `true`，则可以并发更新，生成兄弟对象，即很多值通过向量时钟相互关联。应用程序要负责处理对象版本冲突。</p>
 
-<p>如果对象有多个兄弟数据，会返回 `300 Multiple Choices` 响应。如果 `Accept` 报头倾向于选择 `multipart/mixed` 类型的数据，所有的兄弟数据都会返回。否则，会以纯文本格式列出一组 vtags。请求中可以指定 `vtag` 参数查询单个兄弟数据。更多信息请参照下面的[[手动请求兄弟数据|HTTP Fetch Object#Manually requesting siblings]]示例。</p>
+<p>如果对象有多个兄弟数据，会返回 `300 Multiple Choices` 响应。如果 `Accept` 报头倾向于选择 `multipart/mixed` 类型的数据，所有的兄弟数据都会返回。否则，会以纯文本格式列出一组 vtags。请求中可以指定 `vtag` 参数查询单个兄弟数据。更多信息请参照下面的[[手动请求兄弟数据|通过 HTTP 获取对象#Manually-requesting-siblings]]示例。</p>
 
 <p>要解决冲突，可以把解决好的版本使用响应中的 `X-Riak-Vclock` 存储。</p>
 </div>
@@ -101,6 +101,7 @@ $ curl -v http://127.0.0.1:8098/riak/test/doc2
 
 ## 兄弟数据示例
 
+<a id="Manually-requesting-siblings"></a>
 ### 手动请求兄弟数据
 
 ```bash

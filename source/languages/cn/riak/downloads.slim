@@ -1,5 +1,5 @@
 ---
-title: Downloads
+title: 下载
 project: riak
 version: 1.4.2+
 document: reference
@@ -16,7 +16,7 @@ body_id: downloads
 h1 下载 #{project.capitalize} #{version}
 
 p 可以在下面的列表中找到适合你所用操作系统的下载链接。
-p 如果你所用的操作系统没有列出，请在本页下部下载 [[source|Downloads#source]]，然后根据 [[build Riak|Installing Riak from Source]] 中的说明安装。
+p 如果你所用的操作系统没有列出，请在本页下部下载[[源码|下载#source]]，然后按照“[[从源码编译安装 Riak]]”一文中的说明安装。
 
 - for os, os_data in downloads
   - next unless downloads.files?(os_data)
@@ -44,3 +44,4 @@ p 如果你所用的操作系统没有列出，请在本页下部下载 [[source
   - if os_data['install'].present?
     p.install_instruction 详细说明参照 [[#{os_data['install']}]]
 
+/ Andor: the downloads data are defined in /data/downloads_default.yml, should I translate there?

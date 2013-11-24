@@ -1,5 +1,5 @@
 ---
-title: Key Filters Reference
+title: 键过滤器参考手册
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -10,7 +10,7 @@ keywords: [developers, mapreduce, keyfilters]
 
 ## 转换函数
 
-键过滤器的转换函数对键进行处理，把键转换成能被[[判定函数|Using Key Filters#Predicate-functions]]测试的格式。转换过滤器的描述信息后都跟着使用 JSON 编写的示例用法。
+键过滤器的转换函数对键进行处理，把键转换成能被[[判定函数|使用键过滤器#Predicate-functions]]测试的格式。转换过滤器的描述信息后都跟着使用 JSON 编写的示例用法。
 
 如果在 Erlang 中使用，函数名（和键）都使用二进制形式。
 
@@ -80,11 +80,13 @@ keywords: [developers, mapreduce, keyfilters]
 
 ## 判断函数
 
-键过滤器的判定函数在输入数据上进行测试，返回 `true` 或 `false`。所以判定函数应该是一系列键过滤器中的最后一个，而且经常放在[[转换函数|Using Key Filters#Transform-functions]]之后。
+键过滤器的判定函数在输入数据上进行测试，返回 `true` 或 `false`。所以判定函数应该是一系列键过滤器中的最后一个，而且经常放在[[转换函数|使用键过滤器#Transform-functions]]之后。
 
 <div class="note">
-	<div class="title">比较型判定函数</div>
-	`greater_than`、`less_than_eq` 和 `between` 这种判定函数按照 Erlang 的比较方式进行比较，也就是说数字就按照值本身进行比较（可以进行适当的强制类型转换），字符串按照字面值进行比较。
+<div class="title">比较型判定函数</div>
+
+`greater_than`、`less_than_eq` 和 `between` 这种判定函数按照 Erlang 的比较方式进行比较，也就是说数字就按照值本身进行比较（可以进行适当的强制类型转换），字符串按照字面值进行比较。
+
 </div>
 
 ### `greater_than`

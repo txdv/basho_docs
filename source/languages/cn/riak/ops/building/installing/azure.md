@@ -1,13 +1,13 @@
 ---
-title: Installing on Windows Azure
+title: 在 Windows Azure 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, windows, azure]
-prev: "[[Installing on SUSE]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on AWS Marketplace]]"
+prev: "[[在 SUSE 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[在 AWS Marketplace 中安装]]"
 ---
 
 下面介绍如何在 Windows Azure 平台中使用 Centos VM 安装 Riak。
@@ -145,4 +145,4 @@ next: "[[Installing on AWS Marketplace]]"
 
 进一步阅读：
 
-- [[Basic Riak API Operations|The Basics]]
+- [[Riak API 基本操作|查询基础]]

@@ -1,5 +1,5 @@
 ---
-title: User Subscriptions/Events/Timelines
+title: 用户时间和时间轴
 project: riak
 version: 1.4.2+
 document: cookbook

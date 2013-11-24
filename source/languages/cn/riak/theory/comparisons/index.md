@@ -1,5 +1,5 @@
 ---
-title: Riak Comparisons
+title: Riak 和其他数据库比较
 project: riak
 version: 1.4.2+
 document: appendix
@@ -10,13 +10,13 @@ keywords: [comparisons]
 
 NoSQL，或者说数据库，正在受到越来越多的关注。我们发现经常要回答开发者、潜在客户和客户的问题，“Riak 和其他数据库相比怎么样？”，“Riak 的副本机制和这个 NoSQL 数据库相比有什么主要不同点？”所以，我们觉得有必要和其他数据库做一个简略客观的对比。（如果有时间，我们会做更多的对比。）
 
-* [[Riak 对比 Cassandra|Riak Compared to Cassandra]]
-* [[Riak 对比 Couchbase|Riak Compared to Couchbase]]
-* [[Riak 对比 CouchDB|Riak Compared to CouchDB]]
-* [[Riak 对比 HBase|Riak Compared to HBase]]
-* [[Riak 对比 MongoDB|Riak Compared to MongoDB]]
-* [[Riak 对比 Neo4j|Riak Compared to Neo4j]]
-* [[Riak 对比 DynamoDB|Riak Compared to DynamoDB]]
+* [[Riak 和 Cassandra 比较]]
+* [[Riak 和 Couchbase 比较]]
+* [[Riak 和 CouchDB 比较]]
+* [[Riak 和 HBase 比较]]
+* [[Riak 和 MongoDB 比较]]
+* [[Riak 和 Neo4j 比较]]
+* [[Riak 和 DynamoDB 比较]]
 
 _免责声明：我们尽量保证对比的方式是正确的，但软件是复杂的，而且经常变动，如果你觉得我们哪里错了，请理性的指出来，我们很乐意修正。_
 

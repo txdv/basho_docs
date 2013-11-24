@@ -1,5 +1,5 @@
 ---
-title: Link Walking
+title: 链接遍历
 project: riak
 version: 1.4.2+
 document: cookbook

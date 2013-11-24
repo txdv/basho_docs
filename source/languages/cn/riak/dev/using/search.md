@@ -1,5 +1,5 @@
 ---
-title: Using Search
+title: 使用 Riak Search
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -8,7 +8,7 @@ audience: beginner
 keywords: [developers, search, kv]
 ---
 
-要想使用 Riak Search 必须先将其[[启用|Riak Search Settings]]。
+要想使用 Riak Search 必须先将其[[启用|Riak Search 设置]]。
 
 ## 介绍
 
@@ -41,15 +41,15 @@ Riak Search 通过 pre-commit 钩子在存入数据的时候建立索引。基�
 
 ### 什么时候不要使用 Raik Search
 
-* 使用精确匹配和范围查询时只要简单的为数据打上标签。这是使用[[二级索引|Using Secondary Indexes]]要更简单。
+* 使用精确匹配和范围查询时只要简单的为数据打上标签。这是使用[[二级索引|使用二级索引]]要更简单。
 * 数据无法轻易的使用 Raik Search 分析。例如音频、视频等二进制格式。这时推荐使用二级索引。
 * 需要使用内建的反熵和一致性时。这时 Raik Search 没有读取修复机制。如果 Raik Search 的索引数据丢失了，对许对整个数据集重建索引。
 
 ## 索引数据
 
-在搜索之前，必须先建立索引。在标准模式下，必须手动建立索引。在“[[搜素索引参考手册|Search Indexing Reference]]”一文中有索引命令的详细列表。
+在搜索之前，必须先建立索引。在标准模式下，必须手动建立索引。在“[[Riak Search 索引参考手册|Search Indexing Reference]]”一文中有索引命令的详细列表。
 
-如果想简单点但不是很直观的索引，可以参照“[[高级搜索|Advanced Search]]”中的“[[搜索，KV 和 MapReduce|Advanced Search#Search-KV-and-MapReduce]]”一节。
+如果想简单点但不是很直观的索引，可以参照“[[Riak Search 高级用法]]”中的“[[搜索，KV 和 MapReduce|Riak Search 高级用法#Search-KV-and-MapReduce]]”一节。
 
 <!-- Was "Riak Search - Querying" -->
 
@@ -81,7 +81,7 @@ Riak Search 支持一种和 Solr 兼容的接口，可以通过 HTTP 查询文�
   * `rows=N`：指定返回结果的最大数量。默认值是 10
   * `sort=FIELDNAME`：找到结果后按指定的字段排序。默认值是 `none`，结果按照得分降序排列
   * `wt=FORMAT`：设置输出的格式。可选值是 `xml` 和 `json`。默认值是 `xml`。
-  * `filter=FILTERQUERY`：使用运行在[[行间字段|Advanced Search#Fields-and-Field-Level-Properties]]上的额外查询过滤搜索结果
+  * `filter=FILTERQUERY`：使用运行在[[行间字段|Riak Search 高级用法#Fields-and-Field-Level-Properties]]上的额外查询过滤搜索结果
   * `presort=key|score`：在选择指定的行之前先按照 bucket 键或搜索得分排序结果。分页时可以确保返回结果的顺序一致
       <div class="info">
       <div class="title">presort 的限制</div>

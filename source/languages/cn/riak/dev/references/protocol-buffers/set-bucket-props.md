@@ -1,5 +1,5 @@
 ---
-title: PBC Set Bucket Properties
+title: 通过 PBC 设置 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api
@@ -12,7 +12,7 @@ group_by: "Bucket Operations"
 设置 bucket 的属性。
 
 <div class="note">
-<p>PBC 接口目前没有完全支持所有的 bucket 属性，现在只能设置 <code>allow_mult</code> 和 <code>n_val</code>;。其他的属性要通过 [[HTTP API|HTTP Set Bucket Properties]] 设置。</p>
+<p>PBC 接口目前没有完全支持所有的 bucket 属性，现在只能设置 <code>allow_mult</code> 和 <code>n_val</code>;。其他的属性要通过 [[HTTP API|通过 HTTP 设置 bucket 的属性]] 设置。</p>
 </div>
 
 ## 请求

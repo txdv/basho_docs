@@ -1,13 +1,13 @@
 ---
-title: Installing on SmartOS
+title: 在 SmartOS 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, smartos]
-prev: "[[Installing on FreeBSD]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on Solaris]]"
+prev: "[[在 FreeBSD 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[在 Solaris 中安装]]"
 download:
   key: smartos
   name: "SmartOS"
@@ -151,5 +151,5 @@ Ping 的结果如果是 `pong`，说明节点已经创建，且可以连通；�
 
 现在 Riak 已经安装好了，请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

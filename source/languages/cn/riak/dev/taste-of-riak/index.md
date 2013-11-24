@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: Prerequisites"
+title: "初试 Riak：事先准备"
 project: riak
 version: 1.4.2+
 document: guide
@@ -15,11 +15,11 @@ interest: false
 
 ### 安装 Riak
 
-如果你还没有阅读 [[five minute install]]，赶快去读吧，安装文中的说明安装 Riak。如果只想对单一节点进行开发，可以直接下载（[[download|downloads]]）对应操作系统的安装包安装，然后启动 Riak（执行 `riak start` 命令）。
+如果你还没有阅读“[[花五分钟安装]]”一文，赶快去读吧，安装文中的说明安装 Riak。如果只想对单一节点进行开发，可以直接下载（[[下载]]）对应操作系统的安装包安装，然后启动 Riak（执行 `riak start` 命令）。
 
 ### 选择要用的编程语言
 
-Basho 官方支持很多开源客户端代码库（[[client libraries]]），可以使用多种编程语言和环境。请选择一种语言进行开发。
+Basho 官方支持很多开源客户端代码库（[[客户端代码库]]），可以使用多种编程语言和环境。请选择一种语言进行开发。
 
 <ul class="planguages">
 <li><a href="/dev/taste-of-riak/java/"><img src="/images/plangs/java.jpg" alt="Java"></a></li>
@@ -33,6 +33,6 @@ Basho 官方支持很多开源客户端代码库（[[client libraries]]），可
 
 除了 Basho 官方提供的客户端代码库，还有一些值得提及的针对其他语言的代码库：
 
-* [[OCaml|Taste of Riak: OCaml]]
-* [[Clojure|Taste of Riak: Clojure]]
-* [[C Sharp|Taste of Riak: C Sharp]]
+* [[OCaml|初试 Riak：OCaml 篇]]
+* [[Clojure|初试 Riak：Clojure 篇]]
+* [[C Sharp|初试 Riak：C-Sharp 篇]]

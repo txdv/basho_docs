@@ -1,5 +1,5 @@
 ---
-title: HTTP Status
+title: HTTP 状态
 project: riak
 version: 1.4.2+
 document: api
@@ -9,7 +9,7 @@ keywords: [api, http]
 group_by: "Server Operations"
 ---
 
-报告所请求节点的性能和设置。要想激活这个请求 URL，必须在 app.config 文件中设置 `{riak_kv_stat,true}`。这个请求的效果和使用 [[riak-admin status|Command-Line Tools#status]] 命令得到的结果一样。
+报告所请求节点的性能和设置。要想激活这个请求 URL，必须在 app.config 文件中设置 `{riak_kv_stat,true}`。这个请求的效果和使用 [[riak-admin status|命令行工具#status]] 命令得到的结果一样。
 
 ## 请求
 

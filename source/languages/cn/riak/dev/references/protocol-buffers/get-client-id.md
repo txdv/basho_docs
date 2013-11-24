@@ -1,5 +1,5 @@
 ---
-title: PBC Get Client ID
+title: 通过 PBC 获取客户端 ID
 project: riak
 version: 1.4.2+
 document: api
@@ -9,11 +9,11 @@ keywords: [api, protocol-buffer]
 group_by: "Server Operations"
 ---
 
-获取当前连接的客户端 ID。客户端 ID 用来解决冲突，系统中的每个客户端都应该指定一个 ID。建立 socket 连接时会为客户端随机分配一个 ID，而且后续还可以[[修改|PBC Set Client ID]]。
+获取当前连接的客户端 ID。客户端 ID 用来解决冲突，系统中的每个客户端都应该指定一个 ID。建立 socket 连接时会为客户端随机分配一个 ID，而且后续还可以[[修改|通过 PBC 设置客户端 ID]]。
 
 <div class="note">
 <div class="title">Riak 1.0 中的客户端 ID</div>
-<p>所有发送到 Riak 1.0 及以下版本的请求，如果没有设定 <code>vnode_vclocks</code>，必须要设定客户端 ID，其值可以使用随机的字符串，只要能唯一标识客户端即可。客户端 ID 在[[向量时钟|Vector Clocks]]中用来跟踪对象变动。</p>
+<p>所有发送到 Riak 1.0 及以下版本的请求，如果没有设定 <code>vnode_vclocks</code>，必须要设定客户端 ID，其值可以使用随机的字符串，只要能唯一标识客户端即可。客户端 ID 在[[向量时钟]]中用来跟踪对象变动。</p>
 </div>
 
 ## 请求

@@ -1,5 +1,5 @@
 ---
-title: Sensor Data
+title: 传感器数据
 project: riak
 version: 1.4.2+
 document: cookbook

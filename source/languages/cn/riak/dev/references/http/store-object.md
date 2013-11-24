@@ -1,5 +1,5 @@
 ---
-title: HTTP Store Object
+title: 通过 HTTP 存储对象
 project: riak
 version: 1.4.2+
 document: api
@@ -27,8 +27,8 @@ PUT /buckets/bucket/keys/key    # User-defined key, new format
 * `Content-Type` - 必须为存储的对象指定，其值是取出时希望得到的类型
 * `X-Riak-Vclock` - 如果对象已经存在，读取对象时附加其上的向量时钟
 * `X-Riak-Meta-*` - 其他要附加在存储对象上的元数据报头
-* `X-Riak-Index-*` - 该对象的索引应该放在哪个索引条目下。更多信息参加“[[通过 HTTP 执行二级索引查询|HTTP Secondary Indexes]]”一文
-* `Link` - 用户和系统定义的链接。更多信息参加“[[链接|Links]]”一文
+* `X-Riak-Index-*` - 该对象的索引应该放在哪个索引条目下。更多信息参加“[[通过 HTTP 执行二级索引查询]]”一文
+* `Link` - 用户和系统定义的链接。更多信息参加“[[链接]]”一文
 
 可选的报头（只能在 `PUT` 请求中使用）：
 
@@ -61,7 +61,7 @@ PUT /buckets/bucket/keys/key    # User-defined key, new format
 
 * `Location` - 指向新创建对象的相对 URL 地址（不指定键存储对象时）
 
-如果 `returnbody=true`，[[通过 HTTP 获取对象|HTTP-Fetch-Object]]时得到的响应报头都可能会出现。例如，如果有兄弟数据，或者作为某项操作的一部分，可能会返回 `300 Multiple Choices`，响应可以按照类似方式处理。
+如果 `returnbody=true`，[[通过 HTTP 获取对象]]时得到的响应报头都可能会出现。例如，如果有兄弟数据，或者作为某项操作的一部分，可能会返回 `300 Multiple Choices`，响应可以按照类似方式处理。
 
 ## 示例：不指定键存储对象
 

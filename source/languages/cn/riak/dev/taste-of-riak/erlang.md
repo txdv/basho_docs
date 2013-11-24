@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: Erlang"
+title: "初试 Riak：Erlang 篇"
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,7 +8,7 @@ audience: beginner
 keywords: [developers, client, erlang]
 ---
 
-如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
+如果你还没有创建 Riak 节点并启动，请先阅读“[[事先准备|初试 Riak：事先准备]]”一文。
 
 要使用本文介绍的 Riak 开发方法，必须先正确安装 Erlang。你也可以使用 Riak 安装包中附带的 “erts” Erlang 安装程序。
 
@@ -30,7 +30,7 @@ erl -pa CLIENT_LIBRARY_PATH/ebin/ CLIENT_LIBRARY_PATH/deps/*/ebin
 {ok, Pid} = riakc_pb_socket:start_link("127.0.0.1", 8087).
 ```
 
-如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请使用下面的方法创建连接：
+如果参照“[[花五分钟安装]]”一文中的方法在本地架设了 Riak 集群，请使用下面的方法创建连接：
 
 ```erlang
 {ok, Pid} = riakc_pb_socket:start_link("127.0.0.1", 10017).

@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: OCaml"
+title: "初试 Riak：OCaml 篇"
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,7 +8,7 @@ audience: intermediate
 keywords: [developers, client, ocaml]
 ---
 
-如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
+如果你还没有创建 Riak 节点并启动，请先阅读“[[事先准备|初试 Riak：事先准备]]”一文。
 
 要使用本文介绍的 Riak 开发方法，必须先正确安装含有 [OPAM](http://opam.ocamlpro.com/doc/Quick_Install.html) 的 [OCaml](http://ocaml.org/)。
 
@@ -34,7 +34,7 @@ cd taste-of-ocaml
 
 文件夹 `src` 中只有一个文件，`taste_of_riak.ml`。
 
-示例程序默认尝试连接到 127.0.0.1:8098。如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请修改 `pbip`，绑定到端口 **10017**：
+示例程序默认尝试连接到 127.0.0.1:8098。如果参照“[[花五分钟安装]]”一文中的方法在本地架设了 Riak 集群，请修改 `pbip`，绑定到端口 **10017**：
 
 ```
  let pbip = 10017 in

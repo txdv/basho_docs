@@ -1,5 +1,5 @@
 ---
-title: Choosing a Backend
+title: 选择后台
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -19,4 +19,4 @@ Riak 支持以下后台：
 * [[Memory]]
 * [[Multi]]
 
-Riak 也支持自定义存储后台。详细信息请阅读 [[Backend API]]。
+Riak 也支持自定义存储后台。详细信息请阅读[[后台 API]]。

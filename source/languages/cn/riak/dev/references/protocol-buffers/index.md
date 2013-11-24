@@ -94,26 +94,26 @@ message RpbErrorResp {
 
 ## Bucket 相关操作
 
-* [[通过 PBC 列出 bucket|PBC List Buckets]]
-* [[通过 PBC 列出键|PBC List Keys]]
-* [[通过 PBC 获取 bucket 的属性|PBC Get Bucket Properties]]
-* [[通过 PBC 设置 bucket 的属性|PBC Set Bucket Properties]]
+* [[通过 PBC 列出 bucket]]
+* [[通过 PBC 列出键]]
+* [[通过 PBC 获取 bucket 的属性]]
+* [[通过 PBC 设置 bucket 的属性]]
 
 ## 对象/键相关操作
 
-* [[通过 PBC 获取对象|PBC Fetch Object]]
-* [[通过 PBC 存储对象|PBC Store Object]]
-* [[通过 PBC 删除对象|PBC Delete Object]]
+* [[通过 PBC 获取对象]]
+* [[通过 PBC 存储对象]]
+* [[通过 PBC 删除对象]]
 
 ## 查询
 
-* [[通过 PBC 执行 MapReduce 查询|PBC MapReduce]]
-* [[通过 PBC 执行二级索引查询|PBC Secondary Indexes]]
-* [[通过 PCB 执行 Riak Search 查询|PBC Search]]
+* [[通过 PBC 执行 MapReduce 查询]]
+* [[通过 PBC 执行二级索引查询]]
+* [[通过 PCB 执行 Riak Search 查询]]
 
 ## 服务器相关操作
 
 * [[PBC Ping]]
-* [[通过 PBC 获取客户端 ID|PBC Get Client ID]]
-* [[通过 PBC 设置客户端 ID|PBC Set Client ID]]
-* [[通过 PBC 获取服务器信息|PBC Server Info]]
+* [[通过 PBC 获取客户端 ID]]
+* [[通过 PBC 设置客户端 ID]]
+* [[通过 PBC 获取服务器信息]]

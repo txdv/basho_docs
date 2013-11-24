@@ -1,5 +1,5 @@
 ---
-title: Blog Posts, Articles and Other Content
+title: 博客文章和其他内容
 project: riak
 version: 1.4.2+
 document: cookbook

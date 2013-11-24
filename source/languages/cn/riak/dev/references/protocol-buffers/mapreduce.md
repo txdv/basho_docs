@@ -1,5 +1,5 @@
 ---
-title: PBC MapReduce
+title: 通过 PBC 执行 MapReduce 查询
 project: riak
 version: 1.4.2+
 document: api
@@ -30,7 +30,7 @@ Mapreduce 作业可以使用两种不同的编码方式：
 * **application/json** - 使用 JSON 编码的 map/reduce 作业
 * **application/x-erlang-binary** - 使用 Erlang 外部关键字格式
 
-JSON 编码和 [[REST API|Using MapReduce#rest]] 一样；外部关键字格式和[[本地 Erlang API|Advanced MapReduce#erlang]] 一样。
+JSON 编码和 [[REST API|使用 MapReduce#rest]] 一样；外部关键字格式和[[本地 Erlang API|MapReduce 高级用法#erlang]] 一样。
 
 ## 响应
 

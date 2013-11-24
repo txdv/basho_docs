@@ -1,5 +1,5 @@
 ---
-title: HTTP Get Bucket Properties
+title: 通过 HTTP 获取 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api
@@ -21,7 +21,7 @@ GET /buckets/bucket/props       # New format
 可选的请求参数（只对旧请求格式可用）：
 
 * `props` - 是否返回 bucket 的属性（默认值是 `true`）
-* `keys` - 是否返回 bucket 中存储的键（默认值是 `false`）参见[[HTTP 列键操作|HTTP List Keys]]
+* `keys` - 是否返回 bucket 中存储的键（默认值是 `false`）参见[[HTTP 列键操作|通过 HTTP 列出键]]
 
 ## 响应
 
@@ -35,7 +35,7 @@ GET /buckets/bucket/props       # New format
 
 响应中的 JSON 对象中最多可以有两个元素：`"props"` 和 `"keys"`，根据请求参数的设定，对应的元素可能不会出现。默认情况下，只有 `"props"` 会出现。
 
-可获取的 bucket 属性参见“[[通过 HTTP 接口设定 bucket 属性|HTTP Set Bucket Properties]]”一文。
+可获取的 bucket 属性参见“[[通过 HTTP 设置 bucket 的属性]]”一文。
 
 ## 示例
 

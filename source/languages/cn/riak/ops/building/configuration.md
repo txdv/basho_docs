@@ -1,5 +1,5 @@
 ---
-title: Basic Configuration
+title: 基本设置
 project: riak
 version: 1.4.2+
 document: tutorial
@@ -8,13 +8,13 @@ audience: beginner
 keywords: [operators, building, configuration]
 ---
 
-这篇文档介绍了架构新集群时经常修改的选项，强烈推荐你在把集群部署到生产环境之前阅读内容更详细的 [[Configuration Files]] 文档。
+这篇文档介绍了架构新集群时经常修改的选项，强烈推荐你在把集群部署到生产环境之前阅读内容更详细的“[[设置文件]]”一文。
 
 本文讲到的所有设置都在各节点的 `app.config` 文件中，设置在节点重启后才能生效。
 
-在合并组成集群之前，建议你把本文介绍的所有设置都做了。设置好 `app.config` 后，请阅读 [[Basic Cluster Setup]]，完成集群的架构。
+在合并组成集群之前，建议你把本文介绍的所有设置都做了。设置好 `app.config` 后，请阅读“[[集群搭建基础]]”一文，完成集群的架构。
 
-要想知道节点是否属于集群，可以使用 [[riak-admin member-status|riak-admin Command Line#member-status]] 命令。
+要想知道节点是否属于集群，可以使用 [[riak-admin member-status|riak-admin 命令#member-status]] 命令。
 
 ## 环的大小
 
@@ -24,7 +24,7 @@ Riak 中环的大小是构成集群的数据分区的数量。这个数会影响
 
 如果环太小，服务器上其他的资源（主要指 CPU 和 RAM）就得不到充分利用。
 
-如何正确设置环的大小，请阅读 [[Planning for a Riak System]] 和 [[Scaling and Operating Riak Best Practices]]。
+如何正确设置环的大小，请阅读“[[Riak 系统规划]]”一文和“[[Riak 扩放和操作最佳实践]]”一文。
 
 修改环大小的步骤取决于集群中的服务器（节点）是否已经合并了。
 
@@ -36,16 +36,16 @@ Riak 中环的大小是构成集群的数据分区的数量。这个数会影响
 
 1. 去掉 `ring_creation_size` 参数的注释（去掉前面的 `%`），位于每个节点 `app.config` 文件的 `riak_core` 区，然后设置合适的值
 2. 停掉所有节点
-3. 删掉各节点的环数据文件（该文件的位置请查看 [[Backing up Riak]]）
+3. 删掉各节点的环数据文件（该文件的位置请查看“[[Riak 备份]]”一文）
 4. 启动所有节点
-5. 重新把各节点加入集群（详情请阅读 [[Adding and Removing Nodes|Adding and Removing Nodes#Add-a-Node-to-an-Existing-Cluster]]，或者读完本文，然后完成 [[Basic Cluster Setup]] 中的设置）
+5. 重新把各节点加入集群（详情请阅读“[[添加和删除节点|添加和删除节点#Add-a-Node-to-an-Existing-Cluster]]”一文，或者读完本文，然后完成“[[集群搭建基础]]”一文中的设置）
 
 ### 新服务器，还没合并成集群
 
 1. 去掉 `ring_creation_size` 参数的注释（去掉前面的 `%`），位于每个节点 `app.config` 文件的 `riak_core` 区，然后设置合适的值
 2. 停掉所有节点
-3. 删掉各节点的环数据文件（该文件的位置请查看 [[Backing up Riak]]）
-4. 读完本文，然后完成 [[Basic Cluster Setup]] 中的设置
+3. 删掉各节点的环数据文件（该文件的位置请查看“[[Riak 备份]]”一文）
+4. 读完本文，然后完成“[[集群搭建基础]]”一文中的设置
 
 ### 查看环的大小
 
@@ -65,7 +65,7 @@ Riak 中环的大小是构成集群的数据分区的数量。这个数会影响
 
 最难决定的就是选择合适的后台了。所选的后台会严重影响 Riak 的性能和功能。
 
-可选的后台参见 [[Choosing a Backend]]，文中列出了针对各种后台设置文档的链接。
+可选的后台参见“[[选择后台]]”，文中列出了针对各种后台设置文档的链接。
 
 和修改环的大小一样，变更后台也可能会丢失所有数据，所以在操作之前无比要用足够的时间计算、测评各种后台。
 
@@ -95,25 +95,25 @@ bucket 的属性对性能和行为特性也很重要。
 
 `r` 和 `w` 值在每次请求中都可以重设，`n_val` 很少需要修改，但选择一个适当的 `allow_mult` 值对一个稳健的应用程序来说就很重要了。
 
-关于这些设置的详细介绍，请阅读 [[Eventual Consistency]] 和 [[Replication]]，以及 Basho 博客中的“Understanding Riak's Configurable Behaviors”系列文章：
+关于这些设置的详细介绍，请阅读“[[最终一致性]]”和“[[副本]]”两篇文章，以及 Basho 博客中的“Understanding Riak's Configurable Behaviors”系列文章：
 [[第一部分|http://basho.com/understanding-riaks-configurable-behaviors-part-1/]],
 [[第二部分|http://basho.com/riaks-config-behaviors-part-2/]],
 [[第三部分|http://basho.com/riaks-config-behaviors-part-3/]],
 [[第四部分|http://basho.com/riaks-config-behaviors-part-4/]] 和
 [[后记|http://basho.com/riaks-config-behaviors-epilogue/]]。
 
-如果修改了 `app.config` 文件中 bucket 的默认属性，而且也重启了节点，但现有的 bucket **不会** 受到直接影响。不过可以使用 [[HTTP Reset Bucket Properties]] 中介绍的方法强制使用新的默认值。
+如果修改了 `app.config` 文件中 bucket 的默认属性，而且也重启了节点，但现有的 bucket **不会** 受到直接影响。不过可以使用“[[通过 HTTP 还原 bucket 的属性]]”一文中介绍的方法强制使用新的默认值。
 
 ## 系统调校
 
-在进行评测（[[benchmarking|Basho Bench]]）和部署集群之前，请阅读下面的文档。
+在进行[[评测|Basho Bench]]和部署集群之前，请阅读下面的文档。
 
-* [[Open Files Limit]]
-* [[File System Tuning]]
-* [[Linux Performance Tuning]]
-* [[AWS Performance Tuning]]
-* [[Configuration Files]]
+* [[打开文件限制]]
+* [[文件系统调整]]
+* [[Linux 性能调整]]
+* [[AWS 性能调整]]
+* [[设置文件]]
 
 ## 把节点合并起来
 
-集群搭建的过程参见 [[Basic Cluster Setup]] 一文。
+集群搭建的过程参见“[[集群搭建基础]]”一文。

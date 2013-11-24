@@ -1,5 +1,5 @@
 ---
-title: Advanced Search Schema
+title: Riak Search 模式高级用法
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -132,10 +132,10 @@ bin/search-cmd show-schema Index
 * *skip* - 可选。如果设为 `true`，字段虽然会存储，但不会被索引。默认值是 `false`。
 * *alias* - 可选。映射到当前字段定义上的别名，把多个字段的不同字段名索引到同一个字段中。这个属性根据需要，想设多少个就设多少个。
 * *padding_size* - 可选。值会扩展到这么长。字符串类型的默认值是 0，整数类型的默认值是 10。
-* *inline* - 可选。可设定的值有 `true`、`false` 和 `only`（默认值是 `false`）。设为 `only` 时，字段将无法搜索自身，而是作为搜索其他字段的过滤器。这么做能提高某些查询的性能（例如某些情况下的范围查询），但会消耗更多的存储空间，因为字段的值和其他字段的索引存在一起。设为 `true` 时，除了行间存储之外，字段还会正常存储。过滤行间字段目前只有 [[Solr|Using Search#Query-Interfaces]] 接口支持。
+* *inline* - 可选。可设定的值有 `true`、`false` 和 `only`（默认值是 `false`）。设为 `only` 时，字段将无法搜索自身，而是作为搜索其他字段的过滤器。这么做能提高某些查询的性能（例如某些情况下的范围查询），但会消耗更多的存储空间，因为字段的值和其他字段的索引存在一起。设为 `true` 时，除了行间存储之外，字段还会正常存储。过滤行间字段目前只有 [[Solr|使用 Riak Search#Query-Interfaces]] 接口支持。
 
 <div class="info">
-    <div class="title">别名的注意事项</div>
+<div class="title">别名的注意事项</div>
 
 1. 千万不要把别名设成和字段名一样。这么做会导致字段中的值使用不确定的名字索引。
 2. 多个别名会使用空格连接起来。如果 Name 有两个别名，那么 {LastName:"Smith", FirstName:"Dave"} 将会存储为“Smith Dave”。

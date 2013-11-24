@@ -1,5 +1,5 @@
 ---
-title: HTTP List Keys
+title: 通过 HTTP 列出键
 project: riak
 version: 1.4.2+
 document: api
@@ -33,7 +33,7 @@ GET /buckets/bucket/keys?keys=stream  # Stream keys to the client, new format
 
 可选的请求参数：
 
-* `props` - 默认为 `true`，响应中也会返回 [[bucket 的属性|HTTP-Get-Bucket-Properties]]。设为 `false` 禁止返回 bucket 的属性
+* `props` - 默认为 `true`，响应中也会返回 [[bucket 的属性|通过 HTTP 获取 bucket 的属性]]。设为 `false` 禁止返回 bucket 的属性
 
 ## 响应
 

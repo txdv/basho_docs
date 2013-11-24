@@ -1,5 +1,5 @@
 ---
-title: HTTP Delete Object
+title: 通过 HTTP 删除对象
 project: riak
 version: 1.4.2+
 document: api
@@ -31,7 +31,7 @@ DELETE /buckets/bucket/keys/key   # New format
 
 <div class="note">
 <div class="title">客户端 ID</div>
-<p>发送到 Riak 1.0 及以下版本的请求，如果没有启用 `vnode_vclocks`，请求中必须包含 `X-Riak-ClientId` 报头，使用任意的字符串唯一标识客户端，以便使用[[向量时钟|Vector Clocks]]跟踪对象的变动。</p>
+<p>发送到 Riak 1.0 及以下版本的请求，如果没有启用 `vnode_vclocks`，请求中必须包含 `X-Riak-ClientId` 报头，使用任意的字符串唯一标识客户端，以便使用[[向量时钟]]跟踪对象的变动。</p>
 </div>
 
 正常的响应码：

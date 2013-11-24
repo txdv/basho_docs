@@ -1,5 +1,5 @@
 ---
-title: PBC Get Bucket Properties
+title: 通过 PBC 获取 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api

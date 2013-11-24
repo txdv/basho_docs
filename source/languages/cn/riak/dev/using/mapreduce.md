@@ -1,5 +1,5 @@
 ---
-title: Using MapReduce
+title: 使用 MapReduce
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -24,7 +24,7 @@ MapReduce（M/R）这个技术可以把作业分配到整个分布式系统，�
 ## 什么时候使用 MapReduce
 
 * 知道要使用 MapReduce 处理的是哪些数据（“bucket/键”组合）
-* 真的要返回对象，而不只是键，与使用[[搜索|Using Search]]和[[二级索引|Using Secondary Indexes]]一样
+* 真的要返回对象，而不只是键，与使用[[Riak Search|使用 Riak Search]]和[[二级索引|使用二级索引]]一样
 * 查询数据时需要极大的灵活性。MapReduce 能让你充分掌握对象，并根据需求选择需要的值。
 
 ## 什么时候不要使用 MapReduce
@@ -100,5 +100,5 @@ curl -XPOST http://localhost:8098/mapred \
 
 ## 扩展阅读
 
-* [[MapReduce 高级用法|Advanced MapReduce]]：详细说明了 Riak 是如何实现 MapReduce 的，以及不同的查询方法，示例和设置
-* [[使用键过滤器|Using Key Filters]]：使用键查询整个 bucket，预处理 MapReduce 的输入数据
+* [[MapReduce 高级用法]]：详细说明了 Riak 是如何实现 MapReduce 的，以及不同的查询方法，示例和设置
+* [[使用键过滤器]]：使用键查询整个 bucket，预处理 MapReduce 的输入数据

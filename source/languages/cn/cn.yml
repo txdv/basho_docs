@@ -9,7 +9,7 @@ cn:
   keywords: 关键词
   navigation: 导航
   all_projects: 所有 Riak 项目
-  docs_on_github: "These docs are available on GitHub. Please submit ideas and patches."
+  docs_on_github: "这些文档都可以到 GitHub 上获取，您可以提交建议、进行修改。"
   secondary_header: "您可能会对下面的文章感兴趣"
   faqs_link: "[[FAQs|Riak FAQs]]"
   apis_link: "[[APIs|HTTP API]]"

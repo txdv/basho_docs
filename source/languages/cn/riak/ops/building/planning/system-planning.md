@@ -1,5 +1,5 @@
 ---
-title: Planning for a Riak System
+title: Riak 系统规划
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -12,7 +12,7 @@ keywords: [planning, os]
 
 ## 后台
 
-Riak 的后台是指存储数据的机制。不同的后台各有利弊，如果你无法确定要使用哪种后台，请阅读 [[Choosing a Backend]] 后台。
+Riak 的后台是指存储数据的机制。不同的后台各有利弊，如果你无法确定要使用哪种后台，请阅读“[[选择后台]]”一文。
 
 * [[Bitcask]]
 * [[LevelDB]]
@@ -21,9 +21,9 @@ Riak 的后台是指存储数据的机制。不同的后台各有利弊，如果
 
 ## 容量
 
-[[Cluster Capacity Planning]] 疑问大概介绍了规划 Riak 集群时要考虑的方方面面。
+“[[集群容量规划]]”一文大概介绍了规划 Riak 集群时要考虑的方方面面。
 
-如果你选择使用 [[Bitcask]] 做后台，请阅读 [[Bitcask Capacity Planning]] 了解如何计算适合的容量。
+如果你选择使用 [[Bitcask]] 做后台，请阅读“[[Bitcask 容量规划]]”一文了解如何计算适合的容量。
 
 ## 操作系统
 
@@ -35,14 +35,14 @@ Riak 的后台是指存储数据的机制。不同的后台各有利弊，如果
 
 ## 软件
 
-如果你下载的是 [Basho 提供的 Riak 安装包](http://downloads.basho.com/riak/)，就无需额外的软件包了。如果从源码编译 Riak，需要在系统中安装 Erlang。Erlang 的编译和安装说明请参阅 [[Installing Erlang]]。
+如果你下载的是 [Basho 提供的 Riak 安装包](http://downloads.basho.com/riak/)，就无需额外的软件包了。如果从源码编译 Riak，需要在系统中安装 Erlang。Erlang 的编译和安装说明请参阅“[[安装 Erlang]]”一文。
 
 ## 硬件
 
 在设计 Riak 时考虑了横向扩放，即添加节点时自动提升性能，不过用更强大的硬件总没坏处。下面是推荐使用的硬件：
 
 * **64 位多核 CPU** - Riak 使用 Erlang 开发，多核就意味着更多的并发，因此性能也更好。在 64 位架构上 Riak 还能更高效的进行数字计算。
-* **至少 4GB RAM** - 更大的 RAM 就能在主内存中存储更多的数据，提升读写性能和 [[MapReduce|Using MapReduce]] 的性能。内存不足的话就会增加交换文件的使用，导致性能下降，因为内存操作变成了常规的硬盘操作。你可以使用类似 [[Bitcask calculator|Bitcask Capacity Planning]] 的工具计算节点需要多少内存才能满足 Bitcask 存储数据的需求。关于内存和硬盘使用更多的信息请阅读 [[Cluster Capacity Planning]]
+* **至少 4GB RAM** - 更大的 RAM 就能在主内存中存储更多的数据，提升读写性能和 [[MapReduce|使用 MapReduce]] 的性能。内存不足的话就会增加交换文件的使用，导致性能下降，因为内存操作变成了常规的硬盘操作。你可以使用类似 [[Bitcask 计算器|Bitcask 容量规划]]的工具计算节点需要多少内存才能满足 Bitcask 存储数据的需求。关于内存和硬盘使用更多的信息请阅读“[[集群容量规划 ]]”一文
 * **多个高速硬盘（RAID 和/或 SSD）** - 因为 Riak 的很多操作是受 IO 限制的，所以要得到好的性能就要使用高速硬盘。你还可以把硬盘改造成 RAID0 来提升读写性能。
 * **快速的网络连接（GB 级以上）** - Riak 严重依靠网络处理存储操作和集群状态（环的状态广播，移交处理等），节点直接、客户端和集群之间的很快的话就能提升性能。
 

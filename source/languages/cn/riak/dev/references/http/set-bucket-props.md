@@ -1,5 +1,5 @@
 ---
-title: HTTP Set Bucket Properties
+title: 通过 HTTP 设置 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api
@@ -29,8 +29,8 @@ PUT /buckets/bucket/props       # New format
 * `n_val`（大于 0 的整数） - bucket 中对象的副本数
 * `allow_mult`（`true` 或 `false`） - 是否允许创建兄弟数据（并发更新）
 * `last_write_wins`（`true` 或 `false`） -写入数据时是否忽略对象的历史版本（向量时钟）
-* `precommit` - [[precommit 钩子|Using Commit Hooks]]
-* `postcommit` - [[postcommit 钩子|Using Commit Hooks]]
+* `precommit` - [[precommit 钩子|使用 Commit 钩子]]
+* `postcommit` - [[postcommit 钩子|使用 Commit 钩子]]
 * `r, w, dw, rw` - bucket 中键操作的法定值
 可选的值有：
   * `"all"` - 所有节点都要响应

@@ -1,5 +1,5 @@
 ---
-title: HTTP Secondary Indexes
+title: 通过 HTTP 执行二级索引查询
 project: riak
 version: 1.4.2+
 document: api
@@ -9,7 +9,7 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-[[二级索引|Using Secondary Indexes]] 可以使用“字段/值”组合为 Riak 对象加上一个或多个标签。对象会使用这些“字段/值”组合建立索引，应用程序可以查询这些索引取回符合条件的键列表。
+[[二级索引|使用二级索引]] 可以使用“字段/值”组合为 Riak 对象加上一个或多个标签。对象会使用这些“字段/值”组合建立索引，应用程序可以查询这些索引取回符合条件的键列表。
 
 ## 请求
 

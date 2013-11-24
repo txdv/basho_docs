@@ -1,5 +1,5 @@
 ---
-title: PBC Server Info
+title: 通过 PBC 获取服务器信息
 project: riak
 version: 1.4.2+
 document: api

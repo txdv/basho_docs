@@ -1,5 +1,5 @@
 ---
-title: Advanced Commit Hooks
+title: Commit 钩子高级用法
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,14 +8,11 @@ audience: advanced
 keywords: [developers, commit-hooks, beam]
 ---
 
-Riak 支持在编译好的模块中使用 Erlang 具名函数，实现 pre-commit 钩子、
-post-commit 钩子和 MapReduce 操作。本文介绍如何使用自定义的具名函数，
-以及模块编译、设置和安装步骤。
+Riak 支持在编译好的模块中使用 Erlang 具名函数，实现 pre-commit 钩子、post-commit 钩子和 MapReduce 操作。本文介绍如何使用自定义的具名函数，以及模块编译、设置和安装步骤。
 
 ## Pre-Commit 钩子示例
 
-在这个 pre-commit 钩子示例中，我们要定义一个函数，在把数据写入 bucket 之前
-验证键对应的 JSON 内容。
+在这个 pre-commit 钩子示例中，我们要定义一个函数，在把数据写入 bucket 之前验证键对应的 JSON 内容。
 
 下面就是我们编写的 `validate_json` 模块和所需的 `validate` 函数：
 
@@ -38,11 +35,10 @@ validate(Object) ->
 把上述代码保存为 `validate_json.erl` 文件，然后编译。
 
 <div class="info">
-    <div class="title">Erlang 编译器的注意事项</div>
-    必须使用 Riak 中的 Erlang 编译器（<tt>erlc</tt>），或者使用编译 Riak 源码
-    时使用的 Erlang 版本。如果要用 Riak 中包含的 <tt>erlc</tt>，请参照下面的
-    表格找到相应平台上的位置。如果是从源码编译安装的 Raik，直接使用当时所用
-    版本的 <tt>erlc</tt> 即可。
+<div class="title">Erlang 编译器的注意事项</div>
+
+必须使用 Riak 中的 Erlang 编译器（<tt>erlc</tt>），或者使用编译 Riak 源码时使用的 Erlang 版本。如果要用 Riak 中包含的 <tt>erlc</tt>，请参照下面的表格找到相应平台上的位置。如果是从源码编译安装的 Raik，直接使用当时所用版本的 <tt>erlc</tt> 即可。
+
 </div>
 
 <table style="width: 100%; border-spacing: 0px;">
@@ -88,24 +84,17 @@ validate(Object) ->
 erlc validate_json.erl
 ```
 
-然后，要指定一个路径用来保存和加载编译后的模块。在这个例子中，我们使用
-临时文件夹 `/tmp/beams`。在实际运用中，你应该根据需求选择合适的路径，
-需要使用时才能找到。
+然后，要指定一个路径用来保存和加载编译后的模块。在这个例子中，我们使用临时文件夹 `/tmp/beams`。在实际运用中，你应该根据需求选择合适的路径，需要使用时才能找到。
 
 <div class="info">确保所选的文件夹 <tt>riak</tt> 用户有读权限。</div>
 
 成功编译后会生成 `.beam` 文件，本例中生成的是 `validate_json.beam`。
 
-把编译好的文件发给操作员，或者阅读“[[安装自定义代码|installing custom code]]”
-一文，学习如何在 Raik 节点中安装代码。
+把编译好的文件发给操作员，或者阅读“[[安装自定义代码]]”一文，学习如何在 Raik 节点中安装代码。
 
-重启 Riak 后，剩下的步骤就是把 pre-commit 钩子安装到目标 bucket 中。在本例中，
-只有一个 bucket，名为 `messages`，我们要把 `validate` pre-commit 函数安装到
-这个 bucket 中。
+重启 Riak 后，剩下的步骤就是把 pre-commit 钩子安装到目标 bucket 中。在本例中，只有一个 bucket，名为 `messages`，我们要把 `validate` pre-commit 函数安装到这个 bucket 中。
 
-可以同过 Riak 的 HTTP 接口使用 `curl` 命令行工具把具名函数安装到相应
-的 bucket 中。在本例中，我们要把 `validate_json` 模块的 `validate` 函数安装
-到 `messages` 这个 bucket 中，方法如下：
+可以同过 Riak 的 HTTP 接口使用 `curl` 命令行工具把具名函数安装到相应的 bucket 中。在本例中，我们要把 `validate_json` 模块的 `validate` 函数安装到 `messages` 这个 bucket 中，方法如下：
 
 ```bash
 curl -XPUT -H "Content-Type: application/json" \
@@ -159,8 +148,7 @@ curl http://localhost:8098/buckets/messages/props | python -mjson.tool
 }
 ```
 
-可以看到，`precommit` 属性中确实有 `validate_json` 模块的 `validate` 函数。
-现在我们试着存入不合法的 JSON，测试一下这个 pre-commit 钩子。
+可以看到，`precommit` 属性中确实有 `validate_json` 模块的 `validate` 函数。现在我们试着存入不合法的 JSON，测试一下这个 pre-commit 钩子。
 
 ```bash
 curl -XPUT localhost:8098/buckets/messages/keys/1 \
@@ -175,8 +163,7 @@ Invalid JSON: {case_clause,{{const,<<"authorName">>},{decoder,null,160,1,161,com
 
 ## Post-Commit 钩子示例
 
-在这个 post-commit 钩子示例中，我们要定义一个简单的函数，当对象成功写入 Riak 后，
-向 `console.log` 中写入一条日志信息。
+在这个 post-commit 钩子示例中，我们要定义一个简单的函数，当对象成功写入 Riak 后，向 `console.log` 中写入一条日志信息。
 
 下面就是这个 post-commit 钩子函数：
 
@@ -188,15 +175,13 @@ log(Object) ->
   error_logger:info_msg("OBJECT: ~p~n",[Object]).
 ```
 
-把这段代码保存为 `log_object.erl`，然后编译。
-Save this file as `log_object.erl` and proceed to compiling the module.
+把这段代码保存为 `log_object.erl`，然后编译。Save this file as `log_object.erl` and proceed to compiling the module.
 
 <div class="info">
-    <div class="title">Erlang 编译器的注意事项</div>
-    必须使用 Riak 中的 Erlang 编译器（<tt>erlc</tt>），或者使用编译 Riak 源码
-    时使用的 Erlang 版本。如果要用 Riak 中包含的 <tt>erlc</tt>，请参照下面的
-    表格找到相应平台上的位置。如果是从源码编译安装的 Raik，直接使用当时所用
-    版本的 <tt>erlc</tt> 即可。
+<div class="title">Erlang 编译器的注意事项</div>
+
+必须使用 Riak 中的 Erlang 编译器（<tt>erlc</tt>），或者使用编译 Riak 源码时使用的 Erlang 版本。如果要用 Riak 中包含的 <tt>erlc</tt>，请参照下面的表格找到相应平台上的位置。如果是从源码编译安装的 Raik，直接使用当时所用版本的 <tt>erlc</tt> 即可。
+
 </div>
 
 编译模块的过程很简单。
@@ -207,16 +192,11 @@ erlc log_object.erl
 
 然后要指定一个路径，用来保存和加载编译好的模块。
 
-和 pre-commit 钩子的做法一样，可以把编译好的文件发给操作员，或者参照
-“[[安装自定义代码|installing custom code]]”一文自行安装。
+和 pre-commit 钩子的做法一样，可以把编译好的文件发给操作员，或者参照“[[安装自定义代码]]”一文自行安装。
 
-重启 Riak 后，剩下的步骤就是把这个 post-commit 钩子安装到目标 bucket 了。
-在这个例子中，只有一个 bucket，名为 `updates`。我们要把 `log` 函数安装到
-这个 bucket 中。
+重启 Riak 后，剩下的步骤就是把这个 post-commit 钩子安装到目标 bucket 了。在这个例子中，只有一个 bucket，名为 `updates`。我们要把 `log` 函数安装到这个 bucket 中。
 
-可以通过 Riak 的 HTTP 接口，使用 `curl` 命令行工具把具名函数安装到相应
-的 bucket 中。在这个例子中，我们要把 `log` 函数安装到 `updates` bucket 中，
-方法如下：
+可以通过 Riak 的 HTTP 接口，使用 `curl` 命令行工具把具名函数安装到相应的 bucket 中。在这个例子中，我们要把 `log` 函数安装到 `updates` bucket 中，方法如下：
 
 ```bash
 curl -XPUT -H "Content-Type: application/json" \
@@ -270,8 +250,7 @@ curl localhost:8098/buckets/updates/props | python -mjson.tool
 }
 ```
 
-可以看到，`postcommit` 属性中包含 `log_object` 模块的 `log` 函数。现在我们存入
-一个对象，然后查看 `console.log` 文件，测试一下这个 post-commit 函数。
+可以看到，`postcommit` 属性中包含 `log_object` 模块的 `log` 函数。现在我们存入一个对象，然后查看 `console.log` 文件，测试一下这个 post-commit 函数。
 
 ```bash
 curl -XPUT localhost:8098/buckets/updates/keys/2 \
