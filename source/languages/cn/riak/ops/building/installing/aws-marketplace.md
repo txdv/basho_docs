@@ -7,7 +7,7 @@ audience: beginner
 keywords: [tutorial, installing, AWS, marketplace, amazon]
 prev: "[[在 Windows Azure 中安装]]"
 up:   "[[安装和升级]]"
-next: "[[从源码安装 Riak]]"
+next: "[[从源码编译安装 Riak]]"
 ---
 
 ## 在 AWS Marketplace 上运行 Riak VM

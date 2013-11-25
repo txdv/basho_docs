@@ -1,5 +1,5 @@
 ---
-title: search Command Line
+title: search 命令
 project: riak
 version: 1.4.2+
 document: reference

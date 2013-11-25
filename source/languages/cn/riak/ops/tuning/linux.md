@@ -1,5 +1,5 @@
 ---
-title: Linux Performance Tuning
+title: Linux 性能调整
 project: riak
 version: 1.4.2+
 document: cookbook

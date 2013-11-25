@@ -140,6 +140,7 @@ brew install riak
 
 如果没有安装 Erlang，Homebrew 会自定为你安装。
 
+<a id="Installing-From-Source"></a>
 ## 从源码安装
 
 必须先安装 Mac 附带 CD 中的 Xcode 工具包（还可以从 [Apple 开发者网站](http://developer.apple.com/)上下载）。

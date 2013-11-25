@@ -1,5 +1,5 @@
 ---
-title: 用户时间和时间轴
+title: 用户事件和时间轴
 project: riak
 version: 1.4.2+
 document: cookbook

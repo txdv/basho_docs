@@ -24,7 +24,7 @@ MapReduce（M/R）这个技术可以把作业分配到整个分布式系统，�
 ## 什么时候使用 MapReduce
 
 * 知道要使用 MapReduce 处理的是哪些数据（“bucket/键”组合）
-* 真的要返回对象，而不只是键，与使用[[Riak Search|使用 Riak Search]]和[[二级索引|使用二级索引]]一样
+* 真的要返回对象，而不只是键，与使用 [[Riak Search|使用 Riak Search]] 和[[二级索引|使用二级索引]]一样
 * 查询数据时需要极大的灵活性。MapReduce 能让你充分掌握对象，并根据需求选择需要的值。
 
 ## 什么时候不要使用 MapReduce

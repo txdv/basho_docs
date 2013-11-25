@@ -162,7 +162,7 @@ make && sudo make install
 
 ### 使用 Homebrew 安装
 
-如果使用 Homebre 安装 Riak，请参照 [[Mac OS X Installation documentation|Installing-on-Mac-OS-X]] 中的步骤，会自动安装 Erlang。
+如果使用 Homebre 安装 Riak，请参照 [[Mac OS X 安装文档|在 Mac OS X 中安装]]中的步骤，会自动安装 Erlang。
 
 要想使用 Homebrew 单独安装 Erlang，请执行下面的命令：
 

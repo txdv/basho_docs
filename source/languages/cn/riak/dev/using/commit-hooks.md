@@ -33,6 +33,7 @@ post-commit 钩子只能使用 Erlang 编写，详细内容参加 [[Commit 钩�
 
 定义 JavaScript 具名函数的步骤请参阅 [[MapReduce 高级用法]]。
 
+<a id="Pre-Commit-Hooks"></a>
 ## Pre-Commit 钩子
 
 ### API 和行为表现
@@ -141,6 +142,7 @@ function validateData(data){
 }
 ```
 
+<a id="Post-Commit-Hooks"></a>
 ## Post-Commit 钩子
 
 ### API 和行为表现

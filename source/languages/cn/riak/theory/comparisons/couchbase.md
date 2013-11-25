@@ -16,13 +16,13 @@ keywords: [comparisons, couchbase]
 * Riak 大部分都是使用 Erlang 开发的，还有少部分 C。Couchbase 由 Erlang 和 C/C++ 开发。
 
 <div class="note">
-    <div class="title">Couchbase vs CouchDB</div>
-    注意，Couchbase 和 CouchDB 是两个不同的数据库项目。CouchDB 是文档数据库，支持副本、MapReduce 和 HTTP API。Couchbase 后端使用 CouchDB，在其上又包装了一些高级功能，例如缓存，其设计目的是在集群中使用。
+<div class="title">Couchbase vs CouchDB</div>
+注意，Couchbase 和 CouchDB 是两个不同的数据库项目。CouchDB 是文档数据库，支持副本、MapReduce 和 HTTP API。Couchbase 后端使用 CouchDB，在其上又包装了一些高级功能，例如缓存，其设计目的是在集群中使用。
 </div>
 
 <div class="note">
-    <div class="title">Couchbase 2.0</div>
-    在编写本文时，Couchbase 2.0 还处在开发者预览阶段，因此比较的结果可能和最终发布版有所不同。<i>读者要格外小心。</i>
+<div class="title">Couchbase 2.0</div>
+在编写本文时，Couchbase 2.0 还处在开发者预览阶段，因此比较的结果可能和最终发布版有所不同。<i>读者要格外小心。</i>
 </div>
 
 ## 特性/性能对比

@@ -20,6 +20,7 @@ keywords: [appendix, concepts]
 
 使用这个技术，Riak 可以自动修复过时的数据，或者至少能让客户端有机会在应用程序中调整有分歧的改动。
 
+<a id="Siblings"></a>
 ## 兄弟数据
 
 如果 Riak 无法决定哪个是所存数据的唯一版本就会创建兄弟数据。如果 bucket 的 `allow_mult` 属性为 `true`，那么在三种情况下会在单个对象中创建兄弟数据：

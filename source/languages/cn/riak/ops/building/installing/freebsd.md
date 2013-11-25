@@ -69,6 +69,7 @@ Package dependency openssl-1.0.0_7 for /tmp/riak-{{V.V.V}}-FreeBSD-amd64.tbz not
 
 请确保按照**要求和依赖库**一节的说明安装了正确版本的 OpenSSL。
 
+<a id="Installing-From-Source"></a>
 ## 从源码安装
 
 在 FreeBSD 上从源码安装 Riak 很显然在编译之前需要安装更多的依赖库（例如 Erlang），也比使用安装包用时久。

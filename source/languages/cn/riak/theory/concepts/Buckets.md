@@ -27,7 +27,7 @@ bucket 存在的目的是定义一个虚拟的键空间，而且还能设定独�
 
 ### r, pr, w, dw, pw, rw
 
-`all`、`quorum`、`one`，或*整数*（默认值：`quorum`）。设定操作被认定为成功之前，读取或写入操作要收到多少个响应。参见“[[读取数据|概念#Reading-Data]]”和“[[写入及更新数据|概念#Writing and Updating Data]]”两篇文档。
+`all`、`quorum`、`one`，或*整数*（默认值：`quorum`）。设定操作被认定为成功之前，读取或写入操作要收到多少个响应。参见“[[读取数据|概念#Reading-Data]]”和“[[写入及更新数据|概念#Writing and Updating Data]]”两节。
 
 ### precommit
 

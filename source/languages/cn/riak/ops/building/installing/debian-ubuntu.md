@@ -13,7 +13,7 @@ download:
   name: "Debian or Ubuntu"
 ---
 
-在基于 Debian 或 Ubuntu 的系统中可以使用二进制安装包安装 Riak，也可以[[编译源码安装|从源码安装 Riak]]。下面介绍的安装方法在 **Debian 6.05** and **Ubuntu 12.04** 上测试可行。
+在基于 Debian 或 Ubuntu 的系统中可以使用二进制安装包安装 Riak，也可以[[编译源码安装|从源码编译安装 Riak]]。下面介绍的安装方法在 **Debian 6.05** and **Ubuntu 12.04** 上测试可行。
 
 ## 使用 Apt-Get 安装
 
@@ -138,6 +138,7 @@ sudo dpkg -i riak_{{V.V.V}}-1_i386.deb
 
 {{/1.2.1-1.3.9}}
 
+<a id="Installing-From-Source"></a>
 ## 从源码安装 Riak
 
 首先，使用 apt 安装 Riak 的依赖库：

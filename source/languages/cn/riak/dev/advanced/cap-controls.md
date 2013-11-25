@@ -41,8 +41,8 @@ $ curl -v -XPUT http://127.0.0.1:8091/riak/another_bucket \
 这个命令会把名为“another_bucket”的 bucket 的 n_val 改为 2，即该 bucket 中的数据会在两个分区中创建副本。
 
 <div class="note">
-	<div class="title">修改 N 值时的注意事项</div>
-	<code>n_val</code> 必须大于 0，且要小于或等于集群中节点的数量，这样才能充分发挥副本的作用。我们建议创建 bucket 后不要修改 n_val，这么做可能会导致读取失败，因为新写入的值可能没有在相应的分区中创建副本。
+<div class="title">修改 N 值时的注意事项</div>
+<code>n_val</code> 必须大于 0，且要小于或等于集群中节点的数量，这样才能充分发挥副本的作用。我们建议创建 bucket 后不要修改 n_val，这么做可能会导致读取失败，因为新写入的值可能没有在相应的分区中创建副本。
 </div>
 
 ### R 值和读取失败容忍

@@ -1,5 +1,5 @@
 ---
-title: User Accounts
+title: 用户账户
 project: riak
 version: 1.4.2+
 document: cookbook

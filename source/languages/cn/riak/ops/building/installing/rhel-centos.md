@@ -78,7 +78,7 @@ sudo rpm -Uvh riak-{{V.V.V}}-2.el6.x86_64.rpm
 
 {{/1.2.0+}}
 
-
+<a id="Installing-From-Source"></a>
 ## 从源码安装
 
 Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*

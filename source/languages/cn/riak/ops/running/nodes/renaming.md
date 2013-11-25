@@ -76,13 +76,13 @@ Success: "riak@10.1.42.11" marked as down
 <a id="reconfigure"></a>
 ### 设置节点使用新地址
 
-按照下面的步骤操作，让 `node1.localdomain` 节点监听新的内网 IP *192.168.17.11*：
+按照下面的步骤操作，让 `node1.localdomain` 节点监听新的内网 IP *192.168.17.11* ：
 
 1. 编辑该节点的 `vm.args` 设置文件，把 `-name` 参数设置为：
 
         -name riak@192.168.17.11
 
-2. 在 `app.config` 文件中把相应的 IP 地址改为 *192.168.17.11*，即 `pb_ip`、`http`、`https` 和 `cluster_mgr` 设置。
+2. 在 `app.config` 文件中把相应的 IP 地址改为 *192.168.17.11* ，即 `pb_ip`、`http`、`https` 和 `cluster_mgr` 设置。
 
 3. 重命名该节点的 `ring` 文件夹。该文件夹的位置可在 `app.config` 文件中查看。
 
@@ -99,7 +99,7 @@ Success: "riak@10.1.42.11" marked as down
         Attempting to restart script through sudo -H -u riak
         Success: staged join request for 'riak@192.168.17.11' to 'riak@10.1.42.12'
 
-6. 执行 `riak-admin cluster force-replace` 命令，把所有权从 `riak@10.1.42.11` 改成 `riak@192.168.17.11`：
+6. 执行 `riak-admin cluster force-replace` 命令，把所有权从 `riak@10.1.42.11` 改成 `riak@192.168.17.11` ：
 
         riak-admin cluster force-replace riak@10.1.42.11 riak@192.168.17.11
 
@@ -182,7 +182,7 @@ Success: "riak@10.1.42.11" marked as down
 
 在集群的每个节点中重复上面两步。
 
-修改后续节点时，要把节点加入集群，调用 `riak-admin cluster join` 命令时，目标节点使用  *riak@192.168.17.11*。
+修改后续节点时，要把节点加入集群，调用 `riak-admin cluster join` 命令时，目标节点使用  *riak@192.168.17.11* 。
 
 ```
 riak-admin cluster join riak@192.168.17.11

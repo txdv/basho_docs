@@ -44,7 +44,7 @@ keywords: [comparisons, hbase]
         <td>存储模型</td>
         <td>Riak 的存储系统是模块化可扩展的，允许用户根据寻妖选择适合的后台。默认的后台是 Bitcask。
             <ul>
-              <li>[[Riak 支持的存储后台|选择]]</li>
+              <li>[[Riak 支持的存储后台|选择后台]]</li>
             </ul>
 
             用户还可以使用 Riak 提供的[[后台 API]]自行编写存储后台。

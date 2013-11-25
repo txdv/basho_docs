@@ -31,7 +31,7 @@ Riak 依赖存储在多个 Git 仓库中的源码，在编译之前请确保系�
 
 ### 从源码包安装
 
-从 [Download Center|http://basho.com/resources/downloads/]] 下载 Riak 源码包，然后编译：
+从[[下载中心|http://basho.com/resources/downloads/]]下载 Riak 源码包，然后编译：
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}.tar.gz

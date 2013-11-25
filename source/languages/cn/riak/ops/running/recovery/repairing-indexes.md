@@ -18,7 +18,7 @@ Riak 二级索引（2i）目前没有任何形式的“反熵”（anti-entropy�
 
 下面的方法可以强制重新读取节点上每个分区中的所有键，因此可以重建索引。
 
-1. 在安装了 Riak 的节点上执行下面的命令，打开 Riak 控制台：From a cluster node with Riak installed, attach to the Riak console:
+1. 在安装了 Riak 的节点上执行下面的命令，打开 Riak 控制台：
 
     ```bash
     $ riak attach
@@ -97,7 +97,7 @@ Riak 搜索索引目前没有任何形式的“反熵”（anti-entropy）功能
 
 下面的方法可以强制重新读取节点上每个分区中的所有键，因此可以重建索引。
 
-1. 在安装了 Riak 的节点上执行下面的命令，打开 Riak 控制台：From a cluster node with Riak installed, attach to the Riak console:
+1. 在安装了 Riak 的节点上执行下面的命令，打开 Riak 控制台：
 
     ```bash
     $ riak attach

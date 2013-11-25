@@ -5,7 +5,7 @@ version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, upgrading]
-prev: "[[从源码安装 Riak]]"
+prev: "[[从源码编译安装 Riak]]"
 up:   "[[安装和升级]]"
 ---
 

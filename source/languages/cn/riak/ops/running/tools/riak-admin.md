@@ -177,7 +177,7 @@ riak-admin reip <old nodename> <new nodename>
 
 ## js-reload
 
-强制内嵌的 JavaScript 虚拟机重启。这个命令在部署新的自定义 [[MapReduce|使用 MapReduce]] 功能是很有用。（_这个命令要在集群中所有节点上运行。_）
+强制内嵌的 JavaScript 虚拟机重启。这个命令在部署新的自定义 [[MapReduce|使用 MapReduce]] 功能是很有用。（ _这个命令要在集群中所有节点上运行。_ ）
 
 ```bash
 riak-admin js-reload
@@ -378,9 +378,9 @@ riak-admin status
 riak-admin reformat-indexes [<concurrency>] [<batch size>] --downgrade
 ```
 
-`concurrency` 选项的默认值是 *2*，设定并发重建索引的分区数量。
+`concurrency` 选项的默认值是 *2* ，设定并发重建索引的分区数量。
 
-`batch size` 选项设定同时进行的键操作数量，默认值为 *100*。
+`batch size` 选项设定同时进行的键操作数量，默认值为 *100* 。
 
 这个命令可以在节点接受请求时执行，大多数情况下，选项的值都建议使用默认值。只有测试对集群性能的影响时才应该修改默认值。
 

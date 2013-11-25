@@ -24,7 +24,7 @@ Basho 官方支持多种编程语言的开源客户端和环境。
 
 所有官方支持的客户端都使用 GitHub 提供的问题追踪系统收集程序错误反馈。
 
-除了官方支持的客户端，Basho 还提供了一些非官方的客户端代码库，如下所示。除此之外，还有很多客户端代码库和相关的项目，参见 [[community projects]]。
+除了官方支持的客户端，Basho 还提供了一些非官方的客户端代码库，如下所示。除此之外，还有很多客户端代码库和相关的项目，参见[[社区项目]]。
 
 | 语言                 | 源码                 |
 |---------------------|------------------------|
@@ -93,7 +93,7 @@ Basho 官方支持多种编程语言的开源客户端和环境。
 | 删除对象                 | ✓              | ✓    | ✓       | ✓    |
 
 | 查询相关操作             | Erlang (riakc) | Java | Python  | Ruby |
-|---------- --------------|----------------|------|---------|------|
+|-------------------------|----------------|------|---------|------|
 | MapReduce               | ✓              | ✓    | ✓       | ✓    |
 | 二级索引（模拟的和内嵌的） | ✓✗             | ✓✗   | ✓✓      | ✓✓   |
 | 搜索（模拟的和内嵌的）     | ✓✗             | ✓✗   | ✓✓      | ✓✓   |
@@ -135,7 +135,7 @@ Basho 官方支持多种编程语言的开源客户端和环境。
 | 集成二级索引                             | ✗                         | ✓    | 部分支持 | ✓       | ✓             |
 | 集成 Riak Search                        | ✗                         | ✓    | ✗       | ✓       | ✗             |
 
-很多[[社区项目|community projects]]都支持 Python 和 Ruby 中的主要数据类型和对象映射。上表中列出的支持情况是下面这些项目集成的功能：
+很多[[社区项目]]都支持 Python 和 Ruby 中的主要数据类型和对象映射。上表中列出的支持情况是下面这些项目集成的功能：
 
 - *Ruby*: [ripple](https://github.com/basho/ripple)，[risky](https://github.com/aphyr/risky) 和 [curator](https://github.com/braintree/curator)
 - *Python*: [riakkit](https://github.com/shuhaowu/riakkit)，[riakalchemy](https://github.com/Linux2Go/riakalchemy) 和 [django-riak-engine](https://github.com/oubiwann/django-riak-engine)

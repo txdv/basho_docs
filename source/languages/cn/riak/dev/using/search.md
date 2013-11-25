@@ -47,12 +47,13 @@ Riak Search 通过 pre-commit 钩子在存入数据的时候建立索引。基�
 
 ## 索引数据
 
-在搜索之前，必须先建立索引。在标准模式下，必须手动建立索引。在“[[Riak Search 索引参考手册|Search Indexing Reference]]”一文中有索引命令的详细列表。
+在搜索之前，必须先建立索引。在标准模式下，必须手动建立索引。在“[[Riak Search 索引参考手册]]”一文中有索引命令的详细列表。
 
 如果想简单点但不是很直观的索引，可以参照“[[Riak Search 高级用法]]”中的“[[搜索，KV 和 MapReduce|Riak Search 高级用法#Search-KV-and-MapReduce]]”一节。
 
 <!-- Was "Riak Search - Querying" -->
 
+<a id="Query-Interfaces"></a>
 ## 查询接口
 
 ### 在命令行中查询

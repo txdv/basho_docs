@@ -1,5 +1,5 @@
 ---
-title: riak Command Line
+title: riak 命令
 project: riak
 version: 1.4.2+
 document: reference

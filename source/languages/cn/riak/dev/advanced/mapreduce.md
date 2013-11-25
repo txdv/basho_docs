@@ -611,34 +611,34 @@ curl -XPOST http://localhost:8098/mapred \
 
 ### Map 步骤函数
 
-*Map 函数接受三个参数*（在 Erlang 中，后面的 3 必须指定），分别是：
+<strong>Map 函数接受三个参数</strong>（在 Erlang 中，后面的 3 必须指定），分别是：
 
-  1. *Value*：根据键查找得到的值。可以是 Riak 对象，在 Erlang 中，使用 *riak_object* 模块
-     定义和处理。在 Javascript 中，Riak 对象类似下面这种形式：
+1. <strong>Value</strong>：根据键查找得到的值。可以是 Riak 对象，在 Erlang 中，使用 *riak_object* 模块
+   定义和处理。在 Javascript 中，Riak 对象类似下面这种形式：
 
-    ```
-    {
-     "bucket":BucketAsString,
-     "key":KeyAsString,
-     "vclock":VclockAsString,
-     "values":[
-               {
-                "metadata":{
-                            "X-Riak-VTag":VtagAsString,
-                            "X-Riak-Last-Modified":LastModAsString,
-                            "Links":[...List of link objects],
-                            ...other metadata...
-                           },
-                "data":ObjectData
-               },
-               ...other metadata/data values (siblings)...
-              ]
-    }
-    ```
-  2. *KeyData*：随输入数据一起提交到查询或这一步中的键数据
-  3. *Arg*：查询中提交的静态参数，用于整个步骤
+  ```
+  {
+   "bucket":BucketAsString,
+   "key":KeyAsString,
+   "vclock":VclockAsString,
+   "values":[
+             {
+              "metadata":{
+                          "X-Riak-VTag":VtagAsString,
+                          "X-Riak-Last-Modified":LastModAsString,
+                          "Links":[...List of link objects],
+                          ...other metadata...
+                         },
+              "data":ObjectData
+             },
+             ...other metadata/data values (siblings)...
+            ]
+  }
+  ```
+2. <strong>KeyData</strong>：随输入数据一起提交到查询或这一步中的键数据
+3. <strong>Arg</strong>：查询中提交的静态参数，用于整个步骤
 
-*Map 步骤应该生成一个结果列表。*如果 Map 函数的输出结果不是列表，会看到错误提示。如果 Map 函数不需要生成输出结果，可以返回一个空列表。如果 Map 步骤后面还是 Map 步骤，则函数的输出结果必须和 Map 步骤的输入格式兼容：“bucket/键”组合列表，或者“bucket/键/键数据”组合。
+<strong>Map 步骤应该生成一个结果列表。</strong>如果 Map 函数的输出结果不是列表，会看到错误提示。如果 Map 函数不需要生成输出结果，可以返回一个空列表。如果 Map 步骤后面还是 Map 步骤，则函数的输出结果必须和 Map 步骤的输入格式兼容：“bucket/键”组合列表，或者“bucket/键/键数据”组合。
 
 #### Map 函数示例
 
@@ -681,12 +681,12 @@ function(value, keydata, arg){
 
 ### Reduce 步骤函数
 
-*Reduce 步骤函数接受两个参数*，分别是：
+<strong>Reduce 步骤函数接受两个参数</strong>，分别是：
 
-1. *ValueList*：MapReduce 查询的前一步生成的值列表
-2. *Arg*：查询中提交的静态参数，用于整个步骤
+1. <strong>ValueList</strong>：MapReduce 查询的前一步生成的值列表
+2. <strong>Arg</strong>：查询中提交的静态参数，用于整个步骤
 
-*Reduce 函数应该生成一个值列表*，而且函数的参数顺序可交换、可联合，且是幂等的。也就是说，如果函数 F 的参数是 `[a,b,c,d]`，那么下面这几种用法应该得到相同的结果：
+<strong>Reduce 函数应该生成一个值列表</strong>，而且函数的参数顺序可交换、可联合，且是幂等的。也就是说，如果函数 F 的参数是 `[a,b,c,d]`，那么下面这几种用法应该得到相同的结果：
 
 ```erlang
   F([a,b,c,d])

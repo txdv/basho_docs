@@ -18,13 +18,13 @@ Basho 提供的 Riak 安装包（可以在[[下载]]页面获取）内嵌了 Erl
 
 下面列出的链接包含了针对各平台的说明，告诉你如何下载并从源码安装 Riak。
 
-  * [[Debian 和 Ubuntu|Installing on Debian and Ubuntu#Installing-From-Source]]
-  * [[RHEL 和 CentOS|Installing on RHEL and CentOS#Installing-From-Source]]
-  * [[Mac OS X|Installing on Mac OS X#Installing-From-Source]]
-  * [[FreeBSD|Installing on FreeBSD#Installing-From-Source]]
-  * [[SUSE|Installing on SUSE]]
-  * [[Windows Azure|Installing on Windows Azure]]
-  * [[AWS Marketplace|Installing on AWS Marketplace]]
+  * [[Debian 和 Ubuntu|在 Debian 和 Ubuntu 中安装#Installing-From-Source]]
+  * [[RHEL 和 CentOS|在 RHEL 和 CentOS 中安装#Installing-From-Source]]
+  * [[Mac OS X|在 Mac OS X 中安装#Installing-From-Source]]
+  * [[FreeBSD|在 FreeBSD 中安装#Installing-From-Source]]
+  * [[SUSE|在 SUSE 中安装]]
+  * [[Windows Azure|在 Windows Azure 中安装]]
+  * [[AWS Marketplace|在 AWS Marketplace 中安装]]
   * [[其他操作系统|从源码编译安装 Riak]]
 
 ### 编译 Riak

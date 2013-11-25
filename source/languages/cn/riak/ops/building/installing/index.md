@@ -19,7 +19,7 @@ next: "[[安装 Erlang]]"
   * [[SUSE|在 SUSE 中安装]]
   * [[Windows Azure|在 Windows Azure 中安装]]
   * [[AWS Marketplace|在 AWS Marketplace 中安装]]
-  * [[从源码安装|从源码安装 Riak]] *（针对未列出的操作系统，需要先[[安装 Erlang]]）*
+  * [[从源码安装|从源码编译安装 Riak]] *（针对未列出的操作系统，需要先[[安装 Erlang]]）*
 
 ### Chef Cookbooks
 

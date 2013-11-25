@@ -27,7 +27,7 @@ body_id: errors
 no function clause matching orddict:fetch('riak@192.168.2.81', []) line 72
 ```
 
-开头是日期（`12:34:27.999`），后面跟着日志的等级（`[error]`），然后是由 `lager` 设置控制格式的一段消息（如下面的 Lager 表格中所示：*gen_server `Mod` terminated with reason: `Reason`*）
+开头是日期（`12:34:27.999`），后面跟着日志的等级（`[error]`），然后是由 `lager` 设置控制格式的一段消息（如下面的 Lager 表格中所示：*gen_server `Mod` terminated with reason: `Reason`* ）
 
 ### Lager 格式
 
