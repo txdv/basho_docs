@@ -2010,7 +2010,7 @@ riak:
             x86_64:
               file: riak-1.4.2-SmartOS-x86_64.tgz
               static_file: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/1.8/riak-1.4.2-SmartOS-x86_64.tgz
-              file_size: 34850842
+              file_size: 34840475
               csum: riak-1.4.2-SmartOS-x86_64.tgz.sha
               static_csum: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/1.8/riak-1.4.2-SmartOS-x86_64.tgz.sha
               csum_size: 96
@@ -2022,6 +2022,24 @@ riak:
               file_size: 34820672
               csum: riak-1.4.2-SmartOS-x86_64.tgz.sha
               static_csum: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/13.1/riak-1.4.2-SmartOS-x86_64.tgz.sha
+              csum_size: 96
+        '131':
+          arch:
+            x86_64:
+              file: riak-1.4.2-SmartOS-x86_64.tgz
+              static_file: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/131/riak-1.4.2-SmartOS-x86_64.tgz
+              file_size: 34830746
+              csum: riak-1.4.2-SmartOS-x86_64.tgz.sha
+              static_csum: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/131/riak-1.4.2-SmartOS-x86_64.tgz.sha
+              csum_size: 96
+        '16':
+          arch:
+            x86_64:
+              file: riak-1.4.2-SmartOS-x86_64.tgz
+              static_file: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/16/riak-1.4.2-SmartOS-x86_64.tgz
+              file_size: 33715032
+              csum: riak-1.4.2-SmartOS-x86_64.tgz.sha
+              static_csum: http://s3.amazonaws.com/downloads.basho.com/riak/1.4/1.4.2/smartos/16/riak-1.4.2-SmartOS-x86_64.tgz.sha
               csum_size: 96
     solaris:
       versions:
