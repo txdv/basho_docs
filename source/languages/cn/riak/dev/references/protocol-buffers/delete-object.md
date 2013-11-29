@@ -1,5 +1,5 @@
 ---
-title: PBC Delete Object
+title: 通过 PBC 删除对象
 project: riak
 version: 1.4.2+
 document: api
@@ -9,9 +9,9 @@ keywords: [api, protocol-buffer]
 group_by: "Object/Key Operations"
 ---
 
-Deletes an object from the specified bucket / key.
+删除指定“bucket/键”组合对应的对象。
 
-## Request
+## 请求
 
 ```bash
 message RpbDelReq {
@@ -27,43 +27,23 @@ message RpbDelReq {
 }
 ```
 
-Optional Parameters
+可选的参数：
 
-* **rw** - how many replicas to delete before returning a successful
-response; possible values include a special number to denote 'one'
-(4294967295-1), 'quorum' (4294967295-2), 'all' (4294967295-3),
-'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **vclock** - opaque vector clock provided by an earlier RpbGetResp message.
-Use to prevent deleting of objects that have been modified since the last get request
-* **r** - (read quorum) how many replicas need to agree when retrieving the object; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **w** - (write quorum) how many replicas to write to before returning a successful response; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **pr** - (primary read quorum) how many primary replicas need to be available when retrieving the object; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **pw** - how many primary nodes must be up when the write is attempted; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **dw** - how many replicas to commit to durable storage before returning a successful response; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
+* **rw** - 返回成功响应之前要删除多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **vclock** - 前面的 RpbGetResp 消息提供的向量时钟。避免删除上一次 GET 请求修改的对象
+* **r** -（读取法定值） 获取对象时要得到多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **w** -（写入法定值）返回成功响应之前应该接受到多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **pr** -（主读取法定值）获取对象时要得到多少个主节点副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **pw** - 写入时要有多少个主节点在线。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|PBC API#Set Bucket Properties]]）
+* **dw** - 返回成功响应之前要向持久性存储中写入多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
 
-## Response
+## 响应
 
-Only the message code is returned.
+只会返回消息码。
 
-## Example
+## 示例
 
-Request
+请求：
 
 ```bash
 Hex      00 00 00 12 0D 0A 0A 6E 6F 74 61 62 75 63 6B 65
@@ -74,11 +54,8 @@ RpbDelReq protoc decode:
 bucket: "notabucket"
 key: "k"
 rw: 1
-
 ```
-
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 01 0E

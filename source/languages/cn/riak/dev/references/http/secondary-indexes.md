@@ -1,5 +1,5 @@
 ---
-title: HTTP Secondary Indexes
+title: 通过 HTTP 执行二级索引查询
 project: riak
 version: 1.4.2+
 document: api
@@ -9,25 +9,26 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-[[Secondary Indexes|Using Secondary Indexes]] allows an application to tag a Riak object with one or more field/value pairs. The object is indexed under these field/value pairs, and the application can later query the index to retrieve a list of matching keys.
+[[二级索引|使用二级索引]] 可以使用“字段/值”组合为 Riak 对象加上一个或多个标签。对象会使用这些“字段/值”组合建立索引，应用程序可以查询这些索引取回符合条件的键列表。
 
-## Request
+## 请求
 
-### Exact Match
+### 精确匹配
 
 ```bash
 GET /buckets/mybucket/index/myindex_bin/value
 ```
 
-### Range Query
+### 范围查询
 
 ```
 GET /buckets/mybucket/index/myindex_bin/start/end
 ```
 
 {{#1.4.0+}}
-#### Range query with terms
-To see the index values matched by the range, use `return_terms=true`.
+#### 通过关键字进行范围查询
+
+要得到范围内的索引值，需要指定 `return_terms=true`。
 
 ```
 GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true
@@ -36,38 +37,37 @@ GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true
 
 
 {{#1.4.0+}}
-### Pagination
-Add the parameter `max_results` for pagination. This will limit the results and provide for the next request a `continuation` value.
+### 分页
+
+要想对结果进行分页，需要指定 `max_results` 参数。分页会限制返回的结果数量，并为下一个请求提供 `continuation` 值。
 
 ```
 GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true&max_results=500
 GET /buckets/mybucket/index/myindex_bin/start/end?return_terms=true&max_results=500&continuation=g2gCbQAAAAdyaXBqYWtlbQAAABIzNDkyMjA2ODcwNTcxMjk0NzM=
 ```
-
 {{/1.4.0+}}
 
 
 {{#1.4.0+}}
-### Streaming
+### 流处理
 ```
 GET /buckets/mybucket/index/myindex_bin/start/end?stream=true
 ```
-
 {{/1.4.0+}}
 
-## Response
+## 响应
 
-Normal status codes:
+正常的状态码：
 
 + `200 OK`
 
-Typical error codes:
+常见的错误码：
 
-+ `400 Bad Request` - if the index name or index value is invalid.
-+ `500 Internal Server Error` - if there was an error in processing a map or reduce function, or if indexing is not supported by the system.
-+ `503 Service Unavailable` - if the job timed out before it could complete
++ `400 Bad Request` - 如果索引名或索引值不合法
++ `500 Internal Server Error` - 如果 Map 函数或者 Reduce 函数运行的过程中出现错误，或者系统不支持索引
++ `503 Service Unavailable` - 作业完成前请求超时
 
-## Example
+## 示例
 
 ```bash
 $ curl -v http://localhost:8098/buckets/mybucket/index/field1_bin/val1

@@ -1,5 +1,5 @@
 ---
-title: Riak Search Settings
+title: Riak Search 设置
 project: riak
 version: 1.4.2+
 document: appendix
@@ -13,14 +13,11 @@ keywords: [search]
 {{#1.2.0}}
 <div class="info">
 <div class="title">Riak 搜索 1.2.0 版本中的严重问题</div>
-在 [merge_index 中有个问题](https://github.com/basho/merge_index/pull/24)可以终止
-数据移交。如果遇到这个问题，移交会无限制失败，集群就会卡住。这种情况可能是
-由 merge_index 数据损坏造成的，但具体圆圆还要根据用户日志分析。这个问题在 1.2.1 中已修正。
+在 [merge_index 中有个问题](https://github.com/basho/merge_index/pull/24)可以终止数据移交。如果遇到这个问题，移交会无限制失败，集群就会卡住。这种情况可能是由 merge_index 数据损坏造成的，但具体圆圆还要根据用户日志分析。这个问题在 1.2.1 中已修正。
 </div>
 {{/1.2.0}}
 
-Riak 搜索功能可在 [[app.config|Configuration-Files#app.config]] 文件中开启。
-只需把下面的设置改为 `true` 即可。
+Riak 搜索功能可在 [[app.config|设置文件#app.config]] 文件中开启。只需把下面的设置改为 `true` 即可。
 
 ```erlang
 %% Riak Search Config
@@ -30,10 +27,9 @@ Riak 搜索功能可在 [[app.config|Configuration-Files#app.config]] 文件中�
               ]},
 ```
 
-集群中所有节点都要做这个设置，而且必须重启节点才能生效。
-（可以使用 [[Riaknostic|http://riaknostic.basho.com/]] 查看是不是全部节点都启用了搜索功能。）
+集群中所有节点都要做这个设置，而且必须重启节点才能生效。（可以使用 [[Riaknostic|http://riaknostic.basho.com/]] 查看是不是全部节点都启用了搜索功能。）
 
-设置好后，[[Riak 启动|Installing and Upgrading]]后就会自动启动 Riak 搜索。
+设置好后，[[Riak 启动|安装和升级]]后就会自动启动 Riak 搜索。
 
 ## 默认端口
 

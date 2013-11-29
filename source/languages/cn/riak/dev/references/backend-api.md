@@ -1,5 +1,5 @@
 ---
-title: Backend API
+title: 后台 API
 project: riak
 version: 1.4.2+
 document: appendix
@@ -7,13 +7,9 @@ toc: true
 keywords: [api, backends]
 ---
 
-Riak 存储 API 可用于全部[[支持的后台|Choosing a Backend]]。本页
-[以 Erlang 类型规格表](http://www.erlang.org/doc/reference_manual/typespec.html)
-的形式列出了存储后台 API 的详细信息。
+Riak 存储 API 可用于全部[[支持的后台|选择后台]]。本页[以 Erlang 类型规格表](http://www.erlang.org/doc/reference_manual/typespec.html)的形式列出了存储后台 API 的详细信息。
 
-规格表用于 [dialyzer](http://www.erlang.org/doc/man/dialyzer.html)，Erlang 的静态
-分析工具。建议把这份规格表复制到任何一个自定义的后台模块中，作为开发时的参考，避免出现错误，
-也能确保完全能和 Riak 兼容。
+规格表用于 [dialyzer](http://www.erlang.org/doc/man/dialyzer.html)，Erlang 的静态分析工具。建议把这份规格表复制到任何一个自定义的后台模块中，作为开发时的参考，避免出现错误，也能确保完全能和 Riak 兼容。
 
 下面还列出了函数导出列表，可以直接粘贴到自定义存储后台模块中。
 

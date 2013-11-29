@@ -1,5 +1,5 @@
 ---
-title: The Basics
+title: 查询基础
 project: riak
 version: 1.4.2+
 document: tutorials
@@ -14,7 +14,7 @@ keywords: [developers]
 
 Riak 中的数据依照 bucket、键和值的方式组织。值（或称对象）使用唯一的键标识，键值对都保存在 bucket 中。在 Riak 中，bucket 基本上就是一种命名空间，允许在不同的 bucket 中出现相同的键，还能针对各个 bucket 做设置，例如副本数量和提交前后钩子。
 
-和 Riak 的交互基本上就是使用键存储和取出值。本文将使用 Riak HTTP API 做演示，Riak 还为 Erlang、Java、PHP、Python、Ruby 和 C/C++ 提供了客户端代码库（[[supported client libraries|Client Libraries]]）。.NET、Node.js、Python、Perl、Clojure、Scala、Smalltalk 等其他语言的代码库由社区维护（[[community-supported projects|Client Libraries#Community-Libraries]]）。
+和 Riak 的交互基本上就是使用键存储和取出值。本文将使用 Riak HTTP API 做演示，Riak 还为 Erlang、Java、PHP、Python、Ruby 和 C/C++ 提供了客户端代码库（[[支持的客户端代码库|客户端代码库]]）。.NET、Node.js、Python、Perl、Clojure、Scala、Smalltalk 等其他语言的代码库由社区维护（[[社区支持的项目|客户端代码库]]）。
 
 ### 读取对象
 
@@ -26,7 +26,7 @@ GET /riak/BUCKET/KEY
 
 响应的主体中包含对象的值（如果对象存在的话）。
 
-Riak 能理解很多 HTTP 报头，例如 用于协商内容类型的 `Accept`（处理兄弟数据（sibling）时会用到，参见 [[the sibling examples for the HTTP API|HTTP Fetch Object#Siblings-examples]]），以及用于条件请求的 `If-None-Match`/`ETag` 和 `If-Modified-Since`/`Last-Modified`。
+Riak 能理解很多 HTTP 报头，例如 用于协商内容类型的 `Accept`（处理兄弟数据（sibling）时会用到，参见[[通过 HTTP API 获取兄弟数据的示例|通过 HTTP 获取对象]]），以及用于条件请求的 `If-None-Match`/`ETag` 和 `If-Modified-Since`/`Last-Modified`。
 
 Riak 还能接收很多请求参数，例如 `r`，设置当前 GET 请求的 R 值（R 值表示回返几个副本时表明响应是成功的）。如果省略请求参数 `r`，Riak 取默认值 2.
 
@@ -70,7 +70,7 @@ PUT /riak/BUCKET/KEY
 以下报头对 PUT 请求是可选的：
 
 * `X-Riak-Meta-YOUR_HEADER` 指定要为存储对象设定地其他元数据（例如 `X-Riak-Meta-FirstName`）。
-* `Link` 指定用户和系统定义的指向其他资源的链接。详细说明参见 [[Links]]。
+* `Link` 指定用户和系统定义的指向其他资源的链接。详细说明参见“[[链接]]”一文。
 
 GET 请求可以接收请求参数 `r`，类似的，`PUT` 请求也能接收这些参数：
 
@@ -195,7 +195,7 @@ GET /riak/BUCKET
 可选的请求参数有：
 
 * `props`: `true`|`false` - 是否返回 bucket 的属性，默认为 `true`
-* `keys`: `true`|`false`|`stream` - 是否返回 bucket 中保存的键，默认为 `false`；如何处理 `keys=stream` 形式的响应，请阅读 [[HTTP API's list keys|HTTP List Keys]]
+* `keys`: `true`|`false`|`stream` - 是否返回 bucket 中保存的键，默认为 `false`；如何处理 `keys=stream` 形式的响应，请阅读“[[通过 HTTP 列出键]]”一文。
 
 知道上述内容后，请执行下面的命令，读取刚才设置的 bucket 信息：
 

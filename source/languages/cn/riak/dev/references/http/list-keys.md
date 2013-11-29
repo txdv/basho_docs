@@ -1,5 +1,5 @@
 ---
-title: HTTP List Keys
+title: 通过 HTTP 列出键
 project: riak
 version: 1.4.2+
 document: api
@@ -9,16 +9,16 @@ keywords: [api, http]
 group_by: "Bucket Operations"
 ---
 
-Lists keys in a bucket.
+列出 bucket 中的所有键。
 
 <div class="note">
-<div class="title">Not for production use</div>
+<div class="title">不要在生产环境中操作</div>
 
-This operation requires traversing all keys stored in the cluster and should not be used in production.
+这个操作要遍历集群中的所有键，不应该在生产环境中操作。
 
 </div>
 
-## Request
+## 请求
 
 ```bash
 GET /riak/bucket?keys=true            # List all keys, old format
@@ -27,35 +27,28 @@ GET /riak/bucket?keys=stream          # Stream keys to the client, old format
 GET /buckets/bucket/keys?keys=stream  # Stream keys to the client, new format
 ```
 
-Required query parameters:
+必须提供的请求参数：
 
-* `keys` - defaults to `false`. When set to `true` all keys will be returned in
-a single payload.  When set to `stream`, keys will be returned in
-chunked-encoding.
+* `keys` - 默认为 `false`。如果设为 `true`，一次请求会返回所有键。如果设为 `stream`，会对返回的键分段
 
-Optional query parameters:
+可选的请求参数：
 
-* `props` - defaults to `true`, which will also return [[bucket properties|HTTP-Get-Bucket-Properties]] in the response. Set to `false` to suppress properties
-in the response.
+* `props` - 默认为 `true`，响应中也会返回 [[bucket 的属性|通过 HTTP 获取 bucket 的属性]]。设为 `false` 禁止返回 bucket 的属性
 
-## Response
+## 响应
 
-Normal response codes:
+正常的响应码：
 
 * `200 OK`
 
-Important headers:
+重要的报头：
 
 * `Content-Type` - `application/json`
-* `Transfer-Encoding` - `chunked` when the `keys` query parameter is set to
-`stream`.
+* `Transfer-Encoding` - 如果请求参数 `keys` 设为 `stream`，则为 `chunked`
 
-The JSON object in the response will contain up to two entries, `"props"` and
-`"keys"` which are present or missing according to the query parameters.  If
-`keys=stream` in the query parameters, multiple JSON objects in chunked-encoding
-will be returned containing `"keys"` entries.
+响应中的 JSON 对象最多包含两个元素：`"props"` 和 `"keys"`，根据请求参数的设置不同，包含的元素也会不同。如果 `keys=stream`，会返回很多个包含 `"keys"` 元素的分段 JSON 对象。
 
-## Example
+## 示例
 
 ```bash
 $ curl -i http://localhost:8098/riak/jsconf?keys=true\&props=false

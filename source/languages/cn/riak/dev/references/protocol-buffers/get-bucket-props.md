@@ -1,5 +1,5 @@
 ---
-title: PBC Get Bucket Properties
+title: 通过 PBC 获取 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api
@@ -9,10 +9,9 @@ keywords: [api, protocol-buffer]
 group_by: "Bucket Operations"
 ---
 
-Get the properties for a bucket
+读取 bucket 属性。
 
-## Request
-
+## 请求
 
 ```bash
 message RpbGetBucketReq {
@@ -20,13 +19,11 @@ message RpbGetBucketReq {
 }
 ```
 
+必须提供的参数：
 
-Required Parameters
+* **bucket** - 要读取属性的 bucket
 
-* **bucket** - bucket to retrieve properties for
-
-## Response
-
+## 响应
 
 ```bash
 message RpbGetBucketResp {
@@ -39,16 +36,14 @@ message RpbBucketProps {
 }
 ```
 
+响应值：
 
-Values
+* **n_val** - 该 bucket 的当前 n_val
+* **allow_mult** - 如果冲突要返回给客户端，把 `allow_mult` 设为 `true`
 
-* **n_val** - current n_val for the bucket
-* **allow_mult** - set allow_mult to true if conflicts should be returned to
-clients
+## 示例
 
-## Example
-
-Request
+请求：
 
 ```bash
 Hex      00 00 00 0B 13 0A 08 6D 79 62 75 63 6B 65 74
@@ -56,11 +51,9 @@ Erlang <<0,0,0,11,19,10,8,109,121,98,117,99,107,101,116>>
 
 RpbGetBucketReq protoc decode:
 bucket: "mybucket"
-
 ```
 
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 07 14 0A 04 08 05 10 01

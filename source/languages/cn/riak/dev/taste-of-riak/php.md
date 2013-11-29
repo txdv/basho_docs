@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: PHP"
+title: "初试 Riak：PHP 篇"
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,7 +8,7 @@ audience: beginner
 keywords: [developers, client, php]
 ---
 
-如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
+如果你还没有创建 Riak 节点并启动，请先阅读“[[事先准备|初试 Riak：事先准备]]”。
 
 要使用本文介绍的 Riak 开发方法，必须先正确安装 PHP。
 
@@ -39,7 +39,7 @@ require_once('riak-php-client/src/Basho/Riak/MapReduce/Phase.php');
 $client = new Basho\Riak\Riak('127.0.0.1', 8098);
 ```
 
-如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请使用下面的方法初始化客户端实例：
+如果参照“[[花五分钟安装]]”一文中的方法在本地架设了 Riak 集群，请使用下面的方法初始化客户端实例：
 
 ```php
 $client = new Basho\Riak\Riak('127.0.0.1', 10018);

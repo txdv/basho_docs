@@ -1,5 +1,5 @@
 ---
-title: Use Cases
+title: 使用示例
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -15,19 +15,19 @@ keywords: [use-cases]
 
 *没有复杂的关联，只需要较高的读写性能*
 
-* [[会话存储|Session Storage]]
-* [[提供广告内容|Serving Advertisements]]
-* [[日志数据|Log Data]]
-* [[传感器数据|Sensor Data]]
+* [[会话存储]]
+* [[提供广告服务]]
+* [[日志数据]]
+* [[传感器数据]]
 
 ## 内容管理和社会化程序
 
 *需要实现一对多和多对多关联*
 
-* [[用户账户|User Accounts]]
-* [[用户设置|User Settings/Preferences]]
-* [[用户事件和时间轴|User Subscriptions/Events/Timelines]]
-* [[博客文章|Blog Posts, Articles and Other Content]]
+* [[用户账户]]
+* [[用户设置]]
+* [[用户事件和时间轴]]
+* [[博客文章|博客文章和其他内容]]
 
 <!--
 
@@ -35,7 +35,7 @@ keywords: [use-cases]
 
 *Reproducing common SQL models/queries in Riak*
 
-* [[Counting]]
-* [[Conditional Summation]]
+* [[计数]]
+* [[条件求和]]
 
  -->

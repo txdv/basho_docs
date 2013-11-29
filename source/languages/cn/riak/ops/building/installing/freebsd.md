@@ -1,13 +1,13 @@
 ---
-title: Installing on FreeBSD
+title: 在 FreeBSD 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, freebsd]
-prev: "[[Installing on Mac OS X]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on SmartOS]]"
+prev: "[[在 Mac OS X 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[在 SmartOS 中安装]]"
 download:
   key: freebsd
   name: "FreeBSD"
@@ -69,6 +69,7 @@ Package dependency openssl-1.0.0_7 for /tmp/riak-{{V.V.V}}-FreeBSD-amd64.tbz not
 
 请确保按照**要求和依赖库**一节的说明安装了正确版本的 OpenSSL。
 
+<a id="Installing-From-Source"></a>
 ## 从源码安装
 
 在 FreeBSD 上从源码安装 Riak 很显然在编译之前需要安装更多的依赖库（例如 Erlang），也比使用安装包用时久。
@@ -81,7 +82,7 @@ Package dependency openssl-1.0.0_7 for /tmp/riak-{{V.V.V}}-FreeBSD-amd64.tbz not
 
 如果还没有安装下面列出的软件，请通过包安装之。
 
-* Erlang（也可以使用 kerl 安装，参见 [[Installing Erlang]]）
+* Erlang（也可以使用 kerl 安装，参见“[[安装 Erlang]]”一文）
 * Curl
 * Git
 * OpenSSL（1.0.0_7）
@@ -122,14 +123,14 @@ gmake devrel
 
 请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何搭建一个包含 5 个节点的集群，并且概览了 Riak 的主要功能
--   [[Basic Configuration]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何搭建一个包含 5 个节点的集群，并且概览了 Riak 的主要功能
+-   [[基本设置]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
 
 ## 资源列表
 
 * [Basho 下载页面](http://basho.com/resources/downloads/)
-* [[Installing and Upgrading]]
-* [[Installing Erlang]]
+* [[安装和升级]]
+* [[安装 Erlang]]
 * [使用 FreeBSD 的包系统](http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/packages-using.html)
 * [使用 FreeBSD 的 Ports Collection](http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html)

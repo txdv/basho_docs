@@ -1,12 +1,12 @@
 ---
-title: Post Installation
+title: 安装之后
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, upgrading]
-prev: "[[Installing Riak From Source]]"
-up:   "[[Installing and Upgrading]]"
+prev: "[[从源码编译安装 Riak]]"
+up:   "[[安装和升级]]"
 ---
 
 安装好 Riak 后，你可能想查看各节点的生存状态，确保能正确处理请求。
@@ -54,7 +54,7 @@ pong
 
 <div class="note">
 <div class="title">打开文件限制</div>
-你可能注意到了，如果没有调整打开文件限制的话（`ulimit -n`），启动时 Riak 会警告限制数量太少。运行 Riak 时建议你增加操作系统默认的文件打开限制。这么做的原因请参阅 [[Open Files Limit]]。
+你可能注意到了，如果没有调整打开文件限制的话（`ulimit -n`），启动时 Riak 会警告限制数量太少。运行 Riak 时建议你增加操作系统默认的文件打开限制。这么做的原因请参阅“[[打开文件限制]]”一文。
 </div>
 
 ## 节点可以工作吗？
@@ -128,5 +128,5 @@ riak-admin diag
 
 接下来你或许想阅读下面的文章。
 
-* 阅读 [[Client Libraries]]，学习如何通过你最喜欢的编程语言使用 Riak
-* [[Learn about the high level concepts of Riak|Concepts]]
+* 阅读“[[客户端代码库]]”一文，学习如何通过你最喜欢的编程语言使用 Riak
+* [[学习 Riak 中的高级概念|概念]]

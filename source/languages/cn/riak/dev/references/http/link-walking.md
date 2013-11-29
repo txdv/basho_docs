@@ -1,5 +1,5 @@
 ---
-title: HTTP Link Walking
+title: 通过 HTTP 进行链接遍历
 project: riak
 version: 1.4.2+
 document: api
@@ -9,63 +9,49 @@ keywords: [api, http]
 group_by: "Query Operations"
 ---
 
-Link walking (traversal) finds and returns objects by following links attached
-to them, starting from the object specified by the bucket and key portion.  It
-is a special case of [[MapReduce|Using MapReduce]], and can be expressed more verbosely as such.
-[[Read more about Links|Links]].
+链接遍历根据附属在对象上的链接从指定的“bucket/键”组合开始查找并返回对象。链接遍历是特殊的 [[MapReduce 查询|使用 MapReduce]]，如果直接使用 MapReduce 要复杂的多。关于链接的更多内容请阅读“[[链接]]” 一文。
 
-## Request
+## 请求
 
 ```bash
-GET /riak/bucket/key/[bucket],[tag],[keep]            # Old format
-GET /buckets/bucket/keys/key/[bucket],[tag],[keep]    # New format
+GET /riak/bucket/key/[bucket],[tag],[keep]            # 旧格式
+GET /buckets/bucket/keys/key/[bucket],[tag],[keep]    # 新格式
 ```
 
-<div class="info"><div class="title">Link filters</div>
-<p>A link filter within the request URL is made of three parts, separated by
-commas:</p>
+<div class="info">
+<div class="title">链接过滤器</div>
+<p>请求 URL 中的链接过滤器包含三部分，以逗号分隔：</p>
 
 <ul>
-<li>Bucket - a bucket name to limit the links to</li>
-<li>Tag - a "riaktag" to limit the links to</li>
-<li>Keep - 0 or 1, whether to return results from this phase</li>
+<li>Bucket - 限制链接指向的对象所在的 bucket</li>
+<li>Tag - 设置链接指向的对象的“riaktag”</li>
+<li>Keep - 0 或 1，是否返回这一步的结果</li>
 </ul>
 
-<p>Any of the three parts may be replaced with <code>_</code> (underscore),
-signifying that any value is valid. Multiple phases of links can be followed by
-adding additional path segments to the URL, separating the link filters by
-slashes. The final phase in the link-walking query implicitly returns its
-results.</p>
+<p>这三部分都可以使用 <code>_</code>（下划线），即任何值都是合法的。多步链接变量可以直接在 URL 后面加上路径片段，以斜线分隔。链接遍历的最后一步会返回查询的结果。</p>
 </div>
 
-## Response
+## 响应
 
-Normal status codes:
+正常的状态码：
 
 * `200 OK`
 
-Typical error codes:
+常见的错误码：
 
-* `400 Bad Request` - if the format of the query in the URL is invalid
-* `404 Not Found` - if the origin object of the walk was missing
+* `400 Bad Request` - 如果请求 URL 的格式不正确
+* `404 Not Found` - 如果遍历的初始对象不存在
 
-Important headers:
+重要的报头：
 
-* `Content-Type` - always `multipart/mixed`, with a boundary specified
+* `Content-Type` - 都是 `multipart/mixed`，还指定了边界
 
-<div class="note"><div class="title">Understanding the response body</div>
-<p>The response body will always be <code>multipart/mixed</code>, with each
-chunk representing a single phase of the link-walking query. Each phase will
-also be encoded in <code>multipart/mixed</code>, with each chunk representing a
-single object that was found. If no objects were found or "keep" was not set on
-the phase, no chunks will be present in that phase.  Objects inside phase
-results will include <code>Location</code> headers that can be used to determine
-bucket and key. In fact, you can treat each object-chunk similarly to a complete
-response from [[fetching the object|HTTP Fetch Object]], without the status
-code.</p>
+<div class="note">
+<div class="title">理解响应主体</div>
+<p>响应主体的类型都是 <code>multipart/mixed</code>，每个片段代表链接遍历查询中的一步。每一步的结果也会使用 <code>multipart/mixed</code> 格式编码，每个片段代表找到的一个对象。如果没找到对象，或者这一步的 `keep` 设为 `0`，那么就不会有对应这一步的片段。各步结果中的对象都有 <code>Location</code> 报头，用来识别所属的 bucket 和对应的键。其实，可以直接把每个对象片段看成是[[获取单个对象|通过 HTTP 获取对象]]得到的完整响应，只是没有状态码而已。</p>
 </div>
 
-## Example
+## 示例
 
 ```bash
 $ curl -v http://127.0.0.1:8098/riak/test/doc3/test,_,1/_,next,1

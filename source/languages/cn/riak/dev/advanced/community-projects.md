@@ -1,5 +1,5 @@
 ---
-title: Community Projects
+title: 社区项目
 project: riak
 version: 1.4.2+
 document: reference

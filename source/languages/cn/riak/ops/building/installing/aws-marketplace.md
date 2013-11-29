@@ -1,13 +1,13 @@
 ---
-title: Installing on AWS Marketplace
+title: 在 AWS Marketplace 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, AWS, marketplace, amazon]
-prev: "[[Installing on Windows Azure]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing Riak from Source]]"
+prev: "[[在 Windows Azure 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[从源码编译安装 Riak]]"
 ---
 
 ## 在 AWS Marketplace 上运行 Riak VM
@@ -44,7 +44,7 @@ next: "[[Installing Riak from Source]]"
 
     ![EC2 Security Group Settings](/images/aws-marketplace-security-group.png)
 
-更多内容参见 [[Security and Firewalls]]。
+更多内容参见“[[安全和防火墙]]”一文。
 
 ## 在 AWS 上搭建 Riak 集群
 
@@ -88,4 +88,4 @@ next: "[[Installing Riak from Source]]"
 
 进一步阅读：
 
-- [[Basic Riak API Operations|The Basics]]
+- [[Riak API 基本操作|查询基础]]

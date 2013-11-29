@@ -1,5 +1,5 @@
 ---
-title: Session Storage
+title: 会话存储
 project: riak
 version: 1.4.2+
 document: cookbook

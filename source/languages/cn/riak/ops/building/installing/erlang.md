@@ -1,13 +1,13 @@
 ---
-title: Installing Erlang
+title: 安装 Erlang
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, erlang]
-prev: "[[Installing and Upgrading]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on Debian and Ubuntu]]"
+prev: "[[安装和升级]]"
+up:   "[[安装和升级]]"
+next: "[[在 Debian 和 Ubuntu 中安装]]"
 ---
 
 Riak 需要 [[Erlang|http://erlang.org/]] {{#1.2.0+}}R15B01{{/1.2.0+}}{{#1.2.0-}}R14B03{{/1.2.0-}} 的支持。
@@ -16,7 +16,7 @@ Riak 需要 [[Erlang|http://erlang.org/]] {{#1.2.0+}}R15B01{{/1.2.0+}}{{#1.2.0-}
 
 <div class="note">
 <div class="title">Erlang 版本提醒</div>
-针对 Debian、Ubuntu、Mac OS X、RHEL 和 CentOS 的 Riak 二进制安装包中已经包含了 Erlang，因此无需再编译 Erlang 源码。不过，<strong>如果要完成 [[Five Minute Install]] 中介绍的内容，必须下载安装 Erlang</strong>。
+针对 Debian、Ubuntu、Mac OS X、RHEL 和 CentOS 的 Riak 二进制安装包中已经包含了 Erlang，因此无需再编译 Erlang 源码。不过，<strong>如果要完成“[[花五分钟安装]]”一文中介绍的内容，必须下载安装 Erlang</strong>。
 </div>
 
 ## 使用 kerl 安装
@@ -162,7 +162,7 @@ make && sudo make install
 
 ### 使用 Homebrew 安装
 
-如果使用 Homebre 安装 Riak，请参照 [[Mac OS X Installation documentation|Installing-on-Mac-OS-X]] 中的步骤，会自动安装 Erlang。
+如果使用 Homebre 安装 Riak，请参照 [[Mac OS X 安装文档|在 Mac OS X 中安装]]中的步骤，会自动安装 Erlang。
 
 要想使用 Homebrew 单独安装 Erlang，请执行下面的命令：
 

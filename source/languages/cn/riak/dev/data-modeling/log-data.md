@@ -1,5 +1,5 @@
 ---
-title: Log Data
+title: 日志数据
 project: riak
 version: 1.4.2+
 document: cookbook

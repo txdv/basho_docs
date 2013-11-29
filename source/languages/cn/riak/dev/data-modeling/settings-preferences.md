@@ -1,5 +1,5 @@
 ---
-title: User Settings/Preferences
+title: 用户设置
 project: riak
 version: 1.4.2+
 document: cookbook

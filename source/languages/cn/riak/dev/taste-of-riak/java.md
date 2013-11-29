@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: Java"
+title: "初试 Riak：Java 篇"
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,7 +8,7 @@ audience: beginner
 keywords: [developers, client, java]
 ---
 
-如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
+如果你还没有创建 Riak 节点并启动，请先阅读“[[事先准备|初试 Riak：事先准备]]”一文。
 
 要使用本文介绍的 Riak 开发方法，必须先正确安装 Java。
 
@@ -21,7 +21,7 @@ keywords: [developers, client, java]
 <div class="note">
 <div class="title">针对本地集群的设置</div>
 
-如果你按照 [[five minute install]] 中介绍的方法在本地架设了 Riak 集群，请使用文本编辑器打开 `TasteOfRiak.java`，把第 20 行注释掉，再去掉第 23 行的注释，保存文件。修改后的代码如下：
+如果你按照“[[花五分钟安装]]”一文中介绍的方法在本地架设了 Riak 集群，请使用文本编辑器打开 `TasteOfRiak.java`，把第 20 行注释掉，再去掉第 23 行的注释，保存文件。修改后的代码如下：
 
 ```java
 //IRiakClient client = RiakFactory.pbcClient();

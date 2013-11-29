@@ -1,13 +1,13 @@
 ---
-title: Installing on Mac OS X
+title: 在 Mac OS X 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, osx]
-prev: "[[Installing on RHEL and CentOS]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on FreeBSD]]"
+prev: "[[在 RHEL 和 CentOS 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[在 FreeBSD 中安装]]"
 download:
   key: osx
   name: "Mac OS X"
@@ -24,7 +24,7 @@ download:
 <div class="note">
 <div class="title">OS X 上的 ulimit</div>
 
-OS X 中文件的打开句柄数很小，因此即便是文件句柄使用量很小的后台程序，也可能将其耗尽。更改句柄数量限制的方法参见 [[Open Files Limit]]。
+OS X 中文件的打开句柄数很小，因此即便是文件句柄使用量很小的后台程序，也可能将其耗尽。更改句柄数量限制的方法参见“[[打开文件限制]]”一文。
 </div>
 
 ## 使用预先编译好的 tarball 压缩包安装
@@ -140,6 +140,7 @@ brew install riak
 
 如果没有安装 Erlang，Homebrew 会自定为你安装。
 
+<a id="Installing-From-Source"></a>
 ## 从源码安装
 
 必须先安装 Mac 附带 CD 中的 Xcode 工具包（还可以从 [Apple 开发者网站](http://developer.apple.com/)上下载）。
@@ -148,7 +149,7 @@ brew install riak
 
 Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-如果还没有安装 Erlang，请参照 [[Installing Erlang]]。不用担心，很简单！
+如果还没有安装 Erlang，请参照“[[安装 Erlang]]”一文。不用担心，很简单！
 
 然后，下载解压源码：
 
@@ -165,5 +166,5 @@ make rel
 
 请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

@@ -1,5 +1,5 @@
 ---
-title: Conditional Summation
+title: 条件求和
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -8,4 +8,4 @@ audience: intermediate
 keywords: [use-cases, sql]
 ---
 
-Summing all values that optionally adhere to some constraint.
+根据默写限制求和。

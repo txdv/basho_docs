@@ -1,5 +1,5 @@
 ---
-title: Advanced Search
+title: Riak Search 高级用法
 project: riak
 version: 1.4.2+
 document: guide
@@ -98,8 +98,9 @@ is_stopword(Term) when length(Term) == 5 ->
 4. 规格化每个字段中的关键字
 5.把 {Field, Term, DocumentID} 记录写入索引
 
-详细的索引命令可以参照“[[搜索索引参考手册|Search Indexing Reference]]”。
+详细的索引命令可以参照“[[Riak Search 索引参考手册]]”。
 
+<a id="Search-KV-and-MapReduce"></a>
 ## Riak Search，KV 和 MapReduce
 
 Riak Search 能够索引和查询存储在 Riak KV 中的数据。一般情况下能够迅速启用对纯文本、XML、JSON 数据的索引。

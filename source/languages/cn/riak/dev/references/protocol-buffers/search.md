@@ -1,5 +1,5 @@
 ---
-title: PBC Search
+title: 通过 PCB 执行 Riak Search 查询
 project: riak
 version: 1.4.2+
 document: api
@@ -9,10 +9,9 @@ keywords: [api, protocol-buffer]
 group_by: "Query Operations"
 ---
 
-Send a Search request to retrieve a list of documents, along with a few stats.
+发送 Riak Search 请求，取回一组文档，以及一些状态信息。
 
-## Request
-
+## 请求
 
 ```bash
 message RpbSearchQueryReq {
@@ -29,31 +28,25 @@ message RpbSearchQueryReq {
 }
 ```
 
-Required Parameters
+必须提供的参数：
 
-* **q** - the bucket the index is for
-* **index** - the name of the index to search
+* **q** - 要查询索引所在的 bucket
+* **index** - 要查询的索引名
 
-Optional Parameters
+可选的参数：
 
-* **rows** - the maximum number of rows to return
-* **start** - a start offset. the number of keys to skip before returning values
-* **sort** - how the search results are to be sorted
-* **filter** - filters search with additional query scoped to inline fields
-* **df** - override the `default_field` setting in the schema file
-* **op** - "and" or "or", to override the `default_op` operation setting in the schema file
-* **fl** - return the fields limit
-* **presort** - presort (key / score)
+* **rows** - 返回行数的最大值
+* **start** - 偏移值。返回值之前要跳过的键数量
+* **sort** - 搜索结果的排序方式
+* **filter** - 使用行间字段指定的搜素过滤器
+* **df** - 覆盖模式文件中设置的 `default_field`
+* **op** - "and" 或 "or"，覆盖模式文件中设置的 `default_op`
+* **fl** -返回字段的数量限制
+* **presort** - 预排序（键 / 得分）
 
+## 响应
 
-## Response
-
-The results of a search query are returned as a repeating list of
-0 or more RpbSearchDocs. RpbSearchDocs themselves are composed of
-0 or more key/value pairs (RpbPair) that match the given request
-parameters. It also returns the maximum search score and the number
-of results.
-
+Riak Search 查询的结果会是一系列重复的 0 或者 RpbSearchDocs。RpbSearchDocs 本身是由 0 和符合查询参数的键值对（RpbPair)）组成的。而且还会返回最大的搜素得分和结果的数量。
 
 ```bash
 // RbpPair is a generic key/value pair datatype used for other message types
@@ -71,19 +64,17 @@ message RpbSearchQueryResp {
 }
 ```
 
-Values
+响应值：
 
-* **docs** - a list of docs that match the search request
-* **max_score** - the top score returned
-* **num_found** - returns the total number of values matched by this search
+* **docs** - 符合查询条件的一组文档
+* **max_score** - 最大得分
+* **num_found** - 符合查询条件的结果总数
 
+## 示例
 
-## Example
+请求：
 
-Request
-
-Here we search for any animals that being with the string `pig`. We only
-want the first 100, and sort the values by a `name` field.
+下面这个例子查询以字符串“pig”开头的动物名，我们只想得到前 100 个结果，而且按照 `name` 字段排序。
 
 ```bash
 RpbSearchQueryReq protoc decode:
@@ -100,7 +91,7 @@ Erlang  <<0,0,0,26,27,10,4,112,105,103,42,18,7,97,110,
           109,101>>
 ```
 
-Response
+响应：
 
 ```bash
 Hex     00 00 00 36 1B 0A 1D 0A 0D 0A 06 61 6E 69 6D

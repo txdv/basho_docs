@@ -1,5 +1,5 @@
 ---
-title: Scaling and Operating Riak Best Practices
+title: Riak 扩放和操作最佳实践
 project: riak
 version: 1.4.2+
 document: cookbook

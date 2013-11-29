@@ -1,5 +1,5 @@
 ---
-title: Cluster Capacity Planning
+title: 集群容量规划
 project: riak
 version: 1.4.2+
 document: appendix
@@ -27,7 +27,7 @@ keywords: [planning, cluster]
 
 如果算出的 RAM 用量超出了硬件资源（也就是说无力承担能使用 Bitcask 的 RAM），建议你使用 LevelDB。
 
-规划使用 Bitcask 作为后台的集群，更详细的内容请阅读 [[Bitcask Capacity Planning]]。
+规划使用 Bitcask 作为后台的集群，更详细的内容请阅读 [[Bitcask 容量规划]]。
 
 ### LevelDB
 
@@ -56,7 +56,7 @@ keywords: [planning, cluster]
 
 （在 Basho，我们相信数据库应该很耐用。考虑到这一点，开发时，我们要求 Riak 在能够写入硬盘的同时，把响应时间保持在用户的期待值之下。所以这个计算公式假设所有的数据都保存在硬盘上。）
 
-把电脑设置成可以提供数据库服务的设备时的很多考虑点都可以应用在设置 Riak 节点上。挂载硬盘时不记录访问时间，以及把 OS 和 Riak 数据放在不同的硬盘可以更进一步提升性能。详细内容请阅读 [[System Planning|Planning for a Riak System]]。
+把电脑设置成可以提供数据库服务的设备时的很多考虑点都可以应用在设置 Riak 节点上。挂载硬盘时不记录访问时间，以及把 OS 和 Riak 数据放在不同的硬盘可以更进一步提升性能。详细内容请阅读 [[Riak 系统规划]]。
 
 ## 读写性能分析
 
@@ -64,11 +64,11 @@ keywords: [planning, cluster]
 
 ## 节点的数量
 
-集群中节点的数量取决于数据复制的次数（参阅 [[Replicated|Replication]]）。为了保证集群总是能处理读写请求，Basho 推荐把副本数 N 设为 3。集群中包含 3 个或 4 个节点都可以（调整节点数量的方法参见 [Five Minute Install]]）。不过，在生产环境中部署时，我们建议最少要有 5 个节点，因为数量很小就违背了系统的容错功能。而且，在少于 5 个节点的集群中，响应请求的节点比例会很高（75-100%），集群中过度的负载可能会降低性能。关于这个推荐设置的详细信息请阅读[这篇博文](http://basho.com/blog/technical/2012/04/27/Why-Your-Riak-Cluster-Should-Have-At-Least-Five-Nodes/)。
+集群中节点的数量取决于数据复制的次数（参阅[[副本]]）。为了保证集群总是能处理读写请求，Basho 推荐把副本数 N 设为 3。集群中包含 3 个或 4 个节点都可以（调整节点数量的方法参见 [Five Minute Install]]）。不过，在生产环境中部署时，我们建议最少要有 5 个节点，因为数量很小就违背了系统的容错功能。而且，在少于 5 个节点的集群中，响应请求的节点比例会很高（75-100%），集群中过度的负载可能会降低性能。关于这个推荐设置的详细信息请阅读[这篇博文](http://basho.com/blog/technical/2012/04/27/Why-Your-Riak-Cluster-Should-Have-At-Least-Five-Nodes/)。
 
 ## 环的大小和分区数量
 
-环的大小是组成 Riak 集群的分区数量。这个数量在集群启动之前设置，在 app.config 文件的 [[ring_creation_size|Configuration Files#app-config]] 参数下面。
+环的大小是组成 Riak 集群的分区数量。这个数量在集群启动之前设置，在 app.config 文件的 [[ring_creation_size|设置文件#app-config]] 参数下面。
 
 Riak 集群的默认分区数是 64，这个数字对小型的集群足够了，如果你计划扩建集群就要选择一个更大的数字。环的大小必须是 2 的幂数。每个节点的推荐分区数量是 10，每个节点分配的分区数量可以用分区的数量除以节点的数量得到。
 {{#<1.4.0}}
@@ -94,5 +94,5 @@ Riak 使用 Erlang 内建的分发能力提供了对数据的可靠访问性。R
 
 ## 进一步阅读
 
-* [[System Planning|Planning for a Riak System]]
+* [[Riak 系统规划]]
 * [[Basho Bench]]

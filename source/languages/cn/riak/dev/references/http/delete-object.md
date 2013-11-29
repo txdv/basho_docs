@@ -1,5 +1,5 @@
 ---
-title: HTTP Delete Object
+title: 通过 HTTP 删除对象
 project: riak
 version: 1.4.2+
 document: api
@@ -9,50 +9,43 @@ keywords: [api, http]
 group_by: "Object/Key Operations"
 ---
 
-Deletes an object from the specified bucket / key.
+删除指定“bucket/键”组合对应的对象。
 
-## Request
+## 请求
 
 ```
 DELETE /riak/bucket/key           # Old format
 DELETE /buckets/bucket/keys/key   # New format
 ```
 
-Optional query parameters:
+可选的请求参数：
 
-* `rw` - quorum for both operations (get and put) involved in deleting an
-object (default is set at the bucket level)
-* `r` - (read quorum) how many replicas need to agree when retrieving the object
-* `pr` - (primary read quorum) works like `r` but requires that the nodes
-read from are not fallback nodes
-* `w` - (write quorum) how many replicas must confirm receiving writes before returning a successful response
-* `dw` - (durable write quorum) how many replicas to commit to durable storage
-before returning a successful response
-* `pw` - (primary write quorum) how many replicas to commit to primary nodes
-before returning a successful response
+* `rw` - 删除操作中涉及到的两个请求（GET 和 PUT）使用的法定值（默认值在 bucket 层面设定）
+* `r` - （读取法定值）获取对象时要得到多少个副本
+* `pr` - （主读取法定值）和 `r` 类似，但读取的节点不能是回退节点
+* `w` - （写入法定值）返回成功响应之前应该接受到多少个副本
+* `dw` - （持久写入法定值）返回成功响应之前持久化存储要返回多少个副本
+* `pw` - （主写入法定值）返回成功响应之前主节点要返回多少个副本
 
-## Response
+## 响应
 
-<div class="note"><div class="title">Client ID</div>
-<p>All requests to Riak &lt;1.0 or Riak 1.0 without `vnode_vclocks` enabled
-should include the `X-Riak-ClientId` header, which can be any string that
-uniquely identifies the client, for purposes of tracing object modifications in
-the [[vector clock|Vector Clocks]].</p>
+<div class="note">
+<div class="title">客户端 ID</div>
+<p>发送到 Riak 1.0 及以下版本的请求，如果没有启用 `vnode_vclocks`，请求中必须包含 `X-Riak-ClientId` 报头，使用任意的字符串唯一标识客户端，以便使用[[向量时钟]]跟踪对象的变动。</p>
 </div>
 
-Normal response codes:
+正常的响应码：
 
 * `204 No Content`
 * `404 Not Found`
 
-Typical error codes:
+常见的错误码：
 
 * `400 Bad Request` - e.g. when rw parameter is invalid (> N)
 
-`404` responses are "normal" in the sense that DELETE operations are idempotent
-and not finding the resource has the same effect as deleting it.
+`404` 是正常的响应码，因为 DELETE 操作是幂等的，没找到资源和资源被删除的效果是一样的。
 
-## Example
+## 示例
 
 ```bash
 $ curl -v -X DELETE http://127.0.0.1:8098/riak/test/test2

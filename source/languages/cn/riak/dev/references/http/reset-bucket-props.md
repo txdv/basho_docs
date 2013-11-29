@@ -1,5 +1,5 @@
 ---
-title: HTTP Reset Bucket Properties
+title: 通过 HTTP 还原 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api
@@ -9,27 +9,27 @@ keywords: [api, http]
 group_by: "Bucket Operations"
 ---
 
-Resets the bucket properties like "n_val" and "allow_mult" back to the default settings.
+把 bucket 的属性（例如 "n_val" 和 "allow_mult"）还原到默认值。
 
-## Request
+## 请求
+
 ```bash
 DELETE /buckets/bucket/props
 ```
 
-Resetting bucket properties is not available via the old API format.
+还原 bucket 属性不能使用旧的 API 格式。
 
-## Response
+## 响应
 
-Normal status codes:
+正常的状态码：
 
 * `204 No Content`
 
-Typical error codes:
+常见的错误码：
 
-* `405 Method Not Allowed` - returned if the operation is attempted using the old API
-format `/riak/bucket`.
+* `405 Method Not Allowed` - 如果尝试使用旧的 API 格式 `/riak/bucket`
 
-## Example
+## 示例
 
 ```bash
 curl -XDELETE -v localhost:8098/buckets/bucket/props                                                                                                             {13:47}

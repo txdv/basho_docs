@@ -1,5 +1,5 @@
 ---
-title: Bitcask Capacity Planning
+title: Bitcask 容量规划
 project: riak
 version: 1.4.2+
 document: appendix
@@ -50,7 +50,6 @@ keywords: [planning, bitcask]
 ### 推荐设置
 
 <span id="recommend"></span>
-
 
 ### Bitcask RAM 大小计算详解
 

@@ -1,5 +1,5 @@
 ---
-title: "Taste of Riak: Clojure"
+title: "初试 Riak：Clojure 篇"
 project: riak
 version: 1.4.2+
 document: guide
@@ -8,7 +8,7 @@ audience: beginner
 keywords: [developers, client, clojure]
 ---
 
-如果你还没有创建 Riak 节点并启动，请先阅读 [[Prerequisites|Taste of Riak: Prerequisites]]。
+如果你还没有创建 Riak 节点并启动，请先阅读“[[事先准备|初试 Riak：事先准备]]”一文。
 
 要使用本文介绍的 Riak 开发方法，必须先正确安装 Java 和 [Leiningen](https://github.com/technomancy/leiningen)。
 
@@ -42,7 +42,7 @@ $ lein repl
 (wc/connect! "http://127.0.0.1:8098/riak")
 ```
 
-如果参照 [[five minute install]] 中的方法在本地架设了 Riak 集群，请输入下面的代码：
+如果参照“[[花五分钟安装]]”一文中的方法在本地架设了 Riak 集群，请输入下面的代码：
 
 ```clojure
 ;; Connects to a Riak node at 127.0.0.1:10018

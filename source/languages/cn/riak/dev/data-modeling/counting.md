@@ -1,5 +1,5 @@
 ---
-title: Counting
+title: 计数
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -8,4 +8,4 @@ audience: intermediate
 keywords: [use-cases, sql]
 ---
 
-Counting all values, or partial values.
+统计全部值，或部分值。

@@ -9,23 +9,19 @@ keywords: [api, protocol-buffer]
 index: true
 ---
 
-This is an overview of the operations you can perform over the Protocol Buffers
-Client (PBC) interface to Riak, and can be used as a guide for developing a
-compliant client.
+本文简略介绍了可以使用 Riak 的  Protocol Buffers 客户端（PBC）进行的操作，也可以作为开发客户端的参考。
 
-## Protocol
+## 协议
 
-Riak listens on a TCP port (8087 by default) for incoming connections. Once
-connected the client can send a stream of requests on the same connection.
+Riak 会在 TCP 端口（默认为 8087）上监听进入的连接。一旦建立连接，客户端就可以通过这个连接发送请求。
 
-Each operation consists of a request message and one or more response messages.
-Messages are all encoded the same way
-* 32-bit length of message code + protocol buffer message in network order
-* 8-bit message code to identify the protocol buffer message
-* N-bytes of protocol buffers encoded message
+每个操作包含一个请求消息和一个或多个响应消息。所有的消息都使用相同的方式编码：
 
-### Example
+* 网络排序的 32 位长度的消息码 + Protocol Buffer 消息
+* 标识 Protocol Buffer 消息的 8 位消息码
+* N 字节长编码后的 Protocol Buffer 消息
 
+### 示例
 
 ```bash
 00 00 00 07 09 0A 01 62 12 01 6B
@@ -40,8 +36,7 @@ bucket: "b"
 key: "k"
 ```
 
-
-### Message Codes
+### 消息码
 
 <table>
 <tr><td>0</td><td>RpbErrorResp</td></tr>
@@ -69,25 +64,21 @@ key: "k"
 <tr><td>22</td><td>RpbSetBucketResp</td></tr>
 <tr><td>23</td><td>RpbMapRedReq</td></tr>
 <tr><td>24</td><td>RpbMapRedResp</td></tr>
-<tr><td>25</td><td>RpbIndexReq <i>(new in 1.2+)</i></td></tr>
-<tr><td>26</td><td>RpbIndexResp <i>(new in 1.2+)</i></td></tr>
-<tr><td>27</td><td>RpbSearchQueryReq <i>(new in 1.2+)</i></td></tr>
-<tr><td>28</td><td>RbpSearchQueryResp <i>(new in 1.2+)</i></td></tr>
+<tr><td>25</td><td>RpbIndexReq <i>（1.2+ 中新添加）</i></td></tr>
+<tr><td>26</td><td>RpbIndexResp <i>（1.2+ 中新添加）</i></td></tr>
+<tr><td>27</td><td>RpbSearchQueryReq <i>（1.2+ 中新添加）</i></td></tr>
+<tr><td>28</td><td>RbpSearchQueryResp <i>（1.2+ 中新添加）</i></td></tr>
 </table>
 
 
-<div class="info"><div class="title">Message Definitions</div>
-<p>All Protocol Buffers messages can be found defined in the
-[[riak.proto|https://github.com/basho/riak_pb/blob/master/src/riak.proto]] and other .proto files in the RiakPB project.</p>
+<div class="info">
+<div class="title">消息定义</div>
+<p>所有的 Protocol Buffer 消息都可以在 [[riak.proto|https://github.com/basho/riak_pb/blob/master/src/riak.proto]] 和其他 RiakPB 项目的 .proto 文件中找到。</p>
 </div>
 
+### 错误响应
 
-### Error Response
-
-If the server experiences an error processing a request it will return an
-RpbErrorResp message instead of the response expected for the given request
-(e.g. RbpGetResp is the expected response to RbpGetReq).  Error messages contain
-an error string and an error code.
+如果服务器处理请求的过程中发生了错误，不会返回请求期望得到的响应（例如，RbpGetReq 期望得到的响应是 RbpGetResp），而会返回 RpbErrorResp 消息。错误消息中包含错误消息和错误码。
 
 ```bash
 message RpbErrorResp {
@@ -96,33 +87,33 @@ message RpbErrorResp {
 }
 ```
 
-Values:
+响应值：
 
-* **errmsg** - a string representation of what went wrong
-* **errcode** - a numeric code. Currently only RIAKC_ERR_GENERAL=1 is defined.
+* **errmsg** - 描述错误的文本
+* **errcode** - 数字代码。目前只定义了 RIAKC_ERR_GENERAL=1
 
-## Bucket Operations
+## Bucket 相关操作
 
-* [[PBC List Buckets]]
-* [[PBC List Keys]]
-* [[PBC Get Bucket Properties]]
-* [[PBC Set Bucket Properties]]
+* [[通过 PBC 列出 bucket]]
+* [[通过 PBC 列出键]]
+* [[通过 PBC 获取 bucket 的属性]]
+* [[通过 PBC 设置 bucket 的属性]]
 
-## Object/Key Operations
+## 对象/键相关操作
 
-* [[PBC Fetch Object]]
-* [[PBC Store Object]]
-* [[PBC Delete Object]]
+* [[通过 PBC 获取对象]]
+* [[通过 PBC 存储对象]]
+* [[通过 PBC 删除对象]]
 
-## Query Operations
+## 查询
 
-* [[PBC MapReduce]]
-* [[PBC Secondary Indexes]]
-* [[PBC Search]]
+* [[通过 PBC 执行 MapReduce 查询]]
+* [[通过 PBC 执行二级索引查询]]
+* [[通过 PCB 执行 Riak Search 查询]]
 
-## Server Operations
+## 服务器相关操作
 
 * [[PBC Ping]]
-* [[PBC Get Client ID]]
-* [[PBC Set Client ID]]
-* [[PBC Server Info]]
+* [[通过 PBC 获取客户端 ID]]
+* [[通过 PBC 设置客户端 ID]]
+* [[通过 PBC 获取服务器信息]]

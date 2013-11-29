@@ -1,5 +1,5 @@
 ---
-title: Common Errors
+title: 常见错误
 project: riak
 version: 1.4.2+
 document: reference
@@ -10,18 +10,15 @@ interest: []
 body_id: errors
 ---
 
-本文并没有列出在使用 Riak 时可能遇到的错误，而是尽量列出最常见的错误，
-并给出非关键错误的说明，在日志文件中可能会见到。
+本文并没有列出在使用 Riak 时可能遇到的错误，而是尽量列出最常见的错误，并给出非关键错误的说明，在日志文件中可能会见到。
 
 查找错误所在是个体力活，有时错误是由一系列其他错误导致的。
 
 ## 错误和消息
 
-本文列出的表格没有说明错误消息会写入哪个日志文件。根据你所做的日志设置，有些可能更常见
-（例如，日志等级为 debug），有些只会输出到控制台（例如，执行了 `riak console` 命令）。
+本文列出的表格没有说明错误消息会写入哪个日志文件。根据你所做的日志设置，有些可能更常见（例如，日志等级为 debug），有些只会输出到控制台（例如，执行了 `riak console` 命令）。
 
-你还可以在 `app.config` 文件的 `lager` 区设置 `lager_default_formatter`，调整
-日志消息的格式。如果你做了修改，看到的消息和本文显示的会有所不同。
+你还可以在 `app.config` 文件的 `lager` 区设置 `lager_default_formatter`，调整日志消息的格式。如果你做了修改，看到的消息和本文显示的会有所不同。
 
 本文的组织方式有利于查看日志消息的某个部分，因为整个日志条目太笨重了。例如，下面的消息：
 
@@ -30,18 +27,15 @@ body_id: errors
 no function clause matching orddict:fetch('riak@192.168.2.81', []) line 72
 ```
 
-开头是日期（`12:34:27.999`），后面跟着日志的等级（`[error]`），然后是由 `lager` 设置
-控制格式的一段消息（如下面的 Lager 表格中所示：*gen_server `Mod` terminated with reason: `Reason`*）
+开头是日期（`12:34:27.999`），后面跟着日志的等级（`[error]`），然后是由 `lager` 设置控制格式的一段消息（如下面的 Lager 表格中所示：*gen_server `Mod` terminated with reason: `Reason`* ）
 
 ### Lager 格式
 
-Riak 使用的主要日志机制基于 Lager 项目，最好了解一下常见的消息格式。大多数格式中，导致
-问题的原因都用变量表示，例如对应 `Mod` 的 `Reason`（意思是说 Erlang 模块往往是问题所在）。
+Riak 使用的主要日志机制基于 Lager 项目，最好了解一下常见的消息格式。大多数格式中，导致问题的原因都用变量表示，例如对应 `Mod` 的 `Reason`（意思是说 Erlang 模块往往是问题所在）。
 
 Riak 不会吧收到的所有错误消息都转换成人类可读的句子。不过，输出的错误是个对象。
 
-上面的错误消息示例对应到下表第一个消息，Erlang `Mod` 的值是 **riak_core_capability**，
-原因是个 Erlang 错误：**no function clause matching orddict:fetch('riak@192.168.2.81', []) line 72**。
+上面的错误消息示例对应到下表第一个消息，Erlang `Mod` 的值是 **riak_core_capability**，原因是个 Erlang 错误：**no function clause matching orddict:fetch('riak@192.168.2.81', []) line 72**。
 
 错误 | 消息
 ------|--------
@@ -71,10 +65,7 @@ undef | call to undefined function `Mod`
 
 ### 错误 Atom
 
-Erlang 是一种“happy path/fail fast”风格的语言，最常见的错误日志字符串之一
-会包含 `{error,{badmatch`。这个字符串是 Erlang 使用的方式，用来告诉你赋给了不期望的值，
-因此可以用在很多消息前面。在下面这个例子中，`{error,{badmatch` 放在了 `insufficient_vnodes_available` 错误前面。
-这个例子来自本文后面的 riak_kv 表格。
+Erlang 是一种“happy path/fail fast”风格的语言，最常见的错误日志字符串之一会包含 `{error,{badmatch`。这个字符串是 Erlang 使用的方式，用来告诉你赋给了不期望的值，因此可以用在很多消息前面。在下面这个例子中，`{error,{badmatch` 放在了 `insufficient_vnodes_available` 错误前面。这个例子来自本文后面的 riak_kv 表格。
 
 ```
 2012-01-13 02:30:37.015 [error] <0.116.0> webmachine error: path="/riak/contexts"\
@@ -87,8 +78,7 @@ Erlang 是一种“happy path/fail fast”风格的语言，最常见的错误�
 
 ## Erlang 错误
 
-一旦 Riak 集群部署到生产环境就很难出错，不过很多初次接触 Riak 或 Erlang 的用户偶尔会在
-初次安装时遇到错误。这些错误往往和 Erlang 本身无关，而是由于网络、权限或设置导致的。
+一旦 Riak 集群部署到生产环境就很难出错，不过很多初次接触 Riak 或 Erlang 的用户偶尔会在初次安装时遇到错误。这些错误往往和 Erlang 本身无关，而是由于网络、权限或设置导致的。
 
 错误    | 说明 | 解决办法
 ---------|-------------|-------
@@ -103,19 +93,15 @@ temp_alloc | Erlang 试图分配内存 | 经常和“Cannot allocate X bytes of 
 
 ## Riak 错误和消息
 
-很多 KV 错误都有规定的消息。针对这些情况，我们交由 Riak 来说明正确地做法。
-例如，如果输入不合法，`map/reduce` `parse_input` 会显示如下错误：
+很多 KV 错误都有规定的消息。针对这些情况，我们交由 Riak 来说明正确地做法。例如，如果输入不合法，`map/reduce` `parse_input` 会显示如下错误：
 
 <blockquote>Inputs must be a binary bucket, a tuple of bucket and key-filters, a list of target tuples, or a search, index, or modfun tuple: INPUT</blockquote>
 
-其他的常见错误代码经常都由 Erlang atom 标记
-（经常包含在 `{error,{badmatch,...}}` 元组中，如前一节所述）。下面的表格列出了常见的
-错误代码以及相应的日志消息（如果有的话）。
+其他的常见错误代码经常都由 Erlang atom 标记（经常包含在 `{error,{badmatch,...}}` 元组中，如前一节所述）。下面的表格列出了常见的错误代码以及相应的日志消息（如果有的话）。
 
 ### Riak Core
 
-Riak Core 是 KV 的底层实现。下面列出的错误都是由这个框架导致的，可能会在
-使用 KV，搜索功能或任何其他的核心实现时遇到。
+Riak Core 是 KV 的底层实现。下面列出的错误都是由这个框架导致的，可能会在使用 KV，搜索功能或任何其他的核心实现时遇到。
 
 错误    | 消息 | 说明 | 解决方法
 ---------|---------|-------------|-------
@@ -229,9 +215,7 @@ reset_disabled | | 试图在生产环境中重设内存后台 | 不要在生产�
 
 ### JavaScript
 
-有些错误和 JavaScript pre-commit 函数、map/reduce 函数，或管理 JavaScript VM 的
-进程池有关。如果不适用 JavaScript 就不会遇到这些问题；如果遇到了，
-请把 `*js_vm*` 设置高一点，或者只是某些问题的副作用，例如资源紧张。
+有些错误和 JavaScript pre-commit 函数、map/reduce 函数，或管理 JavaScript VM 的进程池有关。如果不适用 JavaScript 就不会遇到这些问题；如果遇到了，请把 `*js_vm*` 设置高一点，或者只是某些问题的副作用，例如资源紧张。
 
 错误    | 消息 | 说明 | 解决方法
 ---------|---------|-------------|-------
@@ -243,8 +227,7 @@ bad_json | | Bad JSON formatting | 在 JavaScript 命令参数中只使用正确
 
 ### MapReduce
 
-这些错误实在使用 Riak 的 MapReduce 时可能遇到的，不过用的是以前的 MapReduce 还是 Pipe。
-如果从不使用 MapReduce，则不会遇到这些问题。
+这些错误实在使用 Riak 的 MapReduce 时可能遇到的，不过用的是以前的 MapReduce 还是 Pipe。如果从不使用 MapReduce，则不会遇到这些问题。
 
 错误    | 消息 | 说明 | 解决方法
 ---------|---------|-------------|-------
@@ -282,7 +265,7 @@ exit with reason bad return value: {error,eaddrinuse} in context start_error | �
 exited with reason: eaddrnotavail in gen_server:init_it/6 line 320 | 这个问题可能是应为 Riak 无法绑定到设置中指定的 IP 地址。这时，应该检查 `app.config` 中的 HTTP 和 Protocol Buffers 地址，确保所用的端口不在特殊的 1-1024 这个范围内，因为用户 `riak` 无权使用这些端口
 gen_server riak_core_capability terminated with reason: no function clause matching orddict:fetch('riak@192.168.2.2', []) line 72 | 这个问题可能是因为只修改了 `vm.args` 中的 `-name` 值，而没有使用 `riak-admin cluster replace` 命令
 ** Configuration error: [FRAMEWORK-MIB]: missing context.conf file => generating a default file | 这个问题经常出现在没有设置 SNMP 就启动了 Riak 企业版
-RPC to 'node@example.com' failed: {'EXIT', {badarg, [{ets,lookup, [schema_table,<<"search-example">>], []} {riak_search_config,get_schema,1, [{file,"src/riak_search_config.erl"}, {line,69}]} ...| 这个问题可能是由于没有在节点的 `app.config` 启用就使用了搜索功能。请阅读 [[Configuration Files]] 一文，查看如何启用 Riak 搜索。
+RPC to 'node@example.com' failed: {'EXIT', {badarg, [{ets,lookup, [schema_table,<<"search-example">>], []} {riak_search_config,get_schema,1, [{file,"src/riak_search_config.erl"}, {line,69}]} ...| 这个问题可能是由于没有在节点的 `app.config` 启用就使用了搜索功能。请阅读“[[设置文件]]”一文，查看如何启用 Riak 搜索。
 
 ### 脚注
 

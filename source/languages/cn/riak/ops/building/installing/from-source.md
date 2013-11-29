@@ -1,13 +1,13 @@
 ---
-title: Installing Riak from Source
+title: 从源码编译安装 Riak
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, suse]
-prev: "[[Installing on AWS Marketplace]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Post Installation]]"
+prev: "[[在 AWS Marketplace 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[安装之后]]"
 download:
   key: source
   name: "any OS in Source Form"
@@ -19,7 +19,7 @@ download:
 
 Riak 需要 [[Erlang|http://www.erlang.org/]] R15B01 的支持。*注意：暂时不要使用 Erlang R15B02 或 R15B03，因为这两个版本会导致 [riak-admin status 命令出错](https://github.com/basho/riak/issues/227)。*
 
-如果还没有安装 Erlang，请参照 [[Installing Erlang]]。不用担心，很简单！
+如果还没有安装 Erlang，请参照“[[安装 Erlang]]”一文。不用担心，很简单！
 
 Riak 依赖存储在多个 Git 仓库中的源码，在编译之前请确保系统中安装了 Git。
 
@@ -31,7 +31,7 @@ Riak 依赖存储在多个 Git 仓库中的源码，在编译之前请确保系�
 
 ### 从源码包安装
 
-从 [Download Center|http://basho.com/resources/downloads/]] 下载 Riak 源码包，然后编译：
+从[[下载中心|http://basho.com/resources/downloads/]]下载 Riak 源码包，然后编译：
 
 ```bash
 curl -O http://s3.amazonaws.com/downloads.basho.com/riak/{{V.V}}/{{V.V.V}}/riak-{{V.V.V}}.tar.gz
@@ -109,10 +109,10 @@ make rel
 
 针对特定平台的说明请参阅：
 
-  * [[Installing on Debian and Ubuntu]]
-  * [[Installing on Mac OS X]]
-  * [[Installing on RHEL and CentOS]]
-  * [[Installing on SUSE]]
+  * [[在 Debian 和 Ubuntu 中安装]]
+  * [[在 Mac OS X 中安装]]
+  * [[在 RHEL 和 CentOS 中安装]]
+  * [[在 SUSE 中安装]]
 
 如果你要安装 Riak 的平台没有列出了，而且需要一些帮助，请加入 Riak 邮件列表，然后发起新讨论。我们很乐意帮助你安装 Riak。
 
@@ -124,5 +124,5 @@ Riak 现在无法在 Microsoft Windows 上安装。
 
 请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

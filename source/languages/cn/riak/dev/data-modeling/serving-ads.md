@@ -1,5 +1,5 @@
 ---
-title: Serving Advertisements
+title: 提供广告服务
 project: riak
 version: 1.4.2+
 document: cookbook

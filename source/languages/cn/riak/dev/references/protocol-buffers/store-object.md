@@ -1,5 +1,5 @@
 ---
-title: PBC Store Object
+title: 通过 PBC 存储对象
 project: riak
 version: 1.4.2+
 document: api
@@ -9,11 +9,9 @@ keywords: [api, protocol-buffer]
 group_by: "Object/Key Operations"
 ---
 
-Stores an object under the specified bucket / key. Storing an object comes in
-two forms, depending on whether you want to use a key of your choosing, or let
-Riak assign a key to a new object.
+在指定的“bucket/键”上存储对象。存储对象有两种方式：使用指定的键，或者由 Riak 分配键。
 
-#### Request
+#### 请求
 
 ```bash
 message RpbPutReq {
@@ -31,45 +29,24 @@ message RpbPutReq {
 }
 ```
 
+必须指定的参数：
 
-Required Parameters
+* **bucket** - 要存储到哪个 bucket
+* **content** - 对象的新值或者修改后的值，使用相同的 RpbContent 消息，RpbGetResp 返回的数据包含元数据
 
-* **bucket** - bucket key resides in
-* **content** - new/updated content for object - uses the same RpbContent
-message RpbGetResp returns data in and consists of metadata and a value.
+可选的参数：
 
-Optional Parameters
+* **key** - 要创建或更新的键。如果未指定，服务器会生成一个
+* **vclock** - 前面的 RpbGetResp 消息提供的向量时钟。如果这是一个新键，或者故意想创建兄弟数据，就不提供这个参数
+* **w** - （写入法定值）返回成功响应之前应该接受到多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **dw** - 返回成功响应之前要向持久性存储中写入多少个副本。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **return_body** - 是否返回存储对象的内容。默认为 `false`，不返回
+* **pw** - 写入时要有多少个主节点在线。可选值有 `'one'`（4294967295-1），`'quorum'`（4294967295-2），`'all'`（4294967295-3），`'default'`（4294967295-4）和任何小于等于 N 的整数（[[默认值在 bucket 层面设定|通过 PBC 设置 bucket 的属性]]）
+* **if_not_modified** - 只有当提供的对象向量时钟和数据库中的向量时钟匹配时才更新值
+* **if_none_match** - 只有当“bucket/键”组合不存在时才存储对象
+* **return_head** - 和 *return_body" 类似，不过对象的值为空，避免返回大量的值
 
-* **key** - key to create/update. If this is not specified the server will
-generate one.
-* **vclock** - opaque vector clock provided by an earlier RpbGetResp message.
-Omit if this is a new key or you deliberately want to create a sibling
-* **w** - (write quorum) how many replicas to write to before
-returning a successful response; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **dw** - how many replicas to commit to durable storage before
-returning a successful response; possible values include a special
-number to denote 'one' (4294967295-1), 'quorum' (4294967295-2), 'all'
-(4294967295-3), 'default' (4294967295-4), or any integer <= N
-([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **return_body** - whether to return the contents of the stored object.
-Defaults to false.
-* **pw** - how many primary nodes must be up when the write is
- attempted; possible values include a special number to denote 'one'
- (4294967295-1), 'quorum' (4294967295-2), 'all' (4294967295-3),
- 'default' (4294967295-4), or any integer <= N
- ([[default is defined per the bucket|PBC API#Set Bucket Properties]])
-* **if_not_modified** - update the value only if the vclock in the supplied
-object matches the one in the database
-* **if_none_match** - store the value only if this bucket/key combination are
-not already defined
-* **return_head** - like *return_body" except that the value(s) in the object
-are blank to avoid returning potentially large value(s)
-
-#### Response
-
+#### 响应
 
 ```bash
 message RpbPutResp {
@@ -79,21 +56,14 @@ message RpbPutResp {
 }
 ```
 
-
-If returnbody is set to true on the put request, the RpbPutResp will contain the
-current object after the put completes. The key parameter will be set only if
-the server generated a key for the object but it will be set regardless of
-returnbody. If returnbody is not set and no key is generated, the put response
-is empty.
+如果 PUT 请求的 `return_body` 参数设为 `true`，请求完成后返回的 RpbPutResp 会包含刚保存的对象。只有当服务器为对象生成键时，才会返回 `key`。是否返回 `key` 和 `return_body` 无关。如果没有设定 `return_body` 而且没有生成键，PUT 请求的响应为空。
 
 
-<div class="note"><p>N.B. this could contain siblings just like an RpbGetResp
-does.</p></div>
+<div class="note"><p>注意，响应中可能包含兄弟数据，和 RpbGetResp 类似。</p></div>
 
+#### 示例
 
-#### Example
-
-Request
+请求：
 
 ```bash
 Hex      00 00 00 1C 0B 0A 01 62 12 01 6B 22 0F 0A 0D 7B
@@ -109,11 +79,9 @@ content {
 }
 w: 2
 return_body: true
-
 ```
 
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 62 0C 0A 31 0A 0D 7B 22 66 6F 6F 22 3A
@@ -138,5 +106,4 @@ contents {
 }
 vclock: "k316a```312`312005R,,351014206031L211214y254014Z!266G371
 302l315I254rw|240022372 211,000"
-
 ```

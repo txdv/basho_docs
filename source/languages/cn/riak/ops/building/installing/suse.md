@@ -1,13 +1,13 @@
 ---
-title: Installing on SUSE
+title: 在 SUSE 中安装
 project: riak
 version: 1.4.2+
 document: tutorial
 audience: beginner
 keywords: [tutorial, installing, suse]
-prev: "[[Installing on Solaris]]"
-up:   "[[Installing and Upgrading]]"
-next: "[[Installing on Windows Azure]]"
+prev: "[[在 Solaris 中安装]]"
+up:   "[[安装和升级]]"
+next: "[[在 Windows Azure 中安装]]"
 ---
 
 下面介绍的方法可以告诉你如何在 SuSE 上安装 Riak。
@@ -56,5 +56,5 @@ $ zypper mr -r Riak
 
 现在 Riak 已经安装好了，请阅读下面的文章：
 
--   [[Post Installation Notes|Post Installation]]：安装后检查 Riak 的状态
--   [[Five Minute Install]]：介绍如何从一个节点开始，变的比 Google 的节点还多！
+-   [[安装之后要做的事|安装之后]]：安装后检查 Riak 的状态
+-   [[花五分钟安装]]：介绍如何从一个节点开始，变的比 Google 的节点还多！

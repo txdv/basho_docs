@@ -1,5 +1,5 @@
 ---
-title: PBC Set Bucket Properties
+title: 通过 PBC 设置 bucket 的属性
 project: riak
 version: 1.4.2+
 document: api
@@ -9,17 +9,13 @@ keywords: [api, protocol-buffer]
 group_by: "Bucket Operations"
 ---
 
-Set the properties for a bucket
+设置 bucket 的属性。
 
-<div class="note"><p>The PBC interface does not currently support all bucket
-properties. It is currently limited to <code>allow_mult</code> and
-<code>n_val</code>; other bucket properties would need to be set with the [[HTTP
-API|HTTP Set Bucket Properties]].</p>
+<div class="note">
+<p>PBC 接口目前没有完全支持所有的 bucket 属性，现在只能设置 <code>allow_mult</code> 和 <code>n_val</code>;。其他的属性要通过 [[HTTP API|通过 HTTP 设置 bucket 的属性]] 设置。</p>
 </div>
 
-
-## Request
-
+## 请求
 
 ```bash
 message RpbSetBucketReq {
@@ -33,23 +29,22 @@ message RpbBucketProps {
 }
 ```
 
+必须提供的参数：
 
-Required Parameters
+* **bucket** - 要设置属性的 bucket
+* **props** - 要修改的属性
+* **n_val** - bucket 当前的 n_val
+* **allow_mult** - 如果要把冲突返回给客户端，就把 `allow_mult` 设为 `true`
 
-* **bucket** - bucket to set properties for
-* **props** - updated properties - only set properties to change
-* **n_val** - current n_val for the bucket
-* **allow_mult** - allow_mult set true if conflicts are returned to clients
+## 响应
 
-## Response
+只返回消息码。
 
-Only the message code is returned.
+## 示例
 
-## Example
+把“friends”这个 bucket 的 `allow_mult` 设为 `true`。
 
-Change `allow_mult` to true for bucket "friends"
-
-Request
+请求：
 
 ```bash
 Hex      00 00 00 0E 15 0A 07 66 72 69 65 6E 64 73 12 02
@@ -61,11 +56,9 @@ bucket: "friends"
 props {
   allow_mult: true
 }
-
 ```
 
-
-Response
+响应：
 
 ```bash
 Hex      00 00 00 01 16

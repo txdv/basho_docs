@@ -1,5 +1,5 @@
 ---
-title: search Command Line
+title: search 命令
 project: riak
 version: 1.4.2+
 document: reference
@@ -10,9 +10,7 @@ keywords: [command-line, search]
 
 # 命令行工具 - `search-cmd`
 
-这个命令用来和 Riak 的搜索功能交互。确保已经
-[[启用了搜索功能|Configuration Files#riak_search]]。在所有命令中，`INDEX` 选项都是
-可选的，默认值为 `search`。
+这个命令用来和 Riak 的搜索功能交互。确保已经[[启用了搜索功能|设置文件#riak_search]]。在所有命令中，`INDEX` 选项都是可选的，默认值为 `search`。
 
     search-cmd set-schema [INDEX] SCHEMAFILE : 设定索引的模式（schema）
     search-cmd show-schema [INDEX]           : 显示索引的模式
@@ -31,27 +29,25 @@ keywords: [command-line, search]
 
     set-schema [INDEX] SCHEMAFILE
 
-设置指定索引的[[模式|Advanced Search Schema]]。如果不设定就是用默认的模式。
+设置指定索引的[[模式|Riak Search 模式高级用法]]。如果不设定就是用默认的模式。
 
 ## show-schema
 
     show-schema [INDEX]
 
-显示指定索引使用的[[模式|Advanced Search Schema]]。
+显示指定索引使用的[[模式|Riak Search 模式高级用法]]。
 
 ## clear-schema-cache
 
     clear-schema-cache
 
-搜索会把模式存储在 Riak 中，就像保存其他对象一样。为了避免每次需要时都从 Riak 中读取对象，
-所用模式在每个节点中都有个缓存。如果修改了所用的模式，就需要清除这个缓存，确保从 Riak 读取
-的是修改后的模式。
+搜索会把模式存储在 Riak 中，就像保存其他对象一样。为了避免每次需要时都从 Riak 中读取对象，所用模式在每个节点中都有个缓存。如果修改了所用的模式，就需要清除这个缓存，确保从 Riak 读取的是修改后的模式。
 
 ## search
 
     search [INDEX] QUERY
 
-在索引上执行指定的查询，返回文件 ID、属性和得分。[[查询的句法|Using Search]]和 Lucene 一样。
+在索引上执行指定的查询，返回文件 ID、属性和得分。[[查询的句法|使用 Riak Search]]和 Lucene 一样。
 
 ## search-doc
 
@@ -69,25 +65,25 @@ keywords: [command-line, search]
 
     index [INDEX] PATH
 
-索引指定路径中的文件。详细信息请阅读[[这份文档|Search Indexing Reference#Indexing-from-the-Command-Line]]。
+索引指定路径中的文件。详细信息请阅读[[这份文档|Riak Search 索引参考手册#Indexing-from-the-Command-Line]]。
 
 ## delete
 
     delete [INDEX] PATH
 
-从索引中删除文件。详细信息请阅读[[这份文档|Search Indexing Reference#Deleting-from-the-Command-Line]]。
+从索引中删除文件。详细信息请阅读[[这份文档|Riak Search 索引参考手册#Deleting-from-the-Command-Line]]。
 
 ## solr
 
     solr [INDEX] PATH
 
-索引 Solr 文件。详细信息请阅读[[这份文档|Search Indexing Reference#Indexing-using-the-Solr-Interface]]。
+索引 Solr 文件。详细信息请阅读[[这份文档|Riak Search 索引参考手册#Indexing-using-the-Solr-Interface]]。
 
 ## install
 
     install BUCKET
 
-在指定的 bucket 中安装搜索 precommit 钩子。这样就可以[[索引存入的对象|Search Indexing Reference]]了。
+在指定的 bucket 中安装搜索 precommit 钩子。这样就可以[[索引存入的对象|Riak Search 索引参考手册]]了。
 
 ## uninstall
 

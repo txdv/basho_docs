@@ -1,5 +1,5 @@
 ---
-title: Advanced Search Schema
+title: Riak Search 模式高级用法
 project: riak
 version: 1.4.2+
 document: cookbook
@@ -24,7 +24,7 @@ Riak Search 的设计目的就是和 Riak 无缝结合，所有保留了很多 R
 * *FIELDNAME_text* - 全部是文本的字段。使用标准分析器
 * 其他的所有字段都是用空白分析器
 
-默认的字段名是 *value*。
+默认的字段名是 <i>value</i>。
 
 ## 定义模式
 
@@ -132,10 +132,10 @@ bin/search-cmd show-schema Index
 * *skip* - 可选。如果设为 `true`，字段虽然会存储，但不会被索引。默认值是 `false`。
 * *alias* - 可选。映射到当前字段定义上的别名，把多个字段的不同字段名索引到同一个字段中。这个属性根据需要，想设多少个就设多少个。
 * *padding_size* - 可选。值会扩展到这么长。字符串类型的默认值是 0，整数类型的默认值是 10。
-* *inline* - 可选。可设定的值有 `true`、`false` 和 `only`（默认值是 `false`）。设为 `only` 时，字段将无法搜索自身，而是作为搜索其他字段的过滤器。这么做能提高某些查询的性能（例如某些情况下的范围查询），但会消耗更多的存储空间，因为字段的值和其他字段的索引存在一起。设为 `true` 时，除了行间存储之外，字段还会正常存储。过滤行间字段目前只有 [[Solr|Using Search#Query-Interfaces]] 接口支持。
+* *inline* - 可选。可设定的值有 `true`、`false` 和 `only`（默认值是 `false`）。设为 `only` 时，字段将无法搜索自身，而是作为搜索其他字段的过滤器。这么做能提高某些查询的性能（例如某些情况下的范围查询），但会消耗更多的存储空间，因为字段的值和其他字段的索引存在一起。设为 `true` 时，除了行间存储之外，字段还会正常存储。过滤行间字段目前只有 [[Solr|使用 Riak Search#Query-Interfaces]] 接口支持。
 
 <div class="info">
-    <div class="title">别名的注意事项</div>
+<div class="title">别名的注意事项</div>
 
 1. 千万不要把别名设成和字段名一样。这么做会导致字段中的值使用不确定的名字索引。
 2. 多个别名会使用空格连接起来。如果 Name 有两个别名，那么 {LastName:"Smith", FirstName:"Dave"} 将会存储为“Smith Dave”。
@@ -151,7 +151,7 @@ Riak Search 提供了很多不同的分析器：
 
 例如，文本“It's well-known fact that a picture is worth 1000 words.”会被拆分为下面的词法单元：["It's", "a", "well-known", "fact", "that", "a", "picture", "is", "worth", "1000", "words."]。注意，字母的大小写和标点符号都保留着。
 
-要想使用空白分析器，按照下面的方式设置 *analyzer_factory*：
+要想使用空白分析器，按照下面的方式设置 *analyzer_factory* ：
 
 ```erlang
 {analyzer_factory, {erlang, text_analyzers, whitespace_analyzer_factory}}}
@@ -169,7 +169,7 @@ Riak Search 提供了很多不同的分析器：
 
 文本“It's well-known fact that a picture is worth 1000 words.”得到的词法单元是 ["well", "known", "fact", "picture", "worth", "1000", "words"]。
 
-要使用标准分析器，按照下面的方式设置 *analyzer_factory*：
+要使用标准分析器，按照下面的方式设置 *analyzer_factory* ：
 
 ```erlang
 {analyzer_factory, {erlang, text_analyzers, standard_analyzer_factory}}}
@@ -181,7 +181,7 @@ Riak Search 提供了很多不同的分析器：
 
 例如，文本“It's well-known fact that a picture is worth 1000 words.”得到的结果只有一个词法单元 “1000”。
 
-要使用整数分析器，按照下面的方式设置 *analyzer_factory*：
+要使用整数分析器，按照下面的方式设置 *analyzer_factory* ：
 
 ```erlang
 {analyzer_factory, {erlang, text_analyzers, integer_analyzer_factory}}}
@@ -193,7 +193,7 @@ No-Op 分析器不会分析字段，只是把字段的值作为结果返回。�
 
 例如，文本“WPRS10-11#B”经过分析后还是“WPRS10-11#B”。
 
-要使用 No-Op 分析器，按照下面的方式设置 *analyzer_factory*：
+要使用 No-Op 分析器，按照下面的方式设置 *analyzer_factory* ：
 
 ```erlang
 {analyzer_factory, {erlang, text_analyzers, noop_analyzer_factory}}}
