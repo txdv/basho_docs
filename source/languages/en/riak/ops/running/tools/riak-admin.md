@@ -17,7 +17,7 @@ This script performs operations unrelated to node-liveness, including node
 membership, backup, and basic status reporting.  The node must be running for
 most of these commands to work.
 
-
+{{#2.0.0-}}
 ```
 Usage: riak-admin { cluster | join | leave | backup | restore | test |
                     reip | js-reload | erl-reload | wait-for-service |
@@ -25,6 +25,18 @@ Usage: riak-admin { cluster | join | leave | backup | restore | test |
                     cluster-info | member-status | ring-status | vnode-status |
                     diag | status | transfer-limit | top }
 ```
+{{/2.0.0-}}
+{{#2.0.0+}}
+```
+Usage: riak-admin { cluster | join | leave | backup | restore | test |
+                    reip | js-reload | erl-reload | wait-for-service |
+                    ringready | transfers | force-remove | down |
+                    cluster-info | member-status | ring-status | vnode-status |
+                    aae-status | diag | status | transfer-limit | reformat-indexes |
+                    top [-interval N] [-sort reductions|memory|msg_q] [-lines N] |
+                    downgrade-objects | security | bucket-type | repair-2i }
+```
+{{/2.0.0+}}
 
 ## cluster
 
@@ -401,9 +413,7 @@ riak-admin diag <check>
 
 Prints status information, including performance statistics, system health
 information, and version numbers. The statistics-aggregator must be enabled in
-the [[configuration|Configuration Files#riak_kv_stat]] for this to work. Further
-information about the output is available [[here|Inspecting a Node]].
-
+the [[configuration|Configuration Files#riak_kv_stat]] for this to work. Further information about the output is available [[here|Inspecting a Node]].
 
 ```bash
 riak-admin status
@@ -441,8 +451,36 @@ Additional details are available in the
 
 ## top
 
-Top provides information about what the Erlang processes inside of Riak are doing. Top reports process reductions (an indicator of CPU utilization), memory used and message queue sizes
+Top provides information about what the Erlang processes inside of Riak are doing. Top reports process reductions (an indicator of CPU utilization), memory used and message queue sizes.
 
 ```bash
 riak-admin top
 ```
+
+{{#2.0.0+}}
+
+## downgrade-objects
+
+```bash
+riak-admin downgrade-objects <kill-handoffs> [<concurrency>]
+```
+
+## security
+
+Provides an interface for user management, security source management, and other security-related tasks.
+
+```bash
+riak-admin security
+```
+
+Information on this command can be found in the guide to [[Authentication and Authorization]].
+
+## bucket-type
+
+Information on this command can be found in the guide to [[Bucket Types]].
+
+## repair-2i
+
+This command repairs secondary index data on all available partitions. Progress reports on this process can be found in `console.log`, usually housed in a node's `/log` directory. 
+
+{{/2.0.0+}}
