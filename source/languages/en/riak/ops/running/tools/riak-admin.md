@@ -453,11 +453,15 @@ Additional details are available in the
 
 Top provides information about what the Erlang processes inside of Riak are doing. Top reports process reductions (an indicator of CPU utilization), memory used and message queue sizes.
 
+{{#2.0.0-}}
 ```bash
 riak-admin top
 ```
-
+{{/2.0.0-}}
 {{#2.0.0+}}
+```bash
+riak-admin top [-interval N] [-sort reductions|memory|msg_q] [-lines N]
+```
 
 ## downgrade-objects
 
@@ -476,6 +480,12 @@ riak-admin security
 Information on this command can be found in the guide to [[Authentication and Authorization]].
 
 ## bucket-type
+
+Provides an interface for managing bucket types.
+
+```bash
+riak-admin bucket-type
+```
 
 Information on this command can be found in the guide to [[Bucket Types]].
 
