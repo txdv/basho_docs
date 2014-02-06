@@ -484,7 +484,7 @@ Information on this command can be found in the guide to [[Authentication and Au
 Provides an interface for managing bucket types.
 
 ```bash
-riak-admin bucket-type
+riak-admin bucket-type  
 ```
 
 Information on this command can be found in the guide to [[Bucket Types]].
