@@ -7,17 +7,17 @@ audience: intermediate
 keywords: [developers, buckets]
 ---
 
-Bucket types allow groups of buckets to share configuration details and for Riak users to manage bucket properties in a more efficient way.
+Bucket types allow groups of buckets to share configuration details and for Riak users to manage bucket properties in a more efficient way. They also provide a separate namespace in addition to buckets and keys for reasoning about where data is stored.
 
 ## How Bucket Types Work
 
-The ad hoc approach to bucket configuration involves setting bucket properties for specific buckets either through [[HTTP|HTTP Set Bucket Properties]] or [[Protocol Buffers|PBC Set Bucket Properties]]. With this approach, you can take a bucket `my_bucket` and modify any number of its properties, from `n_val` to `allow_mult` and far beyond.
+The ad hoc approach to bucket configuration in versions of Riak prior to 2.0 involves setting bucket properties for specific buckets either via [[HTTP|HTTP Set Bucket Properties]] or [[Protocol Buffers|PBC Set Bucket Properties]]. With the ad hoc approach, you can take a bucket `my_bucket` and modify any number of its properties, from `n_val` to `allow_mult` and far beyond.
 
 Using bucket *types* also involves dealing with bucket properties, but with a few crucial differences:
 
-* Bucket types enable you to assign a total set of properties to buckets _at the time of their creation_ (instead of setting buckets' properties and then using those buckets)
-* Bucket types must be both created _and_ activated before they can be used (bucket properties can be modified at any time)
-* Nearly all bucket properties can be updated using bucket types, with two exceptions: the `datatype` and `consistent` properties
+* Bucket types enable you to assign a total set of properties to buckets _at the time of the buckets' creation_ (instead of setting buckets' properties and then using those buckets)
+* Bucket types must be both created _and_ activated before they can be used (whereas bucket properties can be modified at any time)
+* Nearly all bucket properties can be updated using bucket types, with two exceptions: the `datatype` and `consistent` properties, which are set once and for all in a bucket type
 
 It is important to note that buckets are not assigned types in the same way that they are configured [[using `props`|HTTP Set Bucket Properties
 ]]. You cannot simply take a bucket `my_bucket` and assign it a type the way that you would, say, set `allow_mult` to `false` or `n_val` to `5`, because there is no `type` parameter contained within the bucket's properties (i.e. `props`).
@@ -101,13 +101,6 @@ Below is a listing of the `props` associated with the `default` bucket type:
   }
 }
 ```
-
-<!-- Waiting on confirmation for this
-<div class="note">
-<div class="title">Note</div>
-In Riak 2.x, <tt>allow_mult</tt> is set to <tt>true</tt> by default, in contrast with previous versions.
-</div>
--->
 
 ## Usage Example
 
