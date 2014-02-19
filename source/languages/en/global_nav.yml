@@ -126,6 +126,7 @@ riak:
             sub:
               - "[[riak|riak Command Line]]"
               - "[[riak-admin|riak-admin Command Line]]"
+              - "[[riak-debug|riak-debug Command Line]]"
               - "[[search-cmd|search Command Line]]"
           - title: "Repair and Recovery"
             sub:

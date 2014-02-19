@@ -66,6 +66,10 @@ subcommands are supported:
 * [[ring-status|riak-admin Command Line#ring-status]]
 * [[vnode-status|riak-admin Command Line#vnode-status]]
 
+## riak-debug
+
+`[[riak-debug|riak-debug Command Line]]` is used to produce a tarball containing a wide variety of information about a Riak node, whether it is running or not. It has no subcommands.
+
 ## search-cmd
 
 `[[search-cmd|search Command Line]]` is used to interact with the
