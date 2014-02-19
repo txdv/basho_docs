@@ -12,51 +12,51 @@ moved: {
 ---
 
 {{#2.0.0+}}
-<div class="info">This document refers to the new Riak Search 2.0 with [[Solr|http://lucene.apache.org/solr/]] integration (codenamed Yokozuna). For advanced information about the <em>deprecated</em> Riak Search, visit [[Advanced Legacy Search]].</div>
+<div class="info">This document refers to the new Riak Search 2.0 with [[Solr|http://lucene.apache.org/solr/]] integration (originally codenamed Yokozuna). For advanced information about the <em>deprecated</em> Riak Search, visit [[Advanced Legacy Search]].</div>
 
-The project that implements Riak Search is called Yokozuna. This is a more detailed overview of the concepts and reasons behind the design of Yokozuna, for those interested. If you're simply looking to use Riak Search, you should check out the [[Using Search]] document. 
+This is a detailed overview of the concepts and reasons behind the design of Riak Search for those interested. If you're simply looking to use Riak Search, you should check out the [[Using Search]] document.
 
 ![Yokozuna](/images/yokozuna.png)
 
-## Yokozuna is Erlang
+## Riak Search is Erlang
 
 In Erlang OTP an "application" is a group of modules and Erlang
-processes which together perform a specific task.  The word
+processes which together perform a specific task. The word
 application is confusing because most people think of an application
-as an entire program such as Emacs or Photoshop.  But Yokozuna is just
+as an entire program such as Emacs or Photoshop. But Riak Search is just
 a sub-system in Riak itself.  Erlang applications are often
-stand-alone but Yokozuna is more like an appendage of Riak.  It
+stand-alone but Riak Search is more like an appendage of Riak.  It
 requires other subsystems like Riak Core and KV, but also extends
 their functionality by providing search capabilities for KV data.
 
-The point of Yokozuna is to bring more sophisticated and robust query
-and search support to Riak.  Many people consider Lucene, and programs
+The point of Riak Search is to bring more sophisticated and robust query
+and search support to Riak. Many people consider Lucene, and programs
 built on top of it such as Solr, as _the standard_ for open source
 search.  There are many successful stories built atop Lucene/Solr and
 it sets the bar for the feature set developers and users expect.
 Meanwhile, Riak has a great story as a highly-available, distributed,
-key-value store.  Yokozuna takes advantage of the fact that Riak
+key-value store.  Riak Search takes advantage of the fact that Riak
 already knows how to do the distributed bits, extending its feature
 set with that of Solr's.  It takes the strength of each, and combines
 them.
 
-Yokozuna is a mediator between Riak and Solr.  There is nothing
+Riak Search is a mediator between Riak and Solr.  There is nothing
 stopping a user from deploying these two programs separately but then
 they would be responsible for the glue.  That glue can be tricky to
 write.  It needs to deal with monitoring, querying, indexing, and
 dissemination of information.
 
-Yokozuna knows how to listen for changes in KV data and make the
+Riak Search knows how to listen for changes in KV data and make the
 appropriate changes to indexes that live in Solr.
 
-Yokozuna knows how to take a user query on any node and convert it to
+Riak Search knows how to take a user query on any node and convert it to
 a Solr Distributed Search which will correctly cover the entire index
 without overlap in replicas.
 
-Yokozuna knows how to take index creation commands and disseminate
+Riak Search knows how to take index creation commands and disseminate
 that information across the cluster.
 
-Yokozuna knows how to communicate and monitor the Solr OS process.
+Riak Search knows how to communicate and monitor the Solr OS process.
 
 Etc.
 
@@ -68,11 +68,11 @@ Every node in the Riak cluster has a corresponding operating system
 application server.  This OS process is a child of the Erlang OS
 process running Riak.
 
-Yokozuna has a `gen_server` process which monitors the JVM OS process.
+Riak Search has a `gen_server` process which monitors the JVM OS process.
 The code for this server is in `yz_solr_proc`.  When the JVM process
 crashes this server crashes, causing its supervisor to restart it.
 If there is more than 1 restart in 45 seconds, the entire Riak
-node will be shut down -- if Yokozuna is enabled and Solr cannot
+node will be shut down -- if Riak Search is enabled and Solr cannot
 function for some reason then the Riak node needs to go down so that
 the user will notice and take corrective action.
 
@@ -82,7 +82,7 @@ will also exit.  This double monitoring along with the crash semantics
 means that neither process may exist without the other.  They are either
 both up or both down.
 
-All other communication between Yokozuna and Solr is performed via
+All other communication between Riak Search and Solr is performed via
 HTTP, including querying, indexing, and administration commands.
 The ibrowse Erlang HTTP client is used to manage these communications
 as both it and the Jetty container hosting Solr pool HTTP connections,
@@ -99,8 +99,7 @@ which a bucket is a purely logical entity, and not physically disjoint
 at all.
 
 Indices may be associated with zero or more buckets. At creation time,
-however, each index has no associated buckets -- unlike Riak Search
-Yokozuna indices do not implicitly create bucket associations, meaning
+however, each index has no associated buckets, as Riak Search indices do not implicitly create bucket associations, meaning
 that this must be done as a separate configuration step.
 
 To associate a bucket with an index the bucket property `yz_index`
@@ -133,7 +132,7 @@ flat collection of field-value pairs.  "Flat" here means that a
 field's value cannot be a nested structure of field-value pairs, the
 values are treated as-is (non-composite is another way to say it).
 
-Because of this mismatch between KV and Solr, Yokozuna must act as a
+Because of this mismatch between KV and Solr, Riak Search must act as a
 mediator between the two: it must have a way to inspect a KV object
 and create a structure which Solr can ingest for indexing.  In Solr
 this structure is called a _document_.  This task of creating a Solr
@@ -142,7 +141,7 @@ this task two things must be considered.
 
 NOTE: This isn't quite right, the fields created by the extractor are
 only a subset of the fields created.  Special fields needed for
-Yokozuna to properly query data and tagging fields are also created.
+Riak Search to properly query data and tagging fields are also created.
 This call happens inside `yz_doc:make_doc`.
 
 1. Does an extractor exist to map the content-type of the object to a
@@ -152,8 +151,8 @@ This call happens inside `yz_doc:make_doc`.
    E.g. the value may be `application/json` which contains nested
    objects.  This must somehow be transformed into a flat structure.
 
-The first question is answered by the _extractor mapping_.  By default
-Yokozuna ships with extractors for several common data types.  Below
+The first question is answered by the _extractor mapping_.  By default,
+Riak Search ships with extractors for several common data types.  Below
 is a table of this default mapping:
 
 Content Type          |Erlang Module          
@@ -192,7 +191,7 @@ list.
 An object with the content type `application/json` is a little
 trickier.  JSON can be nested arbitrarily.  That is, the key of a
 top-level object can have an object as a value, and this object can
-have another object nested inside, an so on.  Yokozuna's JSON
+have another object nested inside, an so on.  Riak Search's JSON
 extractor must have some method of converting this arbitrary nesting
 into a flat list.  It does this by concatenating nested object fields
 with a separator.  The default separator is `.`.  An example should
@@ -248,8 +247,8 @@ names and types.  For each document stored, every field must have a
 matching name in the schema, used to determine the field's type, which
 in turn determines how a field's value will be indexed.
 
-Currently, Yokozuna makes no attempts to hide any details of the Solr
-schema: a user creates a schema for Yokozuna just as she would for
+Currently, Riak Search makes no attempts to hide any details of the Solr
+schema: a user creates a schema for Riak Search just as she would for
 Solr.  Here is the general structure of a schema.
 
 
@@ -285,7 +284,7 @@ The corresponding date type is declared under `<types>` like so.
 For a complete reference of the Solr schema, the included types, and
 analyzers, refer to the [Solr 4.4 reference guide][solr440-ref].
 
-Yokozuna comes bundled with a [default schema][ds] called
+Riak Search comes bundled with a [default schema][ds] called
 `_yz_default`.  This is an extremely general schema which makes heavy
 use of dynamic fields -- it is intended for development and
 testing.  In production, a schema should be tailored to the data being
@@ -307,7 +306,7 @@ detection, not prevention.  That is the purpose of AAE.
 Constantly reading and re-indexing every object in Riak could be quite
 expensive.  To minimize the overall cost of detection AAE make use of
 hashtrees.  Every partition has a pair of hashtrees; one for KV and
-another for Yokozuna.  As data is written the hashtrees are updated in
+another for Riak Search.  As data is written the hashtrees are updated in
 real-time.
 
 Each tree stores the hash of the object.  Periodically a partition is
@@ -370,7 +369,7 @@ See [TAGGING][] for more information.
 
 ## Coverage
 
-Yokozuna uses _doc-based partitioning_.  This means that all index
+Riak Search uses _doc-based partitioning_.  This means that all index
 entries for a given Riak Object are co-located on the same physical
 machine. To query the entire index all partitions must be
 contacted. Adjacent partitions keep replicas of the same object.
@@ -380,10 +379,10 @@ covering set of partitions is known as _coverage_.
 
 Each partition in the coverage plan has an owning node. Thus a plan
 can be thought of as a unique set of nodes along with a covering set
-of partitions. Yokozuna treats the node list as physical hostnames and
+of partitions. Riak Search treats the node list as physical hostnames and
 passes them to Solr's distributed search via the `shards`
 parameter. Partitions, on the other hand, are treated logically in
-Yokozuna. All partitions for a given node are stored in the same
+Riak Search. All partitions for a given node are stored in the same
 index; unlike KV which uses _partition_ as a physical separation. To
 properly filter out overlapping replicas the partition data from the
 cover plan is passed to Solr via the filter query (`fq`) parameter.
@@ -391,7 +390,7 @@ cover plan is passed to Solr via the filter query (`fq`) parameter.
 Calculating a coverage plan is handled by Riak Core. It can be a very
 expensive operation as much computation is done symbolically, and the
 process amounts to a knapsack problem.  The larger the ring the more
-expensive.  Yokozuna takes advantage of the fact that it has no
+expensive.  Riak Search takes advantage of the fact that it has no
 physical partitions by computing a coverage plan asynchronously every
 few seconds, caching the plan for query use.  In the case of node
 failure or ownership change this could mean a delay between cluster

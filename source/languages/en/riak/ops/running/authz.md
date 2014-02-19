@@ -285,7 +285,7 @@ Permission | Operation |
 
 Security is incompatible with the original Riak Search.
 
-### Search Query Permissions (Riak Search version 2, aka Yokozuna)
+### Search Query Permissions (Riak Search version 2, codenamed Yokozuna)
 
 If you are using the search capabilities included with Riak versions 2.0 and greater, the following search-related permissions can be granted/revoked:
 
