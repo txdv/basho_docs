@@ -63,6 +63,9 @@ riak-admin security enable
 *As per the warning above, do not enable security in production
  without taking the appropriate precautions.*
 
+If a cluster is being upgraded from an earlier release of Riak which
+does not support security, enabling security will be unsuccessful.
+
 All users, groups, authentication sources, and permissions can be
 configured while security is disabled, allowing you to create a
 security configuration of any level of complexity without prematurely
@@ -78,9 +81,8 @@ other security attributes remain untouched.
 riak-admin security disable
 ```
 
-If security is successfully disabled, the console will return no
-response, and the database will no longer require (but will still
-permit) encrypted client traffic.
+The database will not allow encrypted client traffic once security is
+enabled.
 
 ### Checking Security Status
 
@@ -116,11 +118,11 @@ riak-admin security print-users
 Example output, assuming one user with an assigned password:
 
 ```bash
-+----------+-------+----------------------+------------------------------+
++----------+--------+----------------------+------------------------------+
 | username | groups |       password       |           options            |
-+----------+-------+----------------------+------------------------------+
-| riakuser |       |983e8ae1421574b8733824|              []              |
-+----------+-------+----------------------+------------------------------+
++----------+--------+----------------------+------------------------------+
+| riakuser |        |983e8ae1421574b8733824|              []              |
++----------+--------+----------------------+------------------------------+
 ```
 
 **Note**: All passwords are displayed in encrypted form in console output.
@@ -130,7 +132,7 @@ of `lucius`, the output would look like this:
 
 ```bash
 +----------+----------------+----------------------+---------------------+
-| username |     groups      |       password       |       options       |
+| username |     groups     |       password       |       options       |
 +----------+----------------+----------------------+---------------------+
 | riakuser |      dev       |983e8ae1421574b8733824| [{"name","lucius"}] |
 +----------+----------------+----------------------+---------------------+
