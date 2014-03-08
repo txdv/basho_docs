@@ -60,3 +60,37 @@ For more details on setting default bucket properties see [[Configuration Files|
 
 Specify which named backend to use for the bucket when using `riak_kv_multi_backend`.
 {{/2.0.0-}}
+
+{{#2.0.0+}}
+### basic_quorum
+
+The default is `false`.
+
+### big_vclock
+
+The default is `50`.
+
+### old_vclock
+
+The default is `86400`.
+
+### chash_keyfun
+
+The defaults module is `riak_core_utl` and the default function (in that module) is `chash_std_keyfun`.
+
+### linkfun
+
+The default module is `riak_kv_wm_link_walker` and the default function (in that module) is `mapreduce_linkfun`.
+
+### notfound_ok
+
+The default is `true`.
+
+### small_vclock
+
+The default is `50`.
+
+### young_vclock
+
+The default is `20`.
+{{/2.0.0+}}
