@@ -66,7 +66,7 @@ Based on Basho's [Cuttlefish](https://github.com/basho/cuttlefish) project, the 
 
 ## Bucket Types
 
-In older versions of Riak, bucket properties were managed on a bucket-by-bucket, ad hoc basis. With bucket types, you can now create and manage whole configurations of bucket properties and apply them 
+In older versions of Riak, bucket properties were managed on a bucket-by-bucket, ad hoc basis. With bucket types, you can now create and manage whole configurations of bucket properties and apply them to buckets. This is a much more efficient way of configuring buckets. In addition, bucket types act as a third namespace in addition to buckets and keys.
 
 #### Relevant Docs
 
