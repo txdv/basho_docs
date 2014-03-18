@@ -11,6 +11,7 @@ riak:
       - "[[Why Riak?|Why Riak]]"
       - "[[Download Riak|Downloads]]"
       - "[[Five-Minute Install|Five Minute Install]]"
+      - "[[Introduction to Riak 2.0]]"
 
   - title: "Riak for Developers"
     sub:
