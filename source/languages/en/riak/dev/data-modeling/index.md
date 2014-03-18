@@ -40,13 +40,8 @@ is only meant to be illustrative.
 * [[User Events & Timelines|User Subscriptions/Events/Timelines]]
 * [[Articles & Blog Posts|Blog Posts, Articles and Other Content]]
 
-<!--
+## Riak vs. Relational Databases
 
-## Common SQL Design Patterns
+If you're used to relational databases, developing with Riak may present special challenges. The guide below is a basic introduction to key/value data modeling in Riak.
 
-*Reproducing common SQL models/queries in Riak*
-
-* [[Counting]]
-* [[Conditional Summation]]
-
- -->
+* [[Data Modeling with Keys and Values]]
