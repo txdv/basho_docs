@@ -34,10 +34,19 @@ Here is an example of a GET performed on the key `mykey` in the bucket `mybucket
 curl http://localhost:8098/types/mytype/buckets/mybucket/keys/mykey
 ```
 
+```python
+bucket = client.bucket('mybucket', bucket_type='mytype')
+obj = bucket.get('mykey')
+```
+
 If there is no object stored under that particular key, Riak will return a message indicating that the object doesn't exist.
 
-```
+```curl
 not found
+```
+
+```python
+riak.RiakError: 'no_type'
 ```
 
 If you're using HTTP to interact with Riak, as opposed to using a [[client library|Client Libraries]], Riak understands many HTTP-defined headers, such as `Accept` for content-type negotiation, which is relevant when dealing with siblings (see [[the sibling examples for the HTTP API|HTTP Fetch Object#Siblings-examples]]), and `If-None-Match`/`ETag` and `If-Modified-Since`/`Last-Modified` for conditional requests.
@@ -48,6 +57,12 @@ Here is an example of attempting a read with `r` set to `3`:
 
 ```curl
 curl http://localhost:8098/types/mytype/buckets/mybucket/keys/mykey?r=3
+```
+
+```python
+bucket = client.bucket('mybucket', bucket_type='mytype')
+obj = bucket.get('mykey', r=3)
+obj.data
 ```
 
 If you're using HTTP, you will most often see the following response codes:
@@ -72,6 +87,10 @@ curl http://localhost:8098/types/mytype/buckets/mybucket/keys/mykey
 
 # Response
 404 Not Found
+```
+
+```python
+riak.RiakError: 'no_type'
 ```
 
 This operation should return some form of `not found` response because the key `doc2` does not yet exist (as you haven't created it yet).
@@ -105,6 +124,14 @@ curl -XPUT \
   http://localhost:8098/types/mytype/buckets/mybucket/keys/mykey
 ```
 
+```python
+bucket = client.bucket('mybucket', bucket_type='mytype')
+obj = RiakObject(client, bucket, 'mykey')
+obj.content_type = 'text/plain'
+obj.data = 'some text'
+obj.store()
+```
+
 Other HTTP request headers are optional for writes (and not necessary if using a client library):
 
 * `X-Riak-Meta-YOUR_HEADER` for any additional metadata headers that should be stored with the object (eg. `X-Riak-Meta-FirstName`).
@@ -127,6 +154,14 @@ curl -XPUT \
   http://localhost:8098/types/test_type/buckets/test_bucket/keys/test_key?w=3&returnbody=true
 ```
 
+```python
+bucket = client.bucket('test_bucket', bucket_type='test_type')
+obj = RiakObject(client, bucket, 'test_key')
+obj.content_type = 'some text'
+obj.data = 'some text'
+obj.store(w=3, return_body=True)
+```
+
 Normal HTTP status codes (responses will vary for client libraries):
 
 * `200 OK`
@@ -145,6 +180,15 @@ curl -v -XPUT \
   http://localhost:8098/types/test_type/buckets/test/keys/doc?returnbody=true
 ```
 
+```python
+bucket = client.bucket('test', bucket_type='test_type')
+obj = RiakObject(client, bucket, 'doc')
+obj.content_type = 'application/json'
+obj.data = '{"bar":"baz"}'
+obj.vclock = 'a85hYGBgzGDKBVIszMk55zKYEhnzWBlKIniO8mUBAA=='
+obj.store(return_body=True)
+```
+
 ### Store a New Object and Assign a Random Key
 
 If your application would rather leave key-generation up to Riak, issue a `POST` request to the bucket URL instead of a PUT to a bucket/key pair:
@@ -161,7 +205,7 @@ Normal status codes:
 
 * `201 Created`
 
-This command will store an object in the bucket `test` and assign it a key:
+This command will store an object in the bucket `test` and assign it a random key:
 
 ```curl
 curl -i -XPOST \
@@ -173,6 +217,19 @@ curl -i -XPOST \
 # location of the object in Riak, with the key at the end:
 
 Location: /buckets/test/keys/G7FYUXtTsEdru4NP32eijMIRK3o
+```
+
+```python
+bucket = client.bucket('test', bucket_type='type')
+obj = RiakObject(client, bucket)
+obj.content_type = 'text/plain'
+obj.data = 'this is a test'
+obj.store()
+
+obj.key
+
+# The Python client will assign a random key along the following lines:
+'ZPFF18PUqGW9efVou7EHhfE6h8a'
 ```
 
 ### Delete an Object
@@ -189,6 +246,11 @@ Try this:
 
 ```curl
 curl -XDELETE http://localhost:8098/types/test/buckets/test/keys/test2
+```
+
+```python
+bucket = client.bucket('test', bucket_type='test')
+bucket.delete('test2')
 ```
 
 ## Bucket Properties and Operations
@@ -227,6 +289,11 @@ Once the type is activated, we can see which properties are associated with our 
 
 ```curl
 curl http://localhost:8098/types/test_type/props
+```
+
+```python
+bt = BucketType(client, 'test_type')
+bt.get_properties()
 ```
 
 This should return JSON of the following form:
