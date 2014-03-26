@@ -44,6 +44,13 @@ riak:
               - "[[Java|Taste of Riak: Object Modeling with Java]]"
               - "[[Python|Taste of Riak: Object Modeling with Python]]"
               - "[[Ruby|Taste of Riak: Object Modeling with Ruby]]"
+          - title: Siblings (and other problems)
+            sub:
+              - "[[Introduction|Taste of Riak: Siblings (and other problems)]]"
+              - "[[Erlang|Taste of Riak: Siblings (and other problems) with Erlang]]"
+              - "[[Java|Taste of Riak: Siblings (and other problems) with Java]]"
+              - "[[Python|Taste of Riak: Siblings (and other problems) with Python]]"
+              - "[[Ruby|Taste of Riak: Siblings (and other problems) with Ruby]]"
       - title: "Querying Riak"
         sub:
           - "[[The Basics]]"
