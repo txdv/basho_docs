@@ -1,14 +1,14 @@
 ---
 title: "Taste of Riak: Siblings (and other problems)"
 project: riak
-version: 1.3.1+
+version: 1.4.8+
 document: tutorials
 toc: true
 audience: beginner
 keywords: [developers, client, siblings, modeling]
 ---
 
-
+In the previous chapter we introduced a basic Object Model for a messaging application, and some repositories to help with key generation, etc.  
 
 ###Choose Your Programming Language
 
@@ -20,7 +20,3 @@ Please select the language you'd like to proceed with.
 <li><a href="/dev/taste-of-riak/siblings-ruby/"><img src="/images/plangs/ruby.jpg" alt="Ruby"></a></li>
 <li><a href="/dev/taste-of-riak/siblings-python/"><img src="/images/plangs/python.png" alt="Python"></a></li>
 </ul>
-
-
-
-
