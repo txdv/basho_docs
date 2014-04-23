@@ -23,6 +23,28 @@ We'll begin with a `User` type that will house the following information about e
 
 And so we can begin constructing our data model by creating a `User` class that provides us getters and setters for each of those characteristics:
 
+```java
+public class User {
+  public String firstName;
+  public String lastName;
+  public String[] interests;
+  public int visits;
+  public boolean paidAccount;
+
+  public User(String firstName,
+              String lastName,
+              String[] interests,
+              int visits,
+              boolean paidAccount) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.interests = interests;
+    this.visits = visits;
+    this.paidAccount = paidAccount;
+  }
+}
+```
+
 ```ruby
 class User
   attr_accessor :first_name, :last_name, :interests, :visits, :paid_account
@@ -42,6 +64,14 @@ bill
 #<User:0x007fb7f7885408 @first_name="Bill", @last_name="Murray", @interests=["filming Caddyshack", "being smartly funny"], @visits=10>
 ```
 
+```java
+User bill = new User("Bill",
+                     "Murray",
+                     new String[] {"filming Caddyshack", "being smartly funny"},
+                     10,
+                     false);
+```
+
 Amongst the Riak [[Data Types]], a `User` is best modeled as a map, because maps can hold a variety of Data Types within them, in our case a few strings (best modeled as [[registers|Data Types#Registers]]), an array (best modeled as a [[set|Data Types#Set]]), and a Boolean (best modeled as a [[flag|Data Types#Flags]]). Maps can also house other maps, but that will not be covered in this tutorial.
 
 ## Connecting Our Data Model to Riak
@@ -52,6 +82,14 @@ Once the bucket type is ready (we'll name the bucket type `map_bucket` for our p
 
 ```ruby
 $client = Riak::Client.new(:host => 'localhost', :pb_port => 8087)
+```
+
+```java
+RiakNode node = new RiakNode.Builder()
+        .withRemoteAddress("localhost")
+        .withRemotePort(8087);
+RiakCluster cluster = new RiakCluster.Builder(node).build();
+RiakClient = new RiakClient(cluster);
 ```
 
 Now, we can begin connecting our data model to a Riak map. We'll do that creating a map whenever a new `User` object is created:
@@ -70,6 +108,28 @@ Riak::Crdt::DEFAULT_BUCKET_TYPES[:map] = 'map_bucket'
 # If this parameter is set, you no longer need to specify a bucket type when creating maps. The rest of this tutorial will proceed assum
 ```
 
+```java
+public class User {
+  final private String bucketType = "map_bucket";
+  private Location userMapLocation;
+
+  public String firstName;
+  // plus the other variables from the example above
+
+  public User(String firstName,
+              String lastName,
+              String[] interests,
+              int visits,
+              boolean paidAccount) {
+    this.firstName = firstName;
+    // plus the other variables from the example above
+    this.userMapLocation = new Location("<bucket>")
+            .setBucketType(this.bucketType)
+            .setKey("<key>");
+  }
+}
+```
+
 Note that we haven't specified under which key our map will be stored. In a key/value store like Riak, choosing a key is very important. We'll keep it simple here and use a string consisting of first and last name (separate by an underscore) as the key:
 
 ```ruby
@@ -79,6 +139,24 @@ class User
     @map = Riak::Crdt::Map.new($client.bucket 'users', @key)
   end
 end
+```
+
+```java
+public class User {
+  final private String bucketType = "map_bucket";
+  private Location userMapLocation;
+  private String key;
+
+  public String firstName;
+  // plus the other variables from the example above
+
+  public static void initialize(String firstName, String lastName) {
+    this.key = String.format("%s_%s", firstName, lastname);
+    this.userMapLocation = new Location("users")
+            .setBucketType(this.bucketType)
+            .setKey(this.key);
+  }
+}
 ```
 
 ## Storing An Object's Properties in Our Riak Map
@@ -94,6 +172,12 @@ class User
     @map.registers['last_name'] = last_name
   end
 end
+```
+
+```java
+public class User {
+  
+}
 ```
 
 Now, if we create a new user, that user will have a `map` instance variable attached to it, the `first_name` and `last_name` strings will be stored in Riak registers, and the key will be `Bruce_Wayne`:
