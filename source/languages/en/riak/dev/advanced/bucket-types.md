@@ -68,7 +68,7 @@ client.execute(store);
 ```
 
 ```python
-bucket = client.bucket('sensitive_user_data', bucket_type='no_siblings')
+bucket = client.bucket_type('no_siblings').bucket('sensitive_user_data')
 obj = RiakObject(client, bucket, 'user19735')
 obj.content_type = 'application/json'
 obj.data = '{ ... user data ... }'
@@ -155,8 +155,8 @@ client.execute(fetch2);
 ```
 
 ```python
-bucket1 = client.bucket('my_bucket', bucket_type='type1')
-bucket2 = client.bucket('my_bucket', bucket_type='type2')
+bucket1 = client.bucket_type('type1').bucket('my_bucket')
+bucket2 = client.bucket_type('type2').bucket('my_bucket')
 bucket1.get('my_key')
 bucket2.get('my_key')
 ```
@@ -202,7 +202,7 @@ client.execute(fetch2);
 ```
 
 ```python
-bucket1 = client.bucket('my_bucket', bucket_type='default')
+bucket1 = client.bucket_type('default').bucket('my_bucket')
 bucket2 = client.bucket('my_bucket')
 bucket1.get('my_key')
 bucket2.get('my_key')
@@ -330,7 +330,7 @@ client.execute(store);
 ```
 
 ```python
-bucket = client.bucket('old_memes', bucket_type='no_siblings')
+bucket = client.bucket_type('no_siblings').bucket('old_memes')
 obj = RiakObject(client, bucket, 'all_your_base')
 obj.content_type = 'text/plain'
 obj.data = 'all your base are belong to us'
