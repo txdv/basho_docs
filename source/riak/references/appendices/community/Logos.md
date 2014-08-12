@@ -6,6 +6,9 @@ document: appendix
 toc: true
 keywords: [community]
 moved: {
-  '1.4.0-': '/latest/community/riak-images'
+  '1.4.0-': '/community/riak-images'
 }
 ---
+
+This page is no longer valid. Please see our [[Riak Images]] page
+instead.
