@@ -18,3 +18,6 @@ key/value operations to Riak Search queries to Riak Data Type operations and mor
             OK
 
 + Response 404 (text/plain)
+
+## Bucket type properties [/types/{bucket_type}/props]
+### Get default bucket properties [GET]
