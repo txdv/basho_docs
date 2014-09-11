@@ -285,7 +285,8 @@ Metadata:    best-effort replication (asynchronous)
 
 ### Interpreting ensemble-status Output
 
-The following table provides a guide to `ensemble-status` output:
+The following table provides a general guide to `ensemble-status`
+output:
 
 Item | Meaning
 :----|:-------
@@ -309,6 +310,20 @@ The `ensemble-status` command also enables you to directly inspect the
 status of specific ensembles in a cluster. The IDs for all current
 ensembles are displayed in the `Ensembles` section of the
 `ensemble-status` output described above.
+
+The number of strong consistency ensembles that that are created in a
+cluster (and thus listed in the output of `riak-admin ensemble-status`)
+depends on two factors:
+
+1. The cluster's [[ring size|Clusters#The-Ring]], as set by the `ring_size` parameter
+2. The number of different `n_val`s in use in the cluster
+
+The total number of ensembles can be expressed as ring size times the
+number of different `n_val`s plus one (for the root ensemble responsible
+for certain orchestration tasks). If the ring size is 64 and the only
+`n_val` active in the cluster is, say, N=5, there will be 65 ensembles;
+if the ring size is 64 and there are three different `n_val`s active,
+say N=5, N=7, and N=9, there will be 193 ensembles; and so on.
 
 To inspect a specific ensemble, specify the ID:
 
