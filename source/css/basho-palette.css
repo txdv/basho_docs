@@ -23,7 +23,7 @@
   color: #3b4a5d;
 }
 
-.basho-dark-green, pre .function, pre .python .decorator, pre .python .title, pre .ruby .function .title, pre .ruby .title .keyword, pre .perl .sub, pre .javascript .title, pre .coffeescript .title {
+.basho-dark-green, pre .function, pre .python .decorator, pre .python .title, pre .ruby .function .title, pre .ruby .title .keyword, pre .perl .sub, pre .javascript .title, pre .c\#, pre .coffeescript .title {
   color: #5a7471;
 }
 
