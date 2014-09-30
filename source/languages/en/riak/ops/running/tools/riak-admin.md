@@ -96,6 +96,10 @@ riak-admin cluster plan
 
 #### cluster clear
 
+<div class="note"><div class="title">Notice</div>
+The <tt>riak-admin cluster clear</tt> command will stop Riak nodes that previously had not been part of a cluster. Restarting these nodes will enable them to rewrite their initial ring file.
+</div>
+
 Clear the currently staged cluster changes.
 
 ```bash
