@@ -1,0 +1,5 @@
+#!/bin/bash
+
+VERSION=$1
+
+s3cmd put s3://riakdocs.en/riak/$VERSION/ops/advanced/configs/configuration-files/index.html index.html
