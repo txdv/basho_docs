@@ -1,6 +1,0 @@
-- unless data.page.prev.present? || data.page.up.present? || data.page.next.present?
-  nav.breadcrumbs
-    ul
-      - bread_crumbs(current_page).each do |link|
-        - unless link.blank?
-          li== link

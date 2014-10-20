@@ -1,4 +1,0 @@
-- if data.page.keywords.present?
-  nav.keywords
-    h4== "#{I18n.t(:keywords)}:"
-    == data.page.keywords.map{|kw| "<a href=\"/keywords/"+kw+"/\">"+kw+"</a>"}.join(', ')
