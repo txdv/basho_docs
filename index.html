@@ -593,7 +593,7 @@ Number of vnodes, per physical node, allowed to perform handoff at once. (defaul
 </tr>
 <tr>
 <td align="left"><code>handlers</code></td>
-<td align="left">Allows the selection of log handlers with differing options.<ul><li><code>lager_console_backend</code> logs to the console, with the specified log level</li><li><code>lager_file_backend</code> logs to the given list of files, each with their own log level</li></ul>Lager can rotate its own logs or have it done via an external process. To use internal rotation, use the <code>size</code>, <code>date</code>, and <code>count</code> values in the file backend&#39;s config. See <code>crash_log_date</code> above for a description of the date field. Below is an example:<br /><br /><code>[{name, &quot;error.log&quot;}, {level, error}, {size, 10485760}, {date, &quot;$D0&quot;}, {count, 5}]</code></td>
+<td align="left">Allows the selection of log handlers with differing options.<ul><li><code>lager_console_backend</code> logs to the console, with the specified log level</li><li><code>lager_file_backend</code> logs to the given list of files, each with their own log level</li></ul>Lager can rotate its own logs or have it done via an external process. To use internal rotation, use the <code>size</code>, <code>date</code>, and <code>count</code> values in the file backend&#39;s config. See <code>crash_log_date</code> above for a description of the date field. Below is an example:<br /><br /><code>[{file, &quot;error.log&quot;}, {level, error}, {size, 10485760}, {date, &quot;$D0&quot;}, {count, 5}]</code></td>
 <td align="left"></td>
 </tr>
 <tr>
