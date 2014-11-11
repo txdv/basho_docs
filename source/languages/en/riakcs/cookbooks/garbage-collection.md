@@ -272,6 +272,11 @@ encapsulates the logic needed to retrieve the manifests, resolve any
 conflicts due to siblings, and write updated manifest versions back to
 Riak.
 
+<div class="note">
+<div class="title">Note on manifests and latency</div>
+
+</div>
+
 ## Object Block Reaping
 
 The actual deletion of the blocks of an object is managed by the
