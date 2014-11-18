@@ -5,6 +5,5 @@ VERSION=$1
 s3cmd put index.html \
     s3://riakdocs.en/riak/$VERSION/ops/advanced/configs/configuration-files/index.html \
     --mime-type='text/html; charset=utf-8' \
-    --cf-invalidate
 
 echo "Copied configuration files doc for version $VERSION"
