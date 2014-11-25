@@ -810,3 +810,33 @@ results['docs'][0]['first_name_register'] # u'Joan
 ```
 
 Success! We've now queried not just maps but also maps within maps.
+
+## Data Types with a Custom Schema
+
+All of the examples in the previous section involved storing Riak Data
+Types and then querying them using the default schema (which can be
+found
+[here](https://raw.githubusercontent.com/basho/yokozuna/develop/priv/default_schema.xml)).
+In this section, we'll show you how to query Data Types using custom
+schemas.
+
+The most important thing to note when using custom schemas is that the
+default schema restricts you to the data types listed [[above|Riak Data
+Types and Search#Data-Type-Schemas]]. This means that registers are
+indexed only as strings, sets only as multi-valued strings, and so on.
+What you cannot do with the default schema is index and query, say,
+registers as
+[date/time](https://cwiki.apache.org/confluence/display/solr/Working+with+Dates)
+information, sets as multi-valued
+[UUID](http://lucene.apache.org/solr/4_9_0/solr-core/org/apache/solr/schema/UUIDField.html)
+fields or counters as
+[currency](https://cwiki.apache.org/confluence/display/solr/Working+with+Currencies+and+Exchange+Rates),
+to give just a few examples. Those use cases require a custom schema.
+
+### Basic Structure of Custom Schemas
+
+A list of field types that are available by default in Solr can be found
+[here](https://cwiki.apache.org/confluence/display/solr/Field+Types+Included+with+Solr).
+While not all of these field types can be modeled as a counter, set,
+flag, register, or map, custom schemas do significantly expand the range
+of possible use cases for Riak Search and Data Types.
