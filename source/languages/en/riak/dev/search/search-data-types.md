@@ -180,7 +180,7 @@ client.create_search_index('scores', '_yz_default')
 riakc_pb_socket:create_search_index(Pid, <<"famous">>, <<"_yz_default">>, []).
 ```
 
-```bash
+```curl
 curl -XPUT $RIAK_HOST/search/index/hobbies \
   -H 'Content-Type: application/json' \
   -d '{"schema":"_yz_default"}'
@@ -367,7 +367,7 @@ client.execute(storeIndex);
 client.create_search_index('hobbies', '_yz_default')
 ```
 
-```bash
+```curl
 curl -XPUT $RIAK_HOST/search/index/hobbies \
   -H 'Content-Type: application/json' \
   -d '{"schema": "_yz_default"}'
@@ -840,3 +840,112 @@ A list of field types that are available by default in Solr can be found
 While not all of these field types can be modeled as a counter, set,
 flag, register, or map, custom schemas do significantly expand the range
 of possible use cases for Riak Search and Data Types.
+
+### Example 1: Registers and Date/Time Information
+
+Add to baseline schema:
+
+```xml
+<dynamicField name="datetime_register" type="datetime" indexed="true" stored="true" />
+```
+
+Add the schema to Solr:
+
+```curl
+curl -XPUT $RIAK_HOST/search/schema/sensor_data_schema \
+     -H 'Content-Type: application/xml' \
+     --data-binary @sensor_data_schema.xml
+```
+
+Create an index that uses the schema:
+
+```curl
+curl -XPUT $RIAK_HOST/search/index/sensor_data_index \
+     -H 'Content-Type: application/json' \
+     -d '{"schema": "sensor_data_schema"}'
+```
+
+Create a bucket type to associate with the index:
+
+```bash
+riak-admin bucket-type create sensor_data \
+  '{"props":{"datatype":"map", "search_index":"sensor_data_index"}}'
+riak-admin bucket-type activate sensor_data
+```
+
+Store some sensor data in maps:
+
+```java
+Namespace moistureSensorBucket = new Namespace("sensor_data", "moisture_sensor");
+String time = new SimpleDateFormat("YYYY-MM-DD HH:MM:SSZ").format(new Date());
+
+Location reading1 = new Location(moistureSensorBucket, "reading1");
+MapUpdate mu1 = new MapUpdate()
+        .update("value", new CounterUpdate(178))
+        .update("datetime", new RegisterUpdate(time));
+
+Location reading2 = new Location(moistureSensorBucket, "reading2");
+MapUpdate mu2 = new MapUpdate()
+        .update("value", new CounterUpdate(231))
+        .update("datetime", new RegisterUpdate(time));
+
+UpdateMap update1 = new UpdateMap.Builder(reading1, mu1).build();
+UpdateMap update2 = new UpdateMap.Builder(reading2, mu2).build();
+```
+
+```ruby
+bucket = client.bucket('moisture_sensor')
+sensor_reading1 = Riak::Crdt::Map.new(bucket, 'reading1', 'sensor_data')
+sensor_reading1.batch do |m|
+  m.counters['value'].increment(178)
+  m.registers['datetime'] = Time.now.to_s
+end
+
+sensor_reading2 = Riak::Crdt::Map.new(bucket, 'reading2', 'sensor_data')
+sensor_reading2.batch do |m|
+  m.counters['value'].increment()
+  m.registers['datetime'] = Time.now.to_s
+end
+
+```
+
+```python
+from riak.datatypes import Map
+import datetime
+
+bucket = client.bucket_type('sensor_data').bucket('moisture_sensor')
+sensor_reading1 = Map(bucket, 'reading1')
+sensor_reading1.counters['value'].increment(178)
+sensor_reading1.registers['datetime'].assign(str(datetime.datetime.now()))
+sensor_reading1.store()
+
+sensor_reading2 = Map(bucket, 'reading2')
+sensor_reading2.counters['value'].increment(231)
+sensor_reading2.registers['datetime'].assign(str(datetime.datetime.now()))
+sensor_reading2.store()
+```
+
+Now we can query to see how many sensors have a `datetime` register:
+
+```java
+String index = "sensor_data_index";
+String query = "datetime_register:*";
+SearchOperation searchOp = new SearchOperation
+        .Builder(BinaryValue.create(index), query)
+        .build();
+cluster.execute(searchOp);
+SearchOperation.Response results = searchOp.get();
+int numberFound = results.numResults();
+```
+
+```ruby
+client.search('sensor_data_index', 'datetime_register:*')
+```
+
+```python
+client.fulltext_search('sensor_data_index', 'datetime_register:*')
+```
+
+```curl
+curl "$RIAK_HOST/search/query?wt=json&q=datetime_register:*"
+```
