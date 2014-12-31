@@ -22,9 +22,7 @@ There are two things that you should note:
 1. Many of these statistics will appear only on the current
    leader node
 2. The counts for all statistics will be reset to 0 upon restarting Riak
-   Riak Enterprise unless otherwise noted
-
-{{1.3.0+}}
+   Enterprise unless otherwise noted
 
 Field | Description
 :-----|:----------
@@ -195,7 +193,7 @@ Field | Description
 Field | Description
 ------|------------
 `node` | A unique ID for the Riak node that the source is running on
-`site` | The connected site (sink) name configured with. *Warning: This will be renamed in a future version of Riak*.
+`site` | The connected site (sink) name configured with. **Warning**: This will be renamed in a future version of Riak.
 `strategy` | A replication strategy defines an implementation of the Riak Replication protocol. Valid values: `keylist`, `syncv1`.
 `fullsync_worker` | The Erlang process ID of the fullsync worker
 `bounded_queue` | See <a href="/ops/mdc/statistics/#Bounded-Queue">Bounded Queue</a>
