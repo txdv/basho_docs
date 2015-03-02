@@ -51,7 +51,7 @@ You will see a list of that form for each of the following operations:
 Operation | Description
 :---------|:-----------
 `block_get` | Total BLOCK GET operations performed
-`block_put` | Total BLOCK GET operations performed
+`block_put` | Total BLOCK PUT operations performed
 `block_delete` | Total BLOCK DELETE operations performed
 `service_get_buckets` | Total GET BUCKETS operations performed
 `bucket_list_keys` | Total BUCKET LIST KEYS operations performed
@@ -65,6 +65,8 @@ Operation | Description
 `object_delete` | Total OBJECT DELETE operations performed
 `object_get_acl` | Total OBJECT GET ACL operations performed
 `object_put_acl` | Total OBJECT PUT ACL operations performed
+
+Times are expressed in microseconds.
 
 ## DTrace Probes
 
